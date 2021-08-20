@@ -20,59 +20,59 @@ import Header from "../components/Header";
 export default {
   name: "Index",
   components: {Header},
-  mounted(){
-    this.init();
-    var documentHeight = 0;
-    $("aside").css({
-      marginTop: 0
-    });
-    var topPadding = 15;
-    $(function() {
-      var offset = $("aside").offset();
-      documentHeight = $(document).height();
-      $(window).off('scroll');
-      $(window).scroll(function() {
-        var sideBarHeight = $("aside").height();
-        if($("aside").height() >= $("main").height()){
-          return;
-        }
-        if($(window).height() <= $("aside").height()+topPadding){
-          if ($(window).scrollTop()+$(window).height() > offset.top+$("aside").height()) {
-            var newPosition = ($(window).scrollTop() - offset.top + $(window).height() - $("aside").height()) - 50;
-            if(newPosition > $("main").height() + topPadding  - $(window).height() + 60){
-              let p = $("main").height() + topPadding  - $(window).height() + 60;
-              $("aside").stop().animate({
-                marginTop: p
-              });
-            }
-            else{
-              $("aside").stop().animate({
-                marginTop: newPosition
-              });
-            }
-          }
-          else {
-            $("aside").stop().animate({
-              marginTop: 0
-            });
-          };
-        }
-        else{
-          if($(window).scrollTop()>offset.top){
-            var newPosition = ($(window).scrollTop() - offset.top) + topPadding + 60;
-            $("aside").stop().animate({
-              marginTop: newPosition
-            });
-          }
-          else {
-            $("aside").stop().animate({
-              marginTop: 0
-            });
-          }
-        }
-      });
-    });
-  },
+  // mounted(){
+  //   this.init();
+  //   var documentHeight = 0;
+  //   $("aside").css({
+  //     marginTop: 0
+  //   });
+  //   var topPadding = 15;
+  //   $(function() {
+  //     var offset = $("aside").offset();
+  //     documentHeight = $(document).height();
+  //     $(window).off('scroll');
+  //     $(window).scroll(function() {
+  //       var sideBarHeight = $("aside").height();
+  //       if($("aside").height() >= $("main").height()){
+  //         return;
+  //       }
+  //       if($(window).height() <= $("aside").height()+topPadding){
+  //         if ($(window).scrollTop()+$(window).height() > offset.top+$("aside").height()) {
+  //           var newPosition = ($(window).scrollTop() - offset.top + $(window).height() - $("aside").height()) - 50;
+  //           if(newPosition > $("main").height() + topPadding  - $(window).height() + 60){
+  //             let p = $("main").height() + topPadding  - $(window).height() + 60;
+  //             $("aside").stop().animate({
+  //               marginTop: p
+  //             });
+  //           }
+  //           else{
+  //             $("aside").stop().animate({
+  //               marginTop: newPosition
+  //             });
+  //           }
+  //         }
+  //         else {
+  //           $("aside").stop().animate({
+  //             marginTop: 0
+  //           });
+  //         };
+  //       }
+  //       else{
+  //         if($(window).scrollTop()>offset.top){
+  //           var newPosition = ($(window).scrollTop() - offset.top) + topPadding + 60;
+  //           $("aside").stop().animate({
+  //             marginTop: newPosition
+  //           });
+  //         }
+  //         else {
+  //           $("aside").stop().animate({
+  //             marginTop: 0
+  //           });
+  //         }
+  //       }
+  //     });
+  //   });
+  // },
 }
 </script>
 

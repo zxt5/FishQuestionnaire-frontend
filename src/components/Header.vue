@@ -7,7 +7,7 @@
         @select="handleSelect"
         background-color="#fff"
         text-color="#333"
-        active-text-color="purple">
+        active-text-color="#3F87DA">
       <h1>
         <a class="logo" @click="$router.push({path:'/index'})"></a>
       </h1>
@@ -20,7 +20,7 @@
         </span>
         <el-dropdown @command="handleCommand"  v-else>
           <span class="el-dropdown-link" @click="">
-            <el-avatar :src="avatar">{{username}}</el-avatar>
+            <el-avatar>{{username}}</el-avatar>
           </span>
           <el-dropdown-menu slot="dropdown">
 <!--            <el-dropdown-item command="toCenter">个人空间</el-dropdown-item>-->
@@ -112,13 +112,13 @@ export default {
                   .get('/api/user/' + response[1] + '/')
                   .then(function (response) {
                     const data = response.data;
-                    that.avatar = data.profile.avatar;
+                    // that.avatar = data.profile.avatar;
                     that.username = data.username;
-                    that.id = data.profile.id;
+                    // that.id = data.profile.id;
                     // console.log('header ' + that.username);
                   })
                   .catch(function (error){
-                    this.$notify.error({
+                    that.$notify.error({
                       title: '好像发生了什么错误',
                       message: error.message
                     })
