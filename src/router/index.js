@@ -2,8 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from "../views/Login"
 import Register from "../views/Register";
-import Index from "../views/Index"
-
+import Index from  "../views/Index"
+import Questionnairs from "../components/Questionnairs"
 
 Vue.use(VueRouter)
 
@@ -26,7 +26,13 @@ const routes = [
   {
     path: '/index',
     name: 'Index',
-    component: Index
+    component: Index,
+    children:[
+      {
+      path: '/questionnairs',
+      component: Questionnairs
+      }
+    ]
   },
   {
     path: '/about',
