@@ -1,10 +1,32 @@
 <template>
 <div >
-      <!-- 头部盒子 -->
+      <!--主题内容区域-->
         <el-container class="main">
           <el-container>
-            <el-aside width="300px" style="height: fit-content">
-              侧边栏
+            <!--侧边栏区域-->
+            <el-aside>
+              <div class="aside-top">
+                <span> 题型选择 </span>
+              </div>
+              <el-menu 
+                background-color="#fff"
+                text-color="#18927B"
+                active-text-color="#000"
+              >
+              <!--一级菜单-->
+              <el-submenu v-for="item in menuList" :key="item.type" :index="item.type">
+                <template slot="title">
+                  <span>{{item.name}}</span>
+                </template>
+                  <!--二级菜单-->
+                  <el-menu-item v-for="subItem in item.children" :key="subItem.type" :index="subItem.type">
+                     <template slot="title">
+                      <span>{{subItem.name}}</span>
+                     </template>
+                  </el-menu-item>
+              </el-submenu>
+              
+            </el-menu>
             </el-aside>
             <el-main style="height: fit-content">
               <router-view></router-view>
@@ -13,13 +35,12 @@
           </el-container>
         </el-container>
         <!-- 波浪区域 -->
-        <div>
+        <footer class="wavefooter">
             <!-- svg 形状 -->
             <svg class="waves" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
-                <!-- 形状容器 -->
+                <!-- ,,形状容器 -->
                 <defs>
-                    <path id="gentle-wave"
-                        d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                    <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
                 </defs>
                 <!-- 组合形状 -->
                <g class="parallax">
@@ -29,68 +50,41 @@
                 <use xlink:href="#gentle-wave" x="48" y="7" fill="rgba(118, 218, 255, 0.1)" />
               </g>
             </svg>
-        </div>
-        <div class="test">最底部</div>
+        </footer>
 </div>
 </template>
 
 <script>
-import Header from "../components/Header";
 export default {
-  name: "Index",
-  components: {Header},
-  mounted(){
-    this.init();
-    var documentHeight = 0;
-    $("aside").css({
-      marginTop: 0
-    });
-    var topPadding = 15;
-    $(function() {
-      var offset = $("aside").offset();
-      documentHeight = $(document).height();
-      $(window).off('scroll');
-      $(window).scroll(function() {
-        var sideBarHeight = $("aside").height();
-        if($("aside").height() >= $("main").height()){
-          return;
-        }
-        if($(window).height() <= $("aside").height()+topPadding){
-          if ($(window).scrollTop()+$(window).height() > offset.top+$("aside").height()) {
-            var newPosition = ($(window).scrollTop() - offset.top + $(window).height() - $("aside").height()) - 50;
-            if(newPosition > $("main").height() + topPadding  - $(window).height() + 60){
-              let p = $("main").height() + topPadding  - $(window).height() + 60;
-              $("aside").stop().animate({
-                marginTop: p
-              });
+  data(){
+    return {
+      menuList:[
+        {
+          name: "选择题",
+          type: "choice",
+          children:[
+            {
+              name: "单选题",
+              type: "single-choice",
+            },
+            {
+              name: "多选题",
+              type: "mutiple-choice",
             }
-            else{
-              $("aside").stop().animate({
-                marginTop: newPosition
-              });
+          ]
+        },
+        {
+          name: "填空题",
+          type: "completion",
+          children:[
+            {
+            name: "单项填空",
+            type: "single-completion"
             }
-          }
-          else {
-            $("aside").stop().animate({
-              marginTop: 0
-            });
-          };
+          ]
         }
-        else{
-          if($(window).scrollTop()>offset.top){
-            var newPosition = ($(window).scrollTop() - offset.top) + topPadding + 60;
-            $("aside").stop().animate({
-              marginTop: newPosition
-            });
-          }
-          else {
-            $("aside").stop().animate({
-              marginTop: 0
-            });
-          }
-        }
-      });
-    });
+      ]
+    }
   },
 }
 </script>
@@ -98,17 +92,26 @@ export default {
 
 <style scoped>
 
+.aside-top{
+  text-align: center;
+  margin-bottom: 5pt;
+  font-size: 14pt;
+  font: bolder;
+}
 
 .main{
-  width: 1500px;
-  margin: 40px auto auto;
+  width: 90%;
+  padding-left: 10%;
+  align-items: center;
+  margin-top: 20pt; 
 }
 
 .el-aside {
   background-color: #D3DCE6;
-  color: #333;
   text-align: center;
-  line-height: 200px;
+  margin-top: 0%;
+  padding-top: 10pt;
+  border-radius: 3%;
 }
 
 .el-main {
@@ -117,18 +120,19 @@ export default {
   text-align: center;
   line-height: 360px;
   height: 80%;
+  border-radius: 10px;
+  margin-left: 15pt;
   /*padding-top: 50px;*/
 }
 
-
-.el-container:nth-child(5) .el-aside,
-.el-container:nth-child(6) .el-aside {
-  line-height: 260px;
+.el-menu{
+  position: relative;
+  top: 0;
+  width: 100%;
+  border-right: none;
 }
 
-.el-container:nth-child(7) .el-aside {
-  line-height: 320px;
-}
+/* 背景相关的样式 */
 
 html, body {
     margin: 0;
@@ -181,5 +185,10 @@ h1 {
     100% {
         transform: translate3d(85px,0,0);
     }
+}
+.wavefooter{
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
 </style>

@@ -4,9 +4,6 @@
     </el-card>
 </template>
 <style lang="less" scoped>
-.questionnairs{
-    transform: ;
-}
 
 </style>
 <script>
