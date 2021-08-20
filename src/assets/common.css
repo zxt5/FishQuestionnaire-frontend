@@ -1,0 +1,137 @@
+.mid {
+    margin-top:62px !important;
+}
+
+.el-aside {
+    color: #333;
+    padding-top:50px;
+    padding-bottom:30px;
+}
+
+.el-main {
+    color: #333;
+    padding-top:50px !important;
+    margin-right:10px;
+    margin-left:5px;
+    width:auto;
+    /*box-shadow: 0 2px 12px 1px rgba(0, 0, 0, 0.1);*/
+    background-color: #fff;
+    border-radius: 1px;
+    padding-left:0;
+    padding-right:0;
+}
+
+.book_type{
+    width:auto;
+    box-shadow: 0 2px 12px 1px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.mid {
+    margin-bottom: 40px;
+    width:1500px;
+    margin:0 auto;
+}
+
+@media (max-width: 1560px){
+    .mid{
+        width:1250px;
+    }
+}
+
+@media (max-width: 1320px){
+    .mid{
+        width:1000px;
+    }
+}
+
+.clear_both{
+    clear: both !important;
+    float: none !important;
+}
+
+h1:focus, a:focus{
+    outline: none;
+}
+
+
+.not_found{
+    text-align: center !important;
+    color: #aaa;
+    line-height: 200px;
+
+    background-color: #fff;
+    width: 100%;
+    border-radius: 15px;
+    margin: 0 0 10px;
+    position: relative;
+    box-shadow: 0 2px 12px 1px rgba(0, 0, 0, 0.1);
+}
+
+.pointer{
+    cursor:pointer;
+}
+
+.cur_def, .curdef{
+    cursor: default;
+}
+
+.user_option:hover, .user_option:active, .user_option--active{
+    color:#e67b79;
+    transition: none;
+}
+
+.user_option--noactive{
+    color:#333;
+    transition: none;
+}
+
+.user_option>>>.el-input__icon{
+    transition: none !important;
+}
+
+.loading_bar{
+    position: fixed;
+    top:60px;
+    left:-6px;
+    width:calc(100vw + 11px);
+    transition: 0.1s opacity linear;
+    height:3px
+}
+
+.loading_bar_done{
+    opacity: 0;
+}
+
+.no_choose{
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    cursor:default;
+}
+
+.member{
+    color:hsl(1, 69%, 69%);
+    font-size: inherit;
+}
+
+.more{
+    cursor:pointer
+  }
+
+.more:hover{
+    color:hsl(1, 69%, 69%);
+}
+
+.icon_member{
+    width: 21px;
+}
+
+.member_color{
+    color:hsl(45, 78%, 56%);
+}
+
+.member_color:hover{
+    color:hsl(45, 78%, 69%) !important;
+}
