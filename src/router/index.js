@@ -3,7 +3,8 @@ import VueRouter from 'vue-router'
 import Login from "../views/Login"
 import Register from "../views/Register";
 import Index from "../views/Index"
-
+import Questionnaire from "../components/Questionnaire"
+import RecycleBin from "../components/RecycleBin";
 
 Vue.use(VueRouter)
 
@@ -11,7 +12,7 @@ const routes = [
   {
     path: '/',
     name: 'Index',
-    component: Index
+    component: Index,
   },
   {
     path: '/login',
@@ -26,7 +27,25 @@ const routes = [
   {
     path: '/index',
     name: 'Index',
-    component: Index
+    component: Index,
+    children: [
+      {
+        path: 'questionnaires',
+        name: 'Questionnaire',
+        component: Questionnaire,
+        meta: {
+          title: '全部问卷',
+        }
+      },
+      {
+        path: 'recycle',
+        name: 'RecycleBin',
+        component: RecycleBin,
+        meta: {
+          title: '回收站',
+        }
+      },
+    ]
   },
   {
     path: '/about',

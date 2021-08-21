@@ -2,24 +2,76 @@
   <div>
     <el-container class="main">
       <el-container>
-        <el-aside width="300px" style="height: fit-content">
-          侧边栏
+        <el-aside width="23%" style="height: fit-content;">
+
+          <el-container class="class">
+            <div @click="editBlog" style="margin-left: 0px">
+              <el-button class="button" circle>
+                <i class="el-icon-edit"></i>
+              </el-button>
+              <h4>创建问卷</h4>
+            </div>
+          </el-container>
+
+          <el-menu
+              default-active="1"
+              class="el-menu-vertical-demo">
+            <el-menu-item index="1" @click="toQuestionnaire()">
+              <i class="el-icon-document"></i>
+              <span slot="title">个人问卷</span>
+            </el-menu-item>
+            <el-menu-item index="2" @click="toRecycleBin()">
+              <i class="el-icon-delete"></i>
+              <span slot="title">回收站</span>
+            </el-menu-item>
+          </el-menu>
+
         </el-aside>
-        <el-main style="height: fit-content">
+        <el-main>
           <router-view/>
-          列表视图
         </el-main>
       </el-container>
     </el-container>
   </div>
-
 </template>
 
 <script>
 import Header from "../components/Header";
+import Questionnaire from "../components/Questionnaire";
+import RecycleBin from "../components/RecycleBin";
 export default {
   name: "Index",
-  components: {Header},
+  components: {Questionnaire, Header},
+  data() {
+    return {
+      info: {},
+      avatar: null,
+      name: '',
+      content: '',
+      uid: 0,
+      identity: localStorage.getItem('identity.myblog')
+    }
+  },
+  methods: {
+    toBook(){
+      this.$router.push({path: '/book'});
+    },
+    editBlog(){
+      this.$router.push({path: '/edit/discuss'});
+    },
+    toGroupIndex(){
+      this.$router.push({path: '/group/index'});
+    },
+    toDiscuss(){
+      this.$router.push({path: '/group/discuss'});
+    },
+    toQuestionnaire(){
+      this.$router.push({path: '/index/questionnaires'})
+    },
+    toRecycleBin(){
+      this.$router.push({path: '/index/recycle'})
+    }
+  },
   // mounted(){
   //   this.init();
   //   var documentHeight = 0;
@@ -76,27 +128,110 @@ export default {
 }
 </script>
 
+
 <style scoped>
 @import url("../assets/common.css");
 
 .main{
-  width: 1500px;
-  margin: 40px auto auto;
+  width: 80%;
+  margin: 40px auto 40px;
 }
 
-.el-aside {
-  background-color: #D3DCE6;
+.el-icon-reading, .el-icon-edit{
+  font-size: 30px;
+}
+
+.button {
+  background-image: linear-gradient(to right, #0250c5, #d43f8d);
+  color: white;
+  opacity: 0.6;
+  height: 60px;
+  width: 60px;
+  margin: 10px;
+  /*border-radius : 50%;*/
+}
+
+.button:hover{
+  background-color: #d43f8d;
+}
+
+.el-aside{
+  background-color:transparent;
   color: #333;
-  text-align: center;
-  line-height: 200px;
+  padding-top:0 !important;
+  padding-bottom:30px;
 }
 
 .el-main {
-  background-color: #E9EEF3;
+  background-color: transparent;
+  margin: 0 20px 0;
+  border-radius: 15px;
+  opacity: 0.9;
   color: #333;
+  height: fit-content;
+  padding-top: 0 !important;
+  padding-bottom: 0;
+}
+
+.el-button--mini, .el-button--small {
+  font-size: 20px !important;
+}
+
+body > .el-container {
+  margin-bottom: 40px;
+}
+
+.el-container:nth-child(5) .el-aside,
+.el-container:nth-child(6) .el-aside {
+  line-height: 260px;
+}
+
+.el-container:nth-child(7) .el-aside {
+  line-height: 320px;
+}
+
+.class {
+  background-color: white;
+  opacity: 0.9;
+  border-radius: 10px;
+  padding: 25px 10px 20px;
   text-align: center;
-  line-height: 360px;
-  /*padding-top: 50px;*/
+  justify-content: center;
+}
+
+.el-icon-reading, .el-icon-edit{
+  font-size: 30px;
+}
+
+.el-menu {
+  padding-top: 10px;
+  margin-top: 10px !important;
+  border-radius: 10px;
+  padding-bottom: 10px;
+}
+.el-card {
+  border-radius: 10px;
+}
+
+
+.el-aside {
+  background-color: transparent;
+  color: #333;
+  padding-top:0 !important;
+  padding-bottom:30px;
+  /*border-radius: 15px;*/
+  opacity: 0.9;
+  /*line-height: 200px;*/
+}
+.el-main {
+  /*background-color: black;*/
+  margin: 0 20px 0;
+  border-radius: 10px;
+  opacity: 0.9;
+  color: #333;
+  height: fit-content;
+  padding-top: 0 !important;
+  padding-bottom: 0;
 }
 
 body > .el-container {

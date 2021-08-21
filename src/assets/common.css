@@ -72,7 +72,7 @@ h1:focus, a:focus{
     cursor:pointer;
 }
 
-.cur_def, .curdef{
+.cur_def{
     cursor: default;
 }
 

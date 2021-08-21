@@ -119,7 +119,7 @@ export default {
                   })
                   .catch(function (error){
                     that.$notify.error({
-                      title: '好像发生了什么错误',
+                      title: '好像发生什么错误',
                       message: error.message
                     })
                   })

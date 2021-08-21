@@ -134,7 +134,7 @@ export default {
                }
             }
             that.$notify.error({
-              title: '好像发生了什么错误',
+              title: '好像发生什么错误',
               message: msg,
             })
           });
