@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import Login from "../views/Login"
 import Register from "../views/Register";
 import Index from  "../views/Index"
-import Questionnairs from "../components/Questionnairs"
+import Questionnairs from "../views/Questionnairs"
 
 Vue.use(VueRouter)
 
@@ -27,12 +27,6 @@ const routes = [
     path: '/index',
     name: 'Index',
     component: Index,
-    children:[
-      {
-      path: '/questionnairs',
-      component: Questionnairs
-      }
-    ]
   },
   {
     path: '/about',
@@ -41,7 +35,12 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  }
+  },
+  {
+    path: '/questionnairs',
+    name: 'Questionnairs',
+    component: Questionnairs,
+  },
 ]
 
 const router = new VueRouter({

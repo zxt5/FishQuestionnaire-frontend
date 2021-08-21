@@ -5,28 +5,7 @@
           <el-container>
             <!--侧边栏区域-->
             <el-aside>
-              <div class="aside-top">
-                <span> 题型选择 </span>
-              </div>
-              <el-menu 
-                background-color="#fff"
-                text-color="#18927B"
-                active-text-color="#000"
-              >
-              <!--一级菜单-->
-              <el-submenu v-for="item in menuList" :key="item.type" :index="item.type">
-                <template slot="title">
-                  <span>{{item.name}}</span>
-                </template>
-                  <!--二级菜单-->
-                  <el-menu-item v-for="subItem in item.children" :key="subItem.type" :index="subItem.type">
-                     <template slot="title">
-                      <span>{{subItem.name}}</span>
-                     </template>
-                  </el-menu-item>
-              </el-submenu>
-              
-            </el-menu>
+
             </el-aside>
             <el-main style="height: fit-content">
               <router-view></router-view>
