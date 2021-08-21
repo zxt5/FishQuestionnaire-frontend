@@ -113,7 +113,7 @@ export default {
                   .then(function (response) {
                     const data = response.data;
                     // that.avatar = data.profile.avatar;
-                    that.username = data.username;
+                    that.username = data.username.substr(0, 2).toUpperCase();
                     // that.id = data.profile.id;
                     // console.log('header ' + that.username);
                   })
