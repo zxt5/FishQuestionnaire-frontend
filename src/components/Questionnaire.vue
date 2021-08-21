@@ -7,17 +7,40 @@
       </div>
       <div class="a_block" v-for="item in info" :key="item" >
         <h1 @click="toDiscuss(item.id)">
-<!--          <el-tag class="label" type="success">讨论</el-tag>-->
-          <el-tag v-for="tag in item.tags" key="tag" class="label">{{tag}}</el-tag>
+          <el-tag class="label" v-if="item.mode === 'closed'">未发布</el-tag>
+          <el-tag class="label" type="success" v-if="item.mode === 'shared'">已发布</el-tag>
+          <el-tag class="label" type="danger" v-if="item.mode === 'deleted'">已删除</el-tag>
+<!--          <el-tag v-for="tag in item.tags" key="tag" class="label">{{tag}}</el-tag>-->
           <span style="display: inline-block; width: 3px"></span>
           <a>{{item.title}}</a>
         </h1>
-        <div class="intro">{{item.body}}</div>
+        <div style="float:right !important;">
+          <v-icon small style="vertical-align: center">mdi-file-document-multiple-outline</v-icon>  {{ item.answer_num }}
+        </div>
+        <div class="intro">{{item.content}}</div>
+
         <div class="footer">
-<!--          <div class="author" @click="toCenter(item.author.username)">-->
-<!--            <span style="line-height: 28px; vertical-align: middle;display: inline-block;height: 28px; margin-right:3px">{{item.author.username}}</span>-->
-<!--            <el-avatar :src="item.author.avatar ? item.author.avatar : ''" size="small" style="vertical-align: middle; opacity: 0.9"></el-avatar>-->
-<!--          </div>-->
+          <div class="op cur_def">
+            <ul>
+              <li><v-icon small>mdi-motion-play-outline</v-icon>  发布</li>
+              <li><v-icon small>mdi-content-copy</v-icon>  复制</li>
+              <li><v-icon small>mdi-delete-variant</v-icon>  删除</li>
+            </ul>
+            <el-dropdown style="margin-top: 5px" @command="handleCommand" >
+              <span class="el-dropdown-link">
+               更多<i class="el-icon-arrow-down el-icon--right"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="a">编辑</el-dropdown-item>
+                <el-dropdown-item command="b">分享</el-dropdown-item>
+                <el-dropdown-item command="e" divided>统计</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+            <div class="created">
+              {{ formatted_time(item.create_date) }}
+            </div>
+          </div>
+
         </div>
         <div class="clear_both"></div>
       </div>
@@ -30,28 +53,53 @@ import axios from "axios";
 export default {
   data(){
     return {
+      info: [
+        {
+          id: 1,
+          title: '测试问卷',
+          content: '求求各位姥爷填一下小的问卷吧',
+          create_date : '2021-08-21 16:00',
+          mode : 'closed',
+          answer_num: 123,
+        },
+        {
+          id: 2,
+          title: '测试问卷',
+          content: '求求各位姥爷填一下小的问卷吧',
+          create_date : '2021-08-21 16:00',
+          mode : 'shared',
+          answer_num: 456,
+        },
+        {
+          id: 3,
+          title: '测试问卷',
+          content: '求求各位姥爷填一下小的问卷吧',
+          create_date : '2021-08-21 16:00',
+          mode : 'deleted',
+          answer_num: 789,
+        },
+      ],
+      avatar: '',
       is_final: true,
       cur_page: 0,
       max_num: 8,
       total: 0,
       loading: false,
-      info: [
-        {
-          id: 1,
-          title: '测试问卷',
-          tags: ['未发布'],
-          body: '测试内容',
-        },
-      ],
-      avatar: '',
     }
   },
   methods: {
+    formatted_time: function (iso_date_string) {
+      const date = new Date(iso_date_string);
+      return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+    },
     toDiscuss(id){
       this.$router.push({path: '/discuss/' + id});
     },
     toCenter(username){
       this.$router.push({path: '/center/' + username});
+    },
+    handleCommand(command) {
+      this.$message('click on item ' + command);
     }
   },
   // mounted() {
@@ -100,6 +148,7 @@ export default {
   font-size:20px;
   width: fit-content;
   cursor: pointer;
+  display: inline-block;
 }
 
 h1:hover{
@@ -114,13 +163,11 @@ h1:hover{
   line-height: 1.5em;
 }
 
-.footer{
-  line-height: 18px;
-}
 
 .op{
   margin-top:15px;
   font-size:15px;
+  vertical-align: text-top;
 }
 
 .op ul{
@@ -174,5 +221,27 @@ h1:hover{
   border-bottom: 2px solid purple;
   padding-bottom: 20px;
   margin-bottom: 10px;
+}
+.created {
+  line-height: 28px;
+  color: darkblue;
+  font-size: small;
+  float: right;
+  display: flex;
+  justify-content: space-between;
+}
+.footer{
+  line-height: 18px;
+}
+.op{
+  margin-top:15px;
+  font-size:15px;
+}
+.el-dropdown-link {
+  cursor: pointer;
+  color: #409EFF;
+}
+.el-icon-arrow-down {
+  font-size: 12px;
 }
 </style>

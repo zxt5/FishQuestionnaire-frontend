@@ -29,7 +29,7 @@ const routes = [
     component: Index,
     children: [
       {
-        path: '/index/questionnaires',
+        path: 'questionnaires',
         name: 'Questionnaire',
         component: Questionnaire,
         meta: {
