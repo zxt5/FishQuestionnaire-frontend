@@ -13,19 +13,8 @@
     <div class="questionnaire">
       <!--标题-->
       <h1 class="title">{{title}}</h1>
-      <!-- 题目内容 -->
-      <!--      <div class="question_block">-->
-      <!--        &lt;!&ndash; 单选题 &ndash;&gt;-->
-      <!--        <div class="choice_question" style="margin-top: 20px">-->
-      <!--          <p>1.例题：今天开发几小时？</p>-->
-      <!--          <div style="padding-left: 20px;margin-top: 10px">-->
-      <!--            <div> <el-radio v-model="radio" label="1" style="margin-top: 10px">2h</el-radio></div>-->
-      <!--            <div> <el-radio v-model="radio" label="2" style="margin-top: 10px">4h</el-radio> </div>-->
-      <!--            <div> <el-radio v-model="radio" label="3" style="margin-top: 10px">8h</el-radio> </div>-->
-      <!--            <div> <el-radio v-model="radio" label="4" style="margin-top: 10px">根本不开发</el-radio> </div>-->
-      <!--          </div>-->
-      <!--        </div>-->
-      <el-card class="question_block" v-for="(item,index) in questionList">
+
+      <div class="question_block" v-for="(item,index) in questionList">
         <div slot="header" class="clearfix">
           <div class="questionTitle">
             <!--显示必填标识-->
@@ -38,14 +27,14 @@
         </div>
 
         <!--单选题展示-->
-        <div class="text item" v-if="item.type=='single-choice'" v-for="optionItem in item.option">
+        <div class="single_choice" v-if="item.type=='single-choice'" v-for="optionItem in item.option_list">
 <!--          这里根据哪个属性记录用户的选择还不明确-->
-          <el-radio v-model="item.radioValue" :label="optionItem.id" style="margin: 5px;">{{ optionItem.title }}</el-radio>
+          <el-radio v-model="single" :label="1" style="margin: 5px;">{{ optionItem.title }}</el-radio>
         </div>
 
         <!--多选题展示-->
-        <el-checkbox-group v-if="item.type=='multiple-choice'" v-model="item.checkboxValue">
-          <div class="text item"  v-for="optionItem in item.options">
+        <el-checkbox-group v-if="item.type=='multiple-choice'" v-model="multiple">
+          <div class="multiple_choice"  v-for="optionItem in item.option_list">
             <el-checkbox :label="optionItem.id" style="margin: 5px;">{{ optionItem.title }}</el-checkbox>
           </div>
         </el-checkbox-group>
@@ -59,7 +48,7 @@
 <!--            resize="none">-->
 <!--        </el-input>-->
 
-      </el-card>
+      </div>
 
       <!--内容结束-->
       <el-button class="button_submit" @click="alarm">提交</el-button>
@@ -81,33 +70,86 @@ export default {
   components: {},
   data(){
     return {
-      radio: '1',
-      title: "",
-      questionList: null,
+      single: 0,
+      multiple: [],
+      questionnaire_id: 1,
+      title: "问卷标题",
+      questionList: [
+        {
+          id: 1,
+          title: '第一题这个题很难啊为什么这么难呢难不难呢',
+          type: 'single-choice',
+          is_must_answer: true,
+          option_list: [
+            {
+              id: 1,
+              title: 'A.窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光',
+            },
+            {
+              id: 2,
+              title: 'B.疑是地上霜',
+            },
+            {
+              id: 3,
+              title: 'C.举头望明月',
+            },
+            {
+              id: 4,
+              title: 'D.低头思故乡',
+            },
+          ],
+        },
+        {
+          id: 2,
+          title: '第二题很简单很简单很简单',
+          type: 'multiple-choice',
+          is_must_answer: false,
+          option_list: [
+            {
+              id: 1,
+              title: 'A.窗前明月光',
+            },
+            {
+              id: 2,
+              title: 'B.疑是地上霜',
+            },
+            {
+              id: 3,
+              title: 'C.举头望明月',
+            },
+            {
+              id: 4,
+              title: 'D.低头思故乡',
+            },
+          ],
+
+        },
+      ],
+
     }
   },
-  mounted() {
-    const that = this;
-    authorization()
-      .then(function (response){
-        axios
-          .get('/api/questionnaire/' + that.$route.params.id,
-              {
-                headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-              }
-          )
-          .then(function (response){
-            that.title= response.title;
-            that.questionList = response.questions;
-          })
-          .catch(function (error) {
-            that.$notify.error({
-              title: '好像发生了什么错误',
-              message: error.message
-            })
-          });
-      })
-  },
+  // mounted() {
+  //   const that = this;
+  //   authorization()
+  //     .then(function (response){
+  //       axios
+  //         .get('/api/questionnaire/' + that.questionnaire_id,
+  //             {
+  //               headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+  //             }
+  //         )
+  //         .then(function (response){
+  //           that.title= response.title;
+  //           that.questionList = response.questions;
+  //         })
+  //         .catch(function (error) {
+  //           that.$notify.error({
+  //             title: '好像发生了什么错误',
+  //             message: error.message
+  //           })
+  //         });
+  //     })
+  // },
   methods: {
     alarm(){
       alert('此问卷暂未发布，无法填写！');
@@ -118,11 +160,26 @@ export default {
 
 <style scoped>
 
+el-radio {
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
 p {
   line-height: 20px;
   font-size: 18px;
 }
 
+.questionTitle {
+  padding-bottom: 5px;
+}
+.single_choice {
+  padding-left: 15px;
+}
+
+.multiple_choice {
+  padding-left: 15px;
+}
 .questionnaire{
   background-color: #F4F4F4;
   border-radius: 10px;
@@ -132,6 +189,7 @@ p {
   max-width: 1000px;
   min-width: 1000px;
 }
+
 
 .line{
   /*width: 90%;*/
@@ -183,7 +241,8 @@ p {
 
 .title{
   text-align: center;
-  padding-top: 10px;
+  padding-top: 30px;
+  padding-bottom: 20px;
 }
 
 .button_back{
