@@ -1,0 +1,196 @@
+<template>
+  <div class="main">
+    <!--提示和返回-->
+    <div class="reminder">
+      <h4 class="text1">
+        摸小鱼温馨提示：只能看看，不能填写哦~
+      </h4>
+      <el-button class="button_back">
+        返回
+      </el-button>
+    </div>
+    <!--问卷-->
+    <div class="questionnaire">
+      <!--标题-->
+      <h1 class="title">{{title}}</h1>
+      <!-- 题目内容 -->
+      <!--      <div class="question_block">-->
+      <!--        &lt;!&ndash; 单选题 &ndash;&gt;-->
+      <!--        <div class="choice_question" style="margin-top: 20px">-->
+      <!--          <p>1.例题：今天开发几小时？</p>-->
+      <!--          <div style="padding-left: 20px;margin-top: 10px">-->
+      <!--            <div> <el-radio v-model="radio" label="1" style="margin-top: 10px">2h</el-radio></div>-->
+      <!--            <div> <el-radio v-model="radio" label="2" style="margin-top: 10px">4h</el-radio> </div>-->
+      <!--            <div> <el-radio v-model="radio" label="3" style="margin-top: 10px">8h</el-radio> </div>-->
+      <!--            <div> <el-radio v-model="radio" label="4" style="margin-top: 10px">根本不开发</el-radio> </div>-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <el-card class="question_block" v-for="(item,index) in questionList">
+        <div slot="header" class="clearfix">
+          <div class="questionTitle">
+            <!--显示必填标识-->
+            <span style="color: #F56C6C;">
+              <span v-if="item.is_must_answer">*</span>
+              <span v-else>&nbsp;</span>
+            </span>
+            {{(index+1)+'.'+item.title}}
+          </div>
+        </div>
+
+        <!--单选题展示-->
+        <div class="text item" v-if="item.type=='single-choice'" v-for="optionItem in item.option">
+<!--          这里根据哪个属性记录用户的选择还不明确-->
+          <el-radio v-model="item.radioValue" :label="optionItem.id" style="margin: 5px;">{{ optionItem.title }}</el-radio>
+        </div>
+
+        <!--多选题展示-->
+        <el-checkbox-group v-if="item.type=='multiple-choice'" v-model="item.checkboxValue">
+          <div class="text item"  v-for="optionItem in item.options">
+            <el-checkbox :label="optionItem.id" style="margin: 5px;">{{ optionItem.title }}</el-checkbox>
+          </div>
+        </el-checkbox-group>
+
+        <!--填空题展示-->
+<!--        <el-input-->
+<!--            v-if="item.type=='completion'"-->
+<!--            type="textarea"-->
+<!--            :rows="item.row"-->
+<!--            v-model="item.textValue"-->
+<!--            resize="none">-->
+<!--        </el-input>-->
+
+      </el-card>
+
+      <!--内容结束-->
+      <el-button class="button_submit" @click="alarm">提交</el-button>
+      <div class="line"></div>
+      <div class="text2"> 摸鱼问卷 提供技术支持 </div>
+
+    </div>
+
+  </div>
+
+</template>
+
+<script>
+import authorization from "../utils/authorization";
+import axios from "axios";
+
+export default {
+  name: "CheckQuestionnaire",
+  components: {},
+  data(){
+    return {
+      radio: '1',
+      title: "",
+      questionList: null,
+    }
+  },
+  mounted() {
+    const that = this;
+    authorization()
+      .then(function (response){
+        axios
+          .get('/api/questionnaire/' + that.$route.params.id,
+              {
+                headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+              }
+          )
+          .then(function (response){
+            that.title= response.title;
+            that.questionList = response.questions;
+          })
+          .catch(function (error) {
+            that.$notify.error({
+              title: '好像发生了什么错误',
+              message: error.message
+            })
+          });
+      })
+  },
+  methods: {
+    alarm(){
+      alert('此问卷暂未发布，无法填写！');
+    },
+  }
+}
+</script>
+
+<style scoped>
+
+p {
+  line-height: 20px;
+  font-size: 18px;
+}
+
+.questionnaire{
+  background-color: #F4F4F4;
+  border-radius: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  max-width: 1000px;
+  min-width: 1000px;
+}
+
+.line{
+  /*width: 90%;*/
+  height: 1px;
+  border-top: solid 1px;
+  margin: 20px;
+}
+
+.question_block {
+  margin-top: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+/*.choice_question {*/
+/*  margin-top: 20px;*/
+/*  padding-left: 20px;*/
+/*  padding-right: 40px;*/
+/*}*/
+
+.button_submit{
+  margin-top: 20px;
+  margin-left: 465px;
+  margin-right: 465px;
+  border-radius: 10px;
+  background-color: #3F87DA;
+  opacity: 0.7;
+}
+
+.text1{
+  float: left;
+  margin-left: 600px;
+  margin-top: 18px;
+}
+
+.text2 {
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+.reminder{
+  background-color: #3F87DA;
+  opacity: 0.7;
+  margin-left: 0px;
+  margin-right: 0px;
+  min-height: 60px;
+  overflow: hidden;
+}
+
+.title{
+  text-align: center;
+  padding-top: 10px;
+}
+
+.button_back{
+  float: right;
+  margin-right: 50px;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
+</style>
