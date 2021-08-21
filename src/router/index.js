@@ -4,6 +4,7 @@ import Login from "../views/Login"
 import Register from "../views/Register";
 import Index from "../views/Index"
 import checkQuestionnaire from "../views/checkQuestionnaire";
+import FillQuestionnaire from "@/views/FillQuestionnaire";
 
 Vue.use(VueRouter)
 
@@ -32,6 +33,11 @@ const routes = [
     path: '/checkQuestionnaire',
     name: 'CheckQuestionnaire',
     component: checkQuestionnaire
+  },
+  {
+    path: '/fillQuestionnaire',
+    name: 'fillQuestionnaire',
+    component: FillQuestionnaire
   },
   {
     path: '/about',
