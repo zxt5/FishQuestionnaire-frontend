@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import Login from "../views/Login"
 import Register from "../views/Register";
 import Index from "../views/Index"
-
+import Questionnaire from "../components/Questionnaire"
 
 Vue.use(VueRouter)
 
@@ -11,7 +11,7 @@ const routes = [
   {
     path: '/',
     name: 'Index',
-    component: Index
+    component: Index,
   },
   {
     path: '/login',
@@ -26,7 +26,17 @@ const routes = [
   {
     path: '/index',
     name: 'Index',
-    component: Index
+    component: Index,
+    children: [
+      {
+        path: '/index/questionnaires',
+        name: 'Questionnaire',
+        component: Questionnaire,
+        meta: {
+          title: '全部问卷',
+        }
+      }
+    ]
   },
   {
     path: '/about',

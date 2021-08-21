@@ -7,7 +7,7 @@
     <transition>
       <router-view v-if="isRouterAlive"/>
     </transition>
-    <el-backtop></el-backtop>
+<!--    <el-backtop></el-backtop>-->
   </div>
 </template>
 
