@@ -25,7 +25,6 @@
               <span slot="title">回收站</span>
             </el-menu-item>
           </el-menu>
-
         </el-aside>
         <el-main>
           <router-view/>
@@ -212,7 +211,6 @@ body > .el-container {
 .el-card {
   border-radius: 10px;
 }
-
 
 .el-aside {
   background-color: transparent;

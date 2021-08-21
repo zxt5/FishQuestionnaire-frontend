@@ -9,7 +9,7 @@
         text-color="#333"
         active-text-color="#3F87DA">
       <h1>
-        <a class="logo" @click="$router.push({path:'/index'})"></a>
+        <a class="logo" :style="{backgroundImage: 'url(' +bg + ')'}" @click="$router.push({path:'/index'})"></a>
       </h1>
       <el-menu-item index="1" @click="toIndex">首页</el-menu-item>
       <el-menu-item index="2" @click="$router.push({path:'/book'})">我的问卷</el-menu-item>
@@ -47,6 +47,7 @@ export default {
   name: "Header",
   data() {
     return {
+      bg: require('../assets/logo2.png'),
       activeIndex: 1,
       hasLogin: false,
       search: '',
@@ -187,7 +188,7 @@ h1 a:hover{
 }
 
 .logo{
-  background-image: url("../assets/logo2.png");
+  /*background-image: url("../assets/logo2.png");*/
   background-size: 130px;
   background-position: center;
   background-repeat: no-repeat;

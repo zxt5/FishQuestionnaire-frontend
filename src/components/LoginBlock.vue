@@ -1,7 +1,7 @@
 <template>
   <el-card class="card">
     <div>
-      <h2><figure></figure></h2>
+      <h2><figure :style="{backgroundImage: 'url(' +bg + ')'}"></figure></h2>
       <el-form :model="form" status-icon :rules="rules" ref="form" label-width="0" class="demo-form">
         <el-form-item prop="user">
           <el-input type="text" v-model="form.user" placeholder="请输入用户名" clearable>
@@ -48,6 +48,7 @@ export default {
       }
     };
     return {
+      bg: require('../assets/logo1.png'),
       form: {
         user: '',
         pass: '',
@@ -124,7 +125,7 @@ h2{
 }
 
 h2>figure{
-  background-image: url("../assets/logo1.png");
+  /*background-image: url("../assets/logo1.png");*/
   height: 130px;
   background-size: 220px;
   background-position: center;

@@ -44,6 +44,21 @@
         </div>
         <div class="clear_both"></div>
       </div>
+      <div class="text-center">
+        <v-container>
+          <v-row justify="center" style="justify-content: center">
+            <v-col cols="8">
+              <v-container class="max-width">
+                <v-pagination
+                    v-model="page"
+                    class="my-4"
+                    :length="4"
+                ></v-pagination>
+              </v-container>
+            </v-col>
+          </v-row>
+        </v-container>
+      </div>
     </div>
   </div>
 </template>
@@ -53,6 +68,7 @@ import axios from "axios";
 export default {
   data(){
     return {
+      page: 1,
       info: [
         {
           id: 1,
