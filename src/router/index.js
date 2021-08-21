@@ -4,6 +4,7 @@ import Login from "../views/Login"
 import Register from "../views/Register";
 import Index from "../views/Index"
 import Questionnaire from "../components/Questionnaire"
+import RecycleBin from "../components/RecycleBin";
 
 Vue.use(VueRouter)
 
@@ -35,7 +36,15 @@ const routes = [
         meta: {
           title: '全部问卷',
         }
-      }
+      },
+      {
+        path: 'recycle',
+        name: 'RecycleBin',
+        component: RecycleBin,
+        meta: {
+          title: '回收站',
+        }
+      },
     ]
   },
   {

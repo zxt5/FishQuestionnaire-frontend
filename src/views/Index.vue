@@ -20,7 +20,7 @@
               <i class="el-icon-document"></i>
               <span slot="title">个人问卷</span>
             </el-menu-item>
-            <el-menu-item index="2" @click="$router.push({path: '/index'})">
+            <el-menu-item index="2" @click="toRecycleBin()">
               <i class="el-icon-delete"></i>
               <span slot="title">回收站</span>
             </el-menu-item>
@@ -38,6 +38,7 @@
 <script>
 import Header from "../components/Header";
 import Questionnaire from "../components/Questionnaire";
+import RecycleBin from "../components/RecycleBin";
 export default {
   name: "Index",
   components: {Questionnaire, Header},
@@ -66,6 +67,9 @@ export default {
     },
     toQuestionnaire(){
       this.$router.push({path: '/index/questionnaires'})
+    },
+    toRecycleBin(){
+      this.$router.push({path: '/index/recycle'})
     }
   },
   // mounted(){

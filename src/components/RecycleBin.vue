@@ -1,7 +1,7 @@
 <template>
   <div class="questionnaire" direction="vertical">
     <div>
-      <h2 class="title" style="min-width: 800px">问卷列表</h2>
+      <h2 class="title" style="min-width: 800px">回收站</h2>
       <div class="not_found" v-if="!info.length">
         别看啦 这里啥也没有 <i class="el-icon-cold-drink"></i>
       </div>
@@ -10,7 +10,7 @@
           <el-tag class="label" v-if="item.mode === 'closed'">未发布</el-tag>
           <el-tag class="label" type="success" v-if="item.mode === 'shared'">已发布</el-tag>
           <el-tag class="label" type="danger" v-if="item.mode === 'deleted'">已删除</el-tag>
-<!--          <el-tag v-for="tag in item.tags" key="tag" class="label">{{tag}}</el-tag>-->
+          <!--          <el-tag v-for="tag in item.tags" key="tag" class="label">{{tag}}</el-tag>-->
           <span style="display: inline-block; width: 3px"></span>
           <a>{{item.title}}</a>
         </h1>
@@ -22,20 +22,9 @@
         <div class="footer">
           <div class="op cur_def">
             <ul>
-              <li><v-icon small>mdi-motion-play-outline</v-icon>  发布</li>
-              <li><v-icon small>mdi-content-copy</v-icon>  复制</li>
-              <li><v-icon small>mdi-delete-variant</v-icon>  删除</li>
+              <li><v-icon small>mdi-autorenew</v-icon>  恢复</li>
+              <li><v-icon small>mdi-delete-off-outline</v-icon>  彻底删除</li>
             </ul>
-            <el-dropdown style="margin-top: 5px" @command="handleCommand" >
-              <span class="el-dropdown-link">
-               更多<i class="el-icon-arrow-down el-icon--right"></i>
-              </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="a">编辑</el-dropdown-item>
-                <el-dropdown-item command="b">分享</el-dropdown-item>
-                <el-dropdown-item command="e" divided>统计</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
             <div class="created">
               {{ formatted_time(item.create_date) }}
             </div>
@@ -59,7 +48,7 @@ export default {
           title: '测试问卷',
           content: '求求各位姥爷填一下小的问卷吧',
           create_date : '2021-08-21 16:00',
-          mode : 'closed',
+          mode : 'deleted',
           answer_num: 123,
         },
         {
@@ -67,16 +56,8 @@ export default {
           title: '测试问卷',
           content: '求求各位姥爷填一下小的问卷吧',
           create_date : '2021-08-21 16:00',
-          mode : 'shared',
+          mode : 'deleted',
           answer_num: 456,
-        },
-        {
-          id: 3,
-          title: '测试问卷',
-          content: '求求各位姥爷填一下小的问卷吧',
-          create_date : '2021-08-21 16:00',
-          mode : 'closed',
-          answer_num: 789,
         },
       ],
       avatar: '',
