@@ -5,7 +5,7 @@
       <div class="not_found" v-if="!info.length">
         别看啦 这里啥也没有 <i class="el-icon-cold-drink"></i>
       </div>
-      <div class="a_block" v-for="item in info" :key="item" >
+      <div class="a_block" v-for="(item, index) in info.slice(4 * (page-1), 4 * page)" :key="index">
         <h1 @click="toDiscuss(item.id)">
           <el-tag class="label" type="danger">已删除</el-tag>
           <!--          <el-tag v-for="tag in item.tags" key="tag" class="label">{{tag}}</el-tag>-->
@@ -31,6 +31,23 @@
         </div>
         <div class="clear_both"></div>
       </div>
+      <div v-if="pageLength !== 0" class="text-center">
+        <v-app>
+          <v-container>
+            <v-row justify="center" style="justify-content: center">
+              <v-col cols="8">
+                <v-container class="max-width">
+                  <v-pagination
+                      v-model="page"
+                      :length="pageLength"
+                      :total-visible="pageVisible"
+                  ></v-pagination>
+                </v-container>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-app>
+      </div>
     </div>
   </div>
 </template>
@@ -42,6 +59,10 @@ export default {
   data(){
     return {
       info: [],
+      page: 1,
+      itemPerpage: 4,
+      pageLength: 0,
+      pageVisible: 7,
     }
   },
   methods: {
@@ -68,6 +89,7 @@ export default {
                 .get('/api/user/' + response[1] + '/recycle/')
                 .then(function(response){
                   that.info = response.data;
+                  that.pageLength = parseInt((that.info.length + that.itemPerpage - 1) / that.itemPerpage);
                   console.log(that.info);
                 })
                 .catch(function (error){
@@ -197,5 +219,18 @@ h1:hover{
 }
 .el-icon-arrow-down {
   font-size: 12px;
+}
+li{
+  cursor: pointer;
+}
+.container{
+  padding-bottom: 0;
+  padding-top: 0;
+}
+</style>
+
+<style>
+.v-application--wrap {
+  min-height: 0 !important;
 }
 </style>

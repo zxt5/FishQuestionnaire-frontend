@@ -16,6 +16,16 @@ const routes = [
     path: '/',
     name: 'Index',
     component: Index,
+    children: [
+      {
+        path: '',
+        name: 'Questionnaire',
+        component: Questionnaire,
+        meta: {
+          title: '摸鱼问卷',
+        }
+      },
+    ]
   },
   {
     path: '/login',
@@ -32,6 +42,14 @@ const routes = [
     name: 'Index',
     component: Index,
     children: [
+      {
+        path: '',
+        name: 'Questionnaire',
+        component: Questionnaire,
+        meta: {
+          title: '全部问卷',
+        }
+      },
       {
         path: '/questionnaires',
         name: 'Questionnaire',
