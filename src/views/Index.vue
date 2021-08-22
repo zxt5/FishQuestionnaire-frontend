@@ -56,7 +56,7 @@ export default {
       this.$router.push({path: '/book'});
     },
     editQues(){
-      this.$router.push({path: '/questionnairs'});
+      this.$router.push({path: '/questionnaires'});
     },
     toGroupIndex(){
       this.$router.push({path: '/group/index'});

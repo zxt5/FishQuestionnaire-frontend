@@ -20,8 +20,8 @@
         <div class="footer">
           <div class="op cur_def">
             <ul>
-              <li><v-icon small>mdi-autorenew</v-icon>  恢复</li>
-              <li><v-icon small>mdi-delete-off-outline</v-icon>  彻底删除</li>
+              <li @click="Return(item.id)"><v-icon small>mdi-autorenew</v-icon>  恢复</li>
+              <li @click="Delete4ever(item.id)"><v-icon small>mdi-delete-off-outline</v-icon>  彻底删除</li>
             </ul>
             <div class="created">
               {{ formatted_time(item.create_date) }}
@@ -56,6 +56,7 @@
 import axios from "axios";
 import authorization from "../utils/authorization";
 export default {
+  inject: ['reload'],
   data(){
     return {
       info: [],
@@ -78,6 +79,51 @@ export default {
     },
     handleCommand(command) {
       this.$message('click on item ' + command);
+    },
+    Return(id) {
+      const that = this;
+      axios
+          .put('api/questionnaire/' + id + '/status/', {
+            status: "closed"
+          })
+          .then(function (response){
+            that.$notify.success({
+              title: '问卷成功恢复!',
+              message: '您可以进行查看'
+            })
+            that.$router.push({path: '/questionnaires'});
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '恢复问卷失败'
+            })
+          })
+    },
+    Delete4ever(id) {
+      const that = this;
+      this.$confirm('此操作将永久删除该问卷, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+      }).then(() => {
+        axios
+            .delete('api/questionnaire/' + id + '/')
+            .then(function (response){
+              that.$notify.success({
+                title: '删除成功!',
+                message: '问卷已彻底删除'
+              })
+              that.reload();
+            })
+            .catch(function (error){
+              that.$notify.error({
+                title: '出错啦',
+                message: '删除问卷失败'
+              })
+            })
+      })
     }
   },
   mounted() {

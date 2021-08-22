@@ -22,9 +22,10 @@
         <div class="footer">
           <div class="op cur_def">
             <ul>
-              <li><v-icon small>mdi-motion-play-outline</v-icon>  发布</li>
+              <li v-if="item.status === 'closed'" @click="Start(item.id)"><v-icon small>mdi-motion-play-outline</v-icon>  发布</li>
+              <li v-if="item.status === 'shared'" @click="Close(item.id)"><v-icon small>mdi-stop-circle-outline</v-icon>  停止</li>
               <li><v-icon small>mdi-content-copy</v-icon>  复制</li>
-              <li><v-icon small>mdi-delete-variant</v-icon>  删除</li>
+              <li @click="Delete(item.id)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
             </ul>
             <el-dropdown style="margin-top: 5px" @command="handleCommand" >
               <span class="el-dropdown-link">
@@ -69,6 +70,7 @@
 import axios from "axios";
 import authorization from "../utils/authorization";
 export default {
+  inject: ['reload'],
   data(){
     return {
       info: [],
@@ -91,6 +93,76 @@ export default {
     // },
     handleCommand(command) {
       this.$message('click on item ' + command);
+    },
+    Start(id) {
+      const that = this;
+      axios
+          .put('api/questionnaire/' + id + '/status/', {
+            status: "shared"
+          })
+          .then(function (response){
+            that.$notify.success({
+              title: '问卷成功发布!',
+              message: '您可以进行分享'
+            })
+            that.reload();
+            that.$alert('这是链接和二维码', '分享', {
+              confirmButtonText: '确定',
+            });
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '发布问卷失败'
+            })
+          })
+    },
+    Close(id) {
+      const that = this;
+      axios
+          .put('api/questionnaire/' + id + '/status/', {
+            status: "closed"
+          })
+          .then(function (response){
+            that.$notify.success({
+              title: '问卷已关闭!',
+              message: ''
+            })
+            that.reload();
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '关闭问卷失败'
+            })
+          })
+    },
+    Delete(id) {
+      const that = this;
+      this.$confirm('您确定要删除该问卷吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+      }).then(() => {
+        axios
+          .put('api/questionnaire/' + id + '/status/', {
+            status: "deleted"
+          })
+          .then(function (response){
+            that.$notify.success({
+              title: '问卷成功删除!',
+              message: '您可以到回收站中恢复问卷'
+            })
+            that.reload();
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '删除问卷失败'
+            })
+          })
+      })
     }
   },
   mounted() {
