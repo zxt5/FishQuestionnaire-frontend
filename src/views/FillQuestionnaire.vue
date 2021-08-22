@@ -145,4 +145,97 @@ export default {
 
 <style scoped>
 
+el-radio {
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+p {
+  line-height: 20px;
+  font-size: 18px;
+}
+
+.questionTitle {
+  padding-bottom: 5px;
+}
+.single_choice {
+  padding-left: 15px;
+}
+
+.multiple_choice {
+  padding-left: 15px;
+}
+.questionnaire{
+  background-color: #F4F4F4;
+  border-radius: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  max-width: 1000px;
+  min-width: 1000px;
+}
+
+
+.line{
+  /*width: 90%;*/
+  height: 1px;
+  border-top: solid 1px;
+  margin: 20px;
+}
+
+.question_block {
+  margin-top: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+/*.choice_question {*/
+/*  margin-top: 20px;*/
+/*  padding-left: 20px;*/
+/*  padding-right: 40px;*/
+/*}*/
+
+.button_submit{
+  margin-top: 20px;
+  margin-left: 465px;
+  margin-right: 465px;
+  border-radius: 10px;
+  background-color: #3F87DA;
+  opacity: 0.7;
+}
+
+.text1{
+  float: left;
+  margin-left: 600px;
+  margin-top: 18px;
+}
+
+.text2 {
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+.reminder{
+  background-color: #3F87DA;
+  opacity: 0.7;
+  margin-left: 0px;
+  margin-right: 0px;
+  min-height: 60px;
+  overflow: hidden;
+}
+
+.title{
+  text-align: center;
+  padding-top: 30px;
+  padding-bottom: 20px;
+}
+
+.button_back{
+  float: right;
+  margin-right: 50px;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
+
 </style>
