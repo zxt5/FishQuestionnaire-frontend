@@ -45,19 +45,21 @@
         <div class="clear_both"></div>
       </div>
       <div class="text-center">
-        <v-container>
-          <v-row justify="center" style="justify-content: center">
-            <v-col cols="8">
-              <v-container class="max-width">
-                <v-pagination
-                    v-model="page"
-                    class="my-4"
-                    :length="4"
-                ></v-pagination>
-              </v-container>
-            </v-col>
-          </v-row>
-        </v-container>
+        <v-app>
+          <v-container>
+            <v-row justify="center" style="justify-content: center">
+              <v-col cols="8">
+                <v-container class="max-width">
+                  <v-pagination
+                      v-model="page"
+                      class="my-4"
+                      :length="4"
+                  ></v-pagination>
+                </v-container>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-app>
       </div>
     </div>
   </div>
@@ -259,5 +261,12 @@ h1:hover{
 }
 .el-icon-arrow-down {
   font-size: 12px;
+}
+
+</style>
+
+<style>
+.v-application--wrap {
+  min-height: 0vh !important;
 }
 </style>
