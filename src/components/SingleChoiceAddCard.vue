@@ -1,7 +1,7 @@
 <template>
     <!--添加题目的对话框-->
     <el-dialog
-        title="添加题目"
+        title="添加题目(单选题)"
         width="50%"
         :visible.sync="addDialogVisible">
         <el-form :model="questionForm" 
@@ -41,7 +41,7 @@
 <script>
 
 export default {
-    name: "AddCard",
+    name: "single-choice-addcard",
     data(){
         return{
             addDialogVisible : false,
@@ -49,7 +49,8 @@ export default {
                 content: '',
                 ismust: false,
                 groups: [
-                ]
+                ],
+                answer: ''
             },
             questionFormRules:{
                content:[
