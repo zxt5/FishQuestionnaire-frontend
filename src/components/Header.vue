@@ -1,7 +1,8 @@
 <template>
   <div class="header">
     <el-menu
-        default-active="1"
+        router
+        :default-active="$route.path"
         class="el-menu-demo"
         mode="horizontal"
         @select="handleSelect"
@@ -11,9 +12,9 @@
       <h1>
         <a class="logo" :style="{backgroundImage: 'url(' +bg + ')'}" @click="$router.push({path:'/index'})"></a>
       </h1>
-      <el-menu-item index="1" @click="toIndex">首页</el-menu-item>
-      <el-menu-item index="2" @click="$router.push({path:'/book'})">我的问卷</el-menu-item>
-      <el-menu-item index="3" @click="$router.push({path:'/questionnairs'})">创建问卷</el-menu-item>
+      <el-menu-item index="/index" @click="toIndex">我的问卷</el-menu-item>
+      <el-menu-item index="/fillQuestionnaire" @click="$router.push({path:'/fillQuestionnaire'})">填写问卷</el-menu-item>
+      <el-menu-item index="/questionnairs" @click="$router.push({path:'/questionnairs'})">创建问卷</el-menu-item>
       <div class="user">
         <span class="el-dropdown-link" @click="goLogin" v-if="!hasLogin">
           <el-avatar>登录</el-avatar>

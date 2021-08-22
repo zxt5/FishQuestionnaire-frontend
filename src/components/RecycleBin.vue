@@ -91,7 +91,8 @@ export default {
               title: '问卷成功恢复!',
               message: '您可以进行查看'
             })
-            that.$router.push({path: '/questionnaires'});
+            // that.$router.push({path: '/questionnaires'});
+            that.reload();//不是一个好的解决方法
           })
           .catch(function (error){
             that.$notify.error({

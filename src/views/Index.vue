@@ -14,13 +14,14 @@
           </el-container>
 
           <el-menu
-              default-active="1"
+              router
+              :default-active="$route.path"
               class="el-menu-vertical-demo">
-            <el-menu-item index="1" @click="toQuestionnaire()">
+            <el-menu-item index="/questionnaires" @click="toQuestionnaire()">
               <i class="el-icon-document"></i>
               <span slot="title">个人问卷</span>
             </el-menu-item>
-            <el-menu-item index="2" @click="toRecycleBin()">
+            <el-menu-item index="/recycle" @click="toRecycleBin()">
               <i class="el-icon-delete"></i>
               <span slot="title">回收站</span>
             </el-menu-item>
@@ -56,7 +57,7 @@ export default {
       this.$router.push({path: '/book'});
     },
     editQues(){
-      this.$router.push({path: '/questionnaires'});
+      this.$router.push({path: '/questionnairs'});
     },
     toGroupIndex(){
       this.$router.push({path: '/group/index'});
@@ -66,6 +67,7 @@ export default {
     },
     toQuestionnaire(){
       this.$router.push({path: '/questionnaires'})
+      console.log(this.$route.path);
     },
     toRecycleBin(){
       this.$router.push({path: '/recycle'})
@@ -165,7 +167,7 @@ export default {
   background-color: transparent;
   margin: 0 20px 0;
   border-radius: 15px;
-  opacity: 0.9;
+  opacity: 1;
   color: #333;
   height: fit-content;
   padding-top: 0 !important;
@@ -191,7 +193,7 @@ body > .el-container {
 
 .class {
   background-color: white;
-  opacity: 0.9;
+  /*opacity: 0.9;*/
   border-radius: 10px;
   padding: 25px 10px 20px;
   text-align: center;
@@ -225,7 +227,7 @@ body > .el-container {
   /*background-color: black;*/
   margin: 0 20px 0;
   border-radius: 10px;
-  opacity: 0.9;
+  opacity: 1;
   color: #333;
   height: fit-content;
   padding-top: 0 !important;
