@@ -28,7 +28,7 @@
 
         <!--单选题展示-->
         <div class="single_choice" v-if="item.type=='single-choice'" v-for="optionItem in item.option_list">
-<!--          这里根据哪个属性记录用户的选择还不明确-->
+          <!--          这里根据哪个属性记录用户的选择还不明确-->
           <el-radio v-model="single" :label="1" style="margin: 5px;">{{ optionItem.title }}</el-radio>
         </div>
 
@@ -38,15 +38,6 @@
             <el-checkbox :label="optionItem.id" style="margin: 5px;">{{ optionItem.title }}</el-checkbox>
           </div>
         </el-checkbox-group>
-
-        <!--填空题展示-->
-<!--        <el-input-->
-<!--            v-if="item.type=='completion'"-->
-<!--            type="textarea"-->
-<!--            :rows="item.row"-->
-<!--            v-model="item.textValue"-->
-<!--            resize="none">-->
-<!--        </el-input>-->
 
       </div>
 

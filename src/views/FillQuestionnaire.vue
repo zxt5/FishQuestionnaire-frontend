@@ -1,49 +1,71 @@
 <template>
-  <div class="questionnaire">
-    <!--标题-->
-    <h1 class="title">{{title}}</h1>
 
-    <div class="question_block" v-for="(item,index) in questionList">
-      <div slot="header" class="clearfix">
-        <div class="questionTitle">
-          <!--显示必填标识-->
-          <span style="color: #F56C6C;">
+  <div>
+    <div class="reminder"  v-if="info.status==='closed'">
+      <h4 class="text1">
+        摸小鱼温馨提示：只能看看，不能填写哦~
+      </h4>
+      <el-button class="button_back">
+        返回
+      </el-button>
+    </div>
+
+    <div class="questionnaire" onload="init">
+      <!--标题-->
+      <h1 class="title" >{{info.title}}</h1>
+
+      <div class="content">&nbsp;{{info.content}}</div>
+      <div class="line"></div>
+
+
+      <div class="question_block" v-for="(item,index) in info.question_list" >
+        <div slot="header">
+          <div class="questionTitle">
+            <!--显示必填标识-->
+            <span style="color: #F56C6C;">
             <span v-if="item.is_must_answer">*</span>
             <span v-else>&nbsp;</span>
           </span>
-          {{(index+1)+'.'+item.title}}
+            {{(index+1)+'.'+item.title}}
+          </div>
         </div>
-      </div>
 
-      <!--单选题展示-->
-      <div class="single_choice" v-if="item.type=='single-choice'" v-for="optionItem in item.option_list">
-        <el-radio v-model="single" :label="1" style="margin: 5px;">{{ optionItem.title }}</el-radio>
-      </div>
-
-      <!--多选题展示-->
-      <el-checkbox-group v-if="item.type=='multiple-choice'" v-model="multiple">
-        <div class="multiple_choice"  v-for="optionItem in item.option_list">
-          <el-checkbox :label="optionItem.id" style="margin: 5px;">{{ optionItem.title }}</el-checkbox>
+        <!--单选题展示-->
+        <div>
+          <div class="single_choice" v-if="item.type==='single-choice'" v-for="optionItem in item.option_list">
+            <el-radio v-model="answer_list[index]" :label="optionItem.ordering" style="margin: 5px;">{{ optionItem.title }}{{optionItem.content}}</el-radio>
+          </div>
         </div>
-      </el-checkbox-group>
 
-      <!--填空题展示-->
-      <!--        <el-input-->
-      <!--            v-if="item.type=='completion'"-->
-      <!--            type="textarea"-->
-      <!--            :rows="item.row"-->
-      <!--            v-model="item.textValue"-->
-      <!--            resize="none">-->
-      <!--        </el-input>-->
+        <!--&lt;!&ndash;        多选题展示&ndash;&gt;-->
+        <!--        <el-checkbox-group v-if="item.type==='multiple-choice'" v-model="answer_list[index]" onload>-->
+        <!--          <div class="multiple_choice"  v-for="optionItem in item.option_list">-->
+        <!--            <el-checkbox :label="optionItem.ordering" style="margin: 5px;">{{ optionItem.title }}{{optionItem.content}}</el-checkbox>-->
+        <!--          </div>-->
+        <!--        </el-checkbox-group>-->
+
+        <!--填空题展示-->
+        <el-input style="padding-left: 12px;padding-top: 5px;width: 98%"
+                  placeholder="请在此输入答案~"
+                  v-if="item.type==='completion'"
+                  type="textarea"
+                  maxlength="150"
+                  show-word-limit
+                  :autosize="{minRows: 2}"
+                  :rows="item.row"
+                  v-model="answer_list[index]"
+                  resize="none">
+        </el-input>
+
+      </div>
+      <!--内容结束-->
+      <el-button class="button_submit" @click="click">提交</el-button>
+      <div class="line"></div>
+      <div class="text2"> 摸鱼问卷 提供技术支持 </div>
 
     </div>
-
-    <!--内容结束-->
-    <el-button class="button_submit" @click="alarm">提交</el-button>
-    <div class="line"></div>
-    <div class="text2"> 摸鱼问卷 提供技术支持 </div>
-
   </div>
+
 </template>
 
 <script>
@@ -58,92 +80,74 @@ export default {
       single: 0,
       multiple: [],
       questionnaire_id: 1,
-      title: "问卷标题",
-      questionList: [
-        {
-          id: 1,
-          title: '第一题这个题很难啊为什么这么难呢难不难呢',
-          type: 'single-choice',
-          is_must_answer: true,
-          option_list: [
-            {
-              id: 1,
-              title: 'A.窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光',
-            },
-            {
-              id: 2,
-              title: 'B.疑是地上霜',
-            },
-            {
-              id: 3,
-              title: 'C.举头望明月',
-            },
-            {
-              id: 4,
-              title: 'D.低头思故乡',
-            },
-          ],
-        },
-        {
-          id: 2,
-          title: '第二题很简单很简单很简单',
-          type: 'multiple-choice',
-          is_must_answer: false,
-          option_list: [
-            {
-              id: 1,
-              title: 'A.窗前明月光',
-            },
-            {
-              id: 2,
-              title: 'B.疑是地上霜',
-            },
-            {
-              id: 3,
-              title: 'C.举头望明月',
-            },
-            {
-              id: 4,
-              title: 'D.低头思故乡',
-            },
-          ],
-
-        },
-      ],
-
+      content: '',
+      info: '',
+      answer_list: [],
     }
   },
-  // mounted() {
-  //   const that = this;
-  //   authorization()
-  //     .then(function (response){
-  //       axios
-  //         .get('/api/questionnaire/' + that.questionnaire_id,
-  //             {
-  //               headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-  //             }
-  //         )
-  //         .then(function (response){
-  //           that.title= response.title;
-  //           that.questionList = response.questions;
-  //         })
-  //         .catch(function (error) {
-  //           that.$notify.error({
-  //             title: '好像发生了什么错误',
-  //             message: error.message
-  //           })
-  //         });
-  //     })
-  // },
+  mounted() {
+    const that = this;
+    axios
+        .get('/api/questionnaire/' + this.questionnaire_id)
+        .then(response => (this.info = response.data))
+        .catch(function (error){
+          that.$notify.error({
+            title: '好像发生了什么错误',
+            message: error.message
+          })
+        })
+  },
   methods: {
-    alarm(){
-      alert('此问卷暂未发布，无法填写！');
+    init() {
+      console.log("zhixing");
+      let i = 0;
+      for( let a in this.info.question_list) {
+        if(a.type === 'single-choice') {
+          let t = 'aaa';
+          this.answer_list[i++] = t;
+        }
+        else if(a.type === 'multiple-choice') {
+          let t = [];
+          this.answer_list[i++] = t;
+        }
+        else {
+          let t = 'bbb';
+          this.answer_list[i++] = t;
+        }
+      }
+    },
+    click(){
+      if(this.info.status==='closed') alert('此问卷暂未发布，无法填写！');
+      this.answer_list.push(this.multiple);
+      console.log(this.answer_list);
+      // 提交问卷
+      // else {
+      //   axios
+      //       .post('/api/questionnaire/' + this.questionnaire_id)
+      //       .then(response => (this.info = response.data))
+      //       .catch(function (error){
+      //         that.$notify.error({
+      //           title: '好像发生了什么错误',
+      //           message: error.message
+      //         })
+      //       })
+      // }
     },
   }
 }
 </script>
 
+
+
 <style scoped>
+
+.content {
+  /*text-align: center;*/
+  font-size: 15px;
+  color: #555555;
+  margin: 10px 40px 6px;
+  /*text-indent:1em;*/
+}
 
 el-radio {
   width: 100%;
@@ -179,8 +183,10 @@ p {
 .line{
   /*width: 90%;*/
   height: 1px;
-  border-top: solid 1px;
-  margin: 20px;
+  border-top: solid 2px;
+  margin-left: 30px;
+  margin-right: 30px;
+  color: #3F87DA;
 }
 
 .question_block {
@@ -189,16 +195,8 @@ p {
   padding-right: 40px;
 }
 
-/*.choice_question {*/
-/*  margin-top: 20px;*/
-/*  padding-left: 20px;*/
-/*  padding-right: 40px;*/
-/*}*/
-
 .button_submit{
-  margin-top: 20px;
-  margin-left: 465px;
-  margin-right: 465px;
+  margin: 20px 465px 15px;
   border-radius: 10px;
   background-color: #3F87DA;
   opacity: 0.7;
@@ -213,6 +211,9 @@ p {
 .text2 {
   text-align: center;
   padding-bottom: 20px;
+  margin-top: 10px;
+  color: #555555;
+  font-size: 15px;
 }
 
 .reminder{
@@ -226,8 +227,8 @@ p {
 
 .title{
   text-align: center;
-  padding-top: 30px;
-  padding-bottom: 20px;
+  padding-top: 40px;
+  padding-bottom: 15px;
 }
 
 .button_back{
