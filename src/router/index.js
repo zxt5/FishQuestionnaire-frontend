@@ -33,7 +33,7 @@ const routes = [
     component: Index,
     children: [
       {
-        path: 'questionnaires',
+        path: '/questionnaires',
         name: 'Questionnaire',
         component: Questionnaire,
         meta: {
@@ -41,7 +41,7 @@ const routes = [
         }
       },
       {
-        path: 'recycle',
+        path: '/recycle',
         name: 'RecycleBin',
         component: RecycleBin,
         meta: {

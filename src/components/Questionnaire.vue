@@ -262,7 +262,9 @@ h1:hover{
 .el-icon-arrow-down {
   font-size: 12px;
 }
-
+li{
+  cursor: pointer;
+}
 </style>
 
 <style>

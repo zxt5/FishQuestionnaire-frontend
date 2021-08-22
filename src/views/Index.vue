@@ -65,10 +65,10 @@ export default {
       this.$router.push({path: '/group/discuss'});
     },
     toQuestionnaire(){
-      this.$router.push({path: '/index/questionnaires'})
+      this.$router.push({path: '/questionnaires'})
     },
     toRecycleBin(){
-      this.$router.push({path: '/index/recycle'})
+      this.$router.push({path: '/recycle'})
     }
   },
   // mounted(){
