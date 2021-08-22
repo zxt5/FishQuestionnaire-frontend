@@ -1,103 +1,136 @@
 <template>
-<div >
-      <!--主题内容区域-->
-        <el-container class="main">
-          <el-container>
-            <!--侧边栏区域-->
-            <el-aside>
-              <div class="aside-top">
-                <span> 题型选择 </span>
-              </div>
-              <el-menu 
-                background-color="#fff"
-                text-color="#18927B"
-                active-text-color="#000"
-              >
-              <!--一级菜单-->
-              <el-submenu v-for="item in menuList" :key="item.type" :index="item.type">
+  <div >
+    <!--主题内容区域-->
+    <el-container class="main">
+      <el-container>
+        <!--侧边栏区域-->
+        <el-aside>
+          <div class="aside-top">
+            <span> 题型选择 </span>
+          </div>
+          <el-menu
+              background-color="#fff"
+              text-color="#18927B"
+              active-text-color="#000"
+          >
+            <!--一级菜单-->
+            <el-submenu v-for="item in menuList" :key="item.type" :index="item.type">
+              <template slot="title">
+                <span>{{item.name}}</span>
+              </template>
+              <!--二级菜单-->
+              <el-menu-item v-for="subItem in item.children" :key="subItem.type" :index="subItem.type" @click="addQuestion(subItem.type)">
                 <template slot="title">
-                  <span>{{item.name}}</span>
+                  <span>{{subItem.name}}</span>
                 </template>
-                  <!--二级菜单-->
-                  <el-menu-item v-for="subItem in item.children" :key="subItem.type" :index="subItem.type" @click="addQuestion(subItem.type)">
-                     <template slot="title">
-                      <span>{{subItem.name}}</span>
-                     </template>
-                  </el-menu-item>
-              </el-submenu>
-            </el-menu>
-            </el-aside>
-            <!--问卷区域-->
-            <el-main style="height: fit-content">
-              <!--标题区域-->
-              <div class="question-title"> 
-                <span>{{questionnair.title}}</span>
+              </el-menu-item>
+            </el-submenu>
+          </el-menu>
+        </el-aside>
+        <!--问卷区域-->
+        <el-main style="height: fit-content">
+          <!--标题区域-->
+          <div class="question-title">
+            <span>{{questionnair.title}}</span>
+          </div>
+          <el-card  v-for="(item, index) in questionnair.questions" :key="item.key">
+            <div class="button-top">
+              <el-tooltip placement="top" content="上移" effect="dark" :enterable="false">
+                <el-button icon="el-icon-caret-top" type="text" @click="cardUp(index)">    </el-button>
+              </el-tooltip>
+              <el-tooltip placement="top" content="下移" effect="dark" :enterable="false">
+                <el-button icon="el-icon-caret-bottom" type="text" @click="cardDown(index)">   </el-button>
+              </el-tooltip>
+              <el-tooltip placement="top" content="删除" effect="dark" :enterable="false">
+                <el-button icon="el-icon-delete" type="text" @click="cardDelete(index)">    </el-button>
+              </el-tooltip>
+              <el-tooltip placement="top" content="复制" effect="dark" :enterable="false">
+                <el-button icon="el-icon-copy-document" type="text" @click="cardCopy(index)"></el-button>
+              </el-tooltip>
+            </div>
+            <!--单选框模板-->
+            <template v-if="item.type === 'single-choice'">
+              <div>
+                <span v-if="item.ismust" style="color: #F56C6C">*</span>
+                <span> 第{{' '+(index+1)+' '}}题</span>
+                <p style="margin-top: 20px"> {{item.content}} </p>
               </div>
-              <el-card  v-for="(item, index) in questionnair.questions" :key="item.key">
-               <div class="button-top">
-                    <el-tooltip placement="top" content="上移" effect="dark" :enterable="false">
-                      <el-button icon="el-icon-caret-top" type="text" @click="cardUp(index)">    </el-button>
-                    </el-tooltip>
-                    <el-tooltip placement="top" content="下移" effect="dark" :enterable="false">
-                      <el-button icon="el-icon-caret-bottom" type="text" @click="cardDown(index)">   </el-button>
-                    </el-tooltip>
-                    <el-tooltip placement="top" content="删除" effect="dark" :enterable="false">
-                      <el-button icon="el-icon-delete" type="text" @click="cardDelete(index)">    </el-button>
-                    </el-tooltip>
-                    <el-tooltip placement="top" content="复制" effect="dark" :enterable="false">
-                      <el-button icon="el-icon-copy-document" type="text" @click="cardCopy(index)"></el-button>
-                    </el-tooltip>
-                </div>
-                <!--单选框模板-->
-                <template v-if="item.type === 'single-choice'">
-                  <div>
-                    <span v-if="item.ismust" style="color: #F56C6C">*</span>
-                    <span> 第{{' '+(index+1)+' '}}题</span>
-                    <p style="margin-top: 20px"> {{item.content}} </p>
-                  </div>
-                  <el-radio-group>
-                        <el-radio v-for="subItem in item.groups" :key="subItem.key" :label="subItem.key">
-                          {{subItem.content}}
-                        </el-radio>
-                  </el-radio-group>
-                </template>
-                <!--多选框模板-->
-                <template v-if="item.type === 'multiple-choice'">
-                  <div>
-                    <span v-if="item.ismust" style="color: #F56C6C">*</span>
-                    <span> 第{{' '+(index+1)+' '}}题</span>
-                    <p style="margin-top: 20px"> {{item.content}} </p>
-                  </div>
-                  <el-checkbox-group v-model="item.answer">
-                        <el-checkbox v-for="subItem in item.groups" :key="subItem.key" :label="subItem.key">
-                          {{subItem.content}}
-                        </el-checkbox>
-                  </el-checkbox-group>
-                </template>
-                  <div class="card-footer">
-                    <el-button icon="el-icon-edit" type="primary" size="small" @click="editQuestion(item.type, index)">编辑</el-button>
-                  </div>
-              </el-card>
-              <el-button type="danger" class="main-footer">完成编辑</el-button>
-            </el-main>
-          </el-container>
-        </el-container>
+              <el-radio-group v-model="item.answer">
+                <el-radio v-for="subItem in item.groups" :key="subItem.key" :label="subItem.key">
+                  {{subItem.content}}
+                </el-radio>
+              </el-radio-group>
+            </template>
+            <!--多选框模板-->
+            <template v-if="item.type === 'multiple-choice'">
+              <div>
+                <span v-if="item.ismust" style="color: #F56C6C">*</span>
+                <span> 第{{' '+(index+1)+' '}}题</span>
+                <p style="margin-top: 20px"> {{item.content}} </p>
+              </div>
+              <el-checkbox-group v-model="item.answer">
+                <el-checkbox v-for="subItem in item.groups" :key="subItem.key" :label="subItem.key">
+                  {{subItem.content}}
+                </el-checkbox>
+              </el-checkbox-group>
+            </template>
+            <!--单项填空模板-->
+            <template v-if="item.type === 'single-completion'">
+              <div>
+                <span v-if="item.ismust" style="color: #F56C6C">*</span>
+                <span> 第{{' '+(index+1)+' '}}题</span>
+                <p style="margin-top: 20px"> {{item.content}} </p>
+              </div>
+              <el-input v-model="item.answer" class="single-completion-input" :autosize="true"
+                        type="textarea" :clearable="true" resize="none">
+              </el-input>
+            </template>
+            <!--多项填空模板-->
+            <template v-if="item.type === 'multiple-completion'">
+              <div>
+                <span v-if="item.ismust" style="color: #F56C6C">*</span>
+                <span> 第{{' '+(index+1)+' '}}题</span>
+                <p style="margin-top: 20px"> {{item.content}} </p>
+              </div>
+              <div v-for="(subItem,index) in item.groups" :key="subItem.key" class="multiple-completion-input">
+                <p>{{subItem.content}}</p>
+                <el-input class="single-completion-input" :autosize="true"
+                          type="textarea" :clearable="true" resize="none" v-model="item.answer[index]"></el-input>
+              </div>
+            </template>
+            <div class="card-footer">
+              <el-button icon="el-icon-edit" type="primary" size="small" @click="editQuestion(item.type, index)">编辑</el-button>
+            </div>
+          </el-card>
+          <el-button type="danger" class="main-footer">完成编辑</el-button>
+        </el-main>
+      </el-container>
+    </el-container>
 
+    <!--波浪-->
     <wave></wave>
+    <!--单选对话框-->
     <single-choice-add-card ref="single-choice"></single-choice-add-card>
+    <!--多选对话框-->
     <multiple-choice-add-card ref="multiple-choice"></multiple-choice-add-card>
-</div>
+    <!--单项填空对话框-->
+    <single-completion-add-card ref="single-completion"></single-completion-add-card>
+    <!--多项填空对话框-->
+    <multiple-completion-add-card ref="multiple-completion"></multiple-completion-add-card>
+  </div>
 </template>
 
 <script>
 import SingleChoiceAddCard from "../components/SingleChoiceAddCard.vue"
 import MultipleChoiceAddCard from "../components/MultipleChoiceAddCard.vue"
 import Wave from "../components/Wave.vue"
+import SingleCompletionAddCard from '../components/SingleCompletionAddCard.vue'
+import MultipleCompletionAddCard from '../components/MultipleCompletionAddCard.vue'
 export default {
-  components: {SingleChoiceAddCard, Wave, MultipleChoiceAddCard},
+  components: {SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, },
   data(){
     return {
-        // 菜单栏
+      // 菜单栏
       menuList:[
         {
           name: "选择题",
@@ -118,86 +151,112 @@ export default {
           type: "completion",
           children:[
             {
-            name: "单项填空",
-            type: "single-completion"
+              name: "单项填空",
+              type: "single-completion"
+            },
+            {
+              name: "多项填空",
+              type: "multiple-completion"
             }
           ]
         }
       ],
       questionnair:{
-
-          title: 'xxx',
-          questions:[
-                {
-                  content: "第一题",
-                  answer: '',
-                  key: 1,
-                  type: "single-choice",
-                  groups:[
-                    {
-                      content: "xxx",
-                      key: 2,
-                    },
-                    {
-                      content: "xxx",
-                      key: 3,
-                    }
-                  ]
-                },
-                 {
-                  content: "第二题",
-                  answer: [],
-                  key: 4,
-                  type: "multiple-choice",
-                  groups:[
-                    {
-                      content: "xxx",
-                      key: 5,
-                    },
-                    {
-                      content: "xxxxx",
-                      key: 6,
-                    }
-                  ]
-                }
-          ]
+        title: 'xxx',
+        questions:[
+          {
+            content: "第一题",
+            answer: '',
+            key: 1,
+            type: "single-choice",
+            groups:[
+              {
+                content: "xxx",
+                key: 2,
+              },
+              {
+                content: "xxx",
+                key: 3,
+              }
+            ]
+          },
+          {
+            content: "第二题",
+            answer: [],
+            key: 4,
+            type: "multiple-choice",
+            groups:[
+              {
+                content: "xxx",
+                key: 5,
+              },
+              {
+                content: "xxxxx",
+                key: 6,
+              }
+            ]
+          },
+          {
+            content: "第三题",
+            answer: [],
+            key: 7,
+            type: "single-completion",
+            groups:[
+              {
+                content: "xxx",
+                key: 8,
+              },
+            ]
+          },
+          {
+            content: "第四题",
+            answer: [],
+            key: 9,
+            type: "multiple-completion",
+            groups:[
+              {
+                content: "xxx",
+                key: 10,
+              },
+            ]
+          }
+        ]
       }
     }
   },
   methods:{
-      addQuestion(questionType){
-          this.$refs[questionType].addQuestion(questionType)
-      },
-      editQuestion(questionType, index){
-        console.log(questionType)
-        this.$refs[questionType].editQuestion(this.questionnair.questions[index])
-      },
-      cardUp(index){
+    addQuestion(questionType){
+      this.$refs[questionType].addQuestion(questionType)
+    },
+    editQuestion(questionType, index){
+      this.$refs[questionType].editQuestion(this.questionnair.questions[index])
+    },
+    cardUp(index){
 
-        if (index === 0){
-          return this.$notify.error("已经到顶了啊");
-        }
-        let temp = this.questionnair.questions[index];
-        this.questionnair.questions[index] = this.questionnair.questions[index-1];
-        this.questionnair.questions[index-1] = temp;
-        this.$forceUpdate()
-      },
-      cardDown(index){
-
-        if (index === this.questionnair.questions.length - 1){
-          return this.$notify.error("不能继续往下了")
-        }
-        let temp = this.questionnair.questions[index];
-        this.questionnair.questions[index] = this.questionnair.questions[index+1];
-        this.questionnair.questions[index+1] = temp;
-        this.$forceUpdate()
-      },
-      cardDelete(index){
-        this.questionnair.questions.splice(index, 1)
-      },
-      cardCopy(index){
-        this.questionnair.questions.push(JSON.parse(JSON.stringify(this.questionnair.questions[index])))
+      if (index === 0){
+        return this.$notify.error("已经到顶了啊");
       }
+      let temp = this.questionnair.questions[index];
+      this.questionnair.questions[index] = this.questionnair.questions[index-1];
+      this.questionnair.questions[index-1] = temp;
+      this.$forceUpdate()
+    },
+    cardDown(index){
+
+      if (index === this.questionnair.questions.length - 1){
+        return this.$notify.error("不能继续往下了")
+      }
+      let temp = this.questionnair.questions[index];
+      this.questionnair.questions[index] = this.questionnair.questions[index+1];
+      this.questionnair.questions[index+1] = temp;
+      this.$forceUpdate()
+    },
+    cardDelete(index){
+      this.questionnair.questions.splice(index, 1)
+    },
+    cardCopy(index){
+      this.questionnair.questions.push(JSON.parse(JSON.stringify(this.questionnair.questions[index])))
+    }
   }
 }
 </script>
@@ -216,7 +275,7 @@ export default {
 .main{
   width: 90%;
   padding-left: 10%;
-  margin-top: 20pt; 
+  margin-top: 20pt;
   height: 100%;
 }
 
@@ -288,4 +347,8 @@ export default {
   transform: translate(-50%,0);
 }
 
+.single-completion-input, .multiple-completion-input{
+  margin-top: 20pt;
+  width: 80%;
+}
 </style>

@@ -1,14 +1,15 @@
 <template>
   <!--添加题目的对话框-->
   <el-dialog
-      title="添加题目(多选题)"
+      title="添加题目(多项填空题)"
       width="50%"
       :visible.sync="addDialogVisible"
       @close="cancelQuesiton">
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"
-             label-width="80px">
+             label-width="80px"
+    >
       <el-form-item label="题目表述" prop="content">
         <el-input placeholder="请输入题目描述"
                   v-model="questionForm.content" :autosize="true"
@@ -22,7 +23,7 @@
 
       <el-form-item
           v-for="(choice, index) in questionForm.groups"
-          :label="'选项 ' + (index+1) "
+          :label="'填空 ' + (index+1) "
           :key="choice.key"
           :prop="'groups.' + index + '.content'"
           :rules="{
@@ -46,12 +47,16 @@
 <script>
 
 export default {
-  name: "mutiple-choice-addcard",
+  name: "multiple-completion-addcard",
   data(){
     return{
       addDialogVisible : false,
       questionForm: {
-
+        content: '',
+        ismust: false,
+        groups: [
+        ],
+        answer: ''
       },
       questionFormRules:{
         content:[
@@ -81,15 +86,15 @@ export default {
       this.addDialogVisible = true
     },
     editQuestion(question){
-      this.temp = question
-      this.questionForm = JSON.parse(JSON.stringify(question))
+      console.log(question)
+      this.questionForm = question
       this.addDialogVisible = true
     },
     addChoice() {
       this.questionForm.groups.push({
         content: '',
-        key: Date.now()
-      })
+        key: Date.now()})
+      this.questionForm.answer.push('')
     },
     removeChoice(item) {
       var index = this.questionForm.groups.indexOf(item)
@@ -113,6 +118,7 @@ export default {
       })
     },
     cancelQuestion(){
+      console.log(111)
       this.$refs.questionFormRef.resetFields()
       this.addDialogVisible = false
     }

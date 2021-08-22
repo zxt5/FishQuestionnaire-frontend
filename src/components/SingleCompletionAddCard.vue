@@ -1,7 +1,7 @@
 <template>
   <!--添加题目的对话框-->
   <el-dialog
-      title="添加题目(多选题)"
+      title="添加题目(单项填空题)"
       width="50%"
       :visible.sync="addDialogVisible"
       @close="cancelQuesiton">
@@ -19,23 +19,9 @@
                    active-color="#409eff"
                    inactive-color="#dcdfe6"></el-switch>
       </el-form-item>
-
-      <el-form-item
-          v-for="(choice, index) in questionForm.groups"
-          :label="'选项 ' + (index+1) "
-          :key="choice.key"
-          :prop="'groups.' + index + '.content'"
-          :rules="{
-                    required: true,  message: '内容不能为空', trigger: 'blur'
-                }"
-      >
-        <el-input v-model="choice.content" class="choiceinput">
-        </el-input >
-        <el-button @click.prevent="removeChoice(choice)" type="danger">删除</el-button>
-      </el-form-item>
     </el-form>
     <div class="dialog-footer">
-      <el-button icon="el-icon-edit" @click="addChoice" type="primary">新增选项</el-button>
+      <span> </span>
       <div>
         <el-button icon="el-icon-check" @click="finishQuestion" type="success">完成</el-button>
         <el-button icon="el-icon-close" @click="cancelQuestion" type="danger"> 取消</el-button>
@@ -46,12 +32,17 @@
 <script>
 
 export default {
-  name: "mutiple-choice-addcard",
+  name: "single-completion-add-card",
   data(){
     return{
+      temp: '',
       addDialogVisible : false,
       questionForm: {
-
+        content: '',
+        ismust: false,
+        groups: [
+        ],
+        answer: ''
       },
       questionFormRules:{
         content:[
@@ -73,7 +64,7 @@ export default {
         ismust: false,
         groups: [
         ],
-        answer: []
+        answer: ''
       }
     },
     addQuestion(questionType){
@@ -91,16 +82,9 @@ export default {
         key: Date.now()
       })
     },
-    removeChoice(item) {
-      var index = this.questionForm.groups.indexOf(item)
-      if (index !== -1) {
-        this.questionForm.groups.splice(index, 1)
-      }
-    },
     finishQuestion(){
       this.$refs.questionFormRef.validate(valid => {
         if (!valid) return this.$notify.error("表单有错误");
-        if (this.questionForm.groups.length === 0) return this.$notify.error("请至少添加一个选项哦")
         this.addDialogVisible = false
         var index = this.$parent.questionnair.questions.indexOf(this.questionForm)
         if (index === -1){
@@ -124,7 +108,7 @@ export default {
   color: #fff;
 }
 .choiceinput{
-  width: 70%;
+  width: 90%;
   margin-right: 10%;
 }
 .dialog-footer{
