@@ -365,6 +365,7 @@ export default {
   width: 52%;
   text-align: end;
   transform: translate(0, -50%);
+  float: right;
 }
 
 // 按钮布局
