@@ -5,6 +5,9 @@ import Register from "../views/Register";
 import Index from "../views/Index"
 import Questionnaire from "../components/Questionnaire"
 import RecycleBin from "../components/RecycleBin";
+import checkQuestionnaire from "../views/checkQuestionnaire";
+import FillQuestionnaire from "../views/FillQuestionnaire";
+import Questionnairs from "../views/Questionnairs";
 
 Vue.use(VueRouter)
 
@@ -46,6 +49,21 @@ const routes = [
         }
       },
     ]
+  },
+  {
+    path: '/checkQuestionnaire',
+    name: 'CheckQuestionnaire',
+    component: checkQuestionnaire
+  },
+  {
+    path: '/fillQuestionnaire',
+    name: 'fillQuestionnaire',
+    component: FillQuestionnaire
+  },
+  {
+    path: '/questionnairs',
+    name: 'Questionnairs',
+    component: Questionnairs,
   },
   {
     path: '/about',
