@@ -7,9 +7,7 @@
       </div>
       <div class="a_block" v-for="item in info" :key="item" >
         <h1 @click="toDiscuss(item.id)">
-          <el-tag class="label" v-if="item.mode === 'closed'">未发布</el-tag>
-          <el-tag class="label" type="success" v-if="item.mode === 'shared'">已发布</el-tag>
-          <el-tag class="label" type="danger" v-if="item.mode === 'deleted'">已删除</el-tag>
+          <el-tag class="label" type="danger">已删除</el-tag>
           <!--          <el-tag v-for="tag in item.tags" key="tag" class="label">{{tag}}</el-tag>-->
           <span style="display: inline-block; width: 3px"></span>
           <a>{{item.title}}</a>
@@ -39,33 +37,11 @@
 
 <script>
 import axios from "axios";
+import authorization from "../utils/authorization";
 export default {
   data(){
     return {
-      info: [
-        {
-          id: 1,
-          title: '测试问卷',
-          content: '求求各位姥爷填一下小的问卷吧',
-          create_date : '2021-08-21 16:00',
-          mode : 'deleted',
-          answer_num: 123,
-        },
-        {
-          id: 2,
-          title: '测试问卷',
-          content: '求求各位姥爷填一下小的问卷吧',
-          create_date : '2021-08-21 16:00',
-          mode : 'deleted',
-          answer_num: 456,
-        },
-      ],
-      avatar: '',
-      is_final: true,
-      cur_page: 0,
-      max_num: 8,
-      total: 0,
-      loading: false,
+      info: [],
     }
   },
   methods: {
@@ -83,29 +59,26 @@ export default {
       this.$message('click on item ' + command);
     }
   },
-  // mounted() {
-  //   const that = this;
-  //   axios
-  //       .get('/api/forum/',{
-  //         headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-  //       })
-  //       .then(function (response){
-  //         that.info = response.data;
-  //         console.log(that.info);
-  //       })
-  //       .catch(function (error){
-  //         that.$notify.error({
-  //           title: '好像发生了什么错误',
-  //           message: error.message
-  //         })
-  //       })
-  //       .catch(function (error) {
-  //         that.$notify.error({
-  //           title: '好像发生了什么错误',
-  //           message: error.message
-  //         })
-  //       });
-  // }
+  mounted() {
+    const that = this;
+    authorization()
+        .then(function (response){
+          if(response[0]){
+            axios
+                .get('/api/user/' + response[1] + '/recycle/')
+                .then(function(response){
+                  that.info = response.data;
+                  console.log(that.info);
+                })
+                .catch(function (error){
+                  that.$notify.error({
+                    title: '好像发生了什么错误',
+                    message: error.message
+                  })
+                })
+          }
+        })
+  }
 }
 </script>
 

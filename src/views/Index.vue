@@ -5,7 +5,7 @@
         <el-aside width="23%" style="height: fit-content;">
 
           <el-container class="class">
-            <div @click="editBlog" style="margin-left: 0px">
+            <div @click="editQues" style="margin-left: 0px">
               <el-button class="button" circle>
                 <i class="el-icon-edit"></i>
               </el-button>
@@ -55,8 +55,8 @@ export default {
     toBook(){
       this.$router.push({path: '/book'});
     },
-    editBlog(){
-      this.$router.push({path: '/edit/discuss'});
+    editQues(){
+      this.$router.push({path: '/questionnairs'});
     },
     toGroupIndex(){
       this.$router.push({path: '/group/index'});
