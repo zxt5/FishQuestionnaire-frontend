@@ -4,15 +4,12 @@
     <el-container class="main">
       <el-container>
         <!--侧边栏区域-->
-        <el-aside>
+        <el-aside width="23%" style="height: fit-content;">
           <div class="aside-top">
             <span> 题型选择 </span>
           </div>
-          <el-menu
-              background-color="#fff"
-              text-color="#18927B"
-              active-text-color="#000"
-          >
+          <!--              active-text-color="#DA70D6"-->
+          <el-menu class="aside-mid" text-color="#1E90FF">
             <!--一级菜单-->
             <el-submenu v-for="item in menuList" :key="item.type" :index="item.type">
               <template slot="title">
@@ -28,11 +25,12 @@
           </el-menu>
         </el-aside>
         <!--问卷区域-->
-        <el-main style="height: fit-content">
+        <el-main style="height: fit-content" class="questionnaire">
           <!--标题区域-->
           <div class="question-title">
-            <span>{{questionnair.title}}</span>
+            <h2>{{questionnair.title}}</h2>
           </div>
+          <div class="intro">{{questionnair.content}}</div>
           <el-card  v-for="(item, index) in questionnair.questions" :key="item.key">
             <div class="button-top">
               <el-tooltip placement="top" content="上移" effect="dark" :enterable="false">
@@ -51,9 +49,9 @@
             <!--单选框模板-->
             <template v-if="item.type === 'single-choice'">
               <div>
-                <span v-if="item.ismust" style="color: #F56C6C">*</span>
-                <span> 第{{' '+(index+1)+' '}}题</span>
-                <p style="margin-top: 20px"> {{item.content}} </p>
+                <span v-if="item.ismust" style="color: #F56C6C">* </span>
+                <span>{{(index+1)}}. </span>
+                <span style="margin-top: 20px"> {{item.content}} </span>
               </div>
               <el-radio-group v-model="item.answer">
                 <el-radio v-for="subItem in item.groups" :key="subItem.key" :label="subItem.key">
@@ -64,9 +62,9 @@
             <!--多选框模板-->
             <template v-if="item.type === 'multiple-choice'">
               <div>
-                <span v-if="item.ismust" style="color: #F56C6C">*</span>
-                <span> 第{{' '+(index+1)+' '}}题</span>
-                <p style="margin-top: 20px"> {{item.content}} </p>
+                <span v-if="item.ismust" style="color: #F56C6C">* </span>
+                <span>{{(index+1)}}. </span>
+                <span style="margin-top: 20px"> {{item.content}} </span>
               </div>
               <el-checkbox-group v-model="item.answer">
                 <el-checkbox v-for="subItem in item.groups" :key="subItem.key" :label="subItem.key">
@@ -77,9 +75,9 @@
             <!--单项填空模板-->
             <template v-if="item.type === 'single-completion'">
               <div>
-                <span v-if="item.ismust" style="color: #F56C6C">*</span>
-                <span> 第{{' '+(index+1)+' '}}题</span>
-                <p style="margin-top: 20px"> {{item.content}} </p>
+                <span v-if="item.ismust" style="color: #F56C6C">* </span>
+                <span>{{(index+1)}}. </span>
+                <span style="margin-top: 20px"> {{item.content}} </span>
               </div>
               <el-input v-model="item.answer" class="single-completion-input" :autosize="true"
                         type="textarea" :clearable="true" resize="none">
@@ -88,12 +86,12 @@
             <!--多项填空模板-->
             <template v-if="item.type === 'multiple-completion'">
               <div>
-                <span v-if="item.ismust" style="color: #F56C6C">*</span>
-                <span> 第{{' '+(index+1)+' '}}题</span>
-                <p style="margin-top: 20px"> {{item.content}} </p>
+                <span v-if="item.ismust" style="color: #F56C6C">* </span>
+                <span>{{(index+1)}}. </span>
+                <span style="margin-top: 20px"> {{item.content}} </span>
               </div>
               <div v-for="(subItem,index) in item.groups" :key="subItem.key" class="multiple-completion-input">
-                <p>{{subItem.content}}</p>
+                <p style="margin-left:10px">{{subItem.content}}</p>
                 <el-input class="single-completion-input" :autosize="true"
                           type="textarea" :clearable="true" resize="none" v-model="item.answer[index]"></el-input>
               </div>
@@ -108,7 +106,7 @@
     </el-container>
 
     <!--波浪-->
-    <wave></wave>
+<!--    <wave></wave>-->
     <!--单选对话框-->
     <single-choice-add-card ref="single-choice"></single-choice-add-card>
     <!--多选对话框-->
@@ -162,13 +160,15 @@ export default {
         }
       ],
       questionnair:{
-        title: 'xxx',
+        title: 'ABCDEFG',
+        content: '求求各位姥爷填一下小的问卷吧',
         questions:[
           {
             content: "第一题",
             answer: '',
             key: 1,
             type: "single-choice",
+            ismust: 1,
             groups:[
               {
                 content: "xxx",
@@ -185,6 +185,7 @@ export default {
             answer: [],
             key: 4,
             type: "multiple-choice",
+            ismust: 1,
             groups:[
               {
                 content: "xxx",
@@ -201,6 +202,7 @@ export default {
             answer: [],
             key: 7,
             type: "single-completion",
+            ismust: 1,
             groups:[
               {
                 content: "xxx",
@@ -213,6 +215,7 @@ export default {
             answer: [],
             key: 9,
             type: "multiple-completion",
+            ismust: 1,
             groups:[
               {
                 content: "xxx",
@@ -269,14 +272,50 @@ export default {
   text-align: center;
   margin-bottom: 5pt;
   font-size: 14pt;
-  font: bolder;
+  font-weight: bolder;
+  //background-color: white;
+  //opacity: 0.95;
+  //border-radius: 10px;
+  //padding: 25px 10px 20px;
+  //text-align: center;
+  //justify-content: center;
+}
+.question-title{
+  text-align: center;
+  font-size: 30px;
+  font-weight: bolder;
+  margin-bottom: 20px;
+}
+.questionnaire {
+  //padding: 20px;
+  border-radius: 10px;
+  background-color: #fff;
+  opacity: 0.95;
+}
+.intro{
+  padding: 0 2em;
+  margin:10px 0;
+  font-size:15px;
+  //color:#888;
+  line-height: 1.5em;
+}
+.aside-mid{
+  //text-align: center;
+  margin-bottom: 5pt;
+  font-size: 14pt;
+  //font-weight: bolder;
+  //background-color: white;
+  opacity: 0.95;
+  background-color: #FFFFFF;
 }
 // 全部主题区域布局
 .main{
-  width: 90%;
-  padding-left: 10%;
-  margin-top: 20pt;
-  height: 100%;
+  //width: 90%;
+  //padding-left: 10%;
+  //margin-top: 20pt;
+  //height: 100%;
+  width: 80%;
+  margin: 40px auto 40px;
 }
 
 .el-card {
@@ -285,17 +324,19 @@ export default {
 
 // 侧边栏布局
 .el-aside {
-  background-color: #D3DCE6;
-  margin-top: 0%;
+  background-color: #FFFFFF;
+  opacity: 0.95;
+  margin-top: 0;
   padding-top: 10pt;
   border-radius: 3%;
 }
 // element ui 的主题区域布局
 .el-main {
-  background-color: #E9EEF3;
-  color: #333;
-  border-radius: 10px;
-  margin-left: 15pt;
+  //background-color: #E9EEF3;
+  //color: #333;
+  //border-radius: 10px;
+  margin-left: 30pt;
+  //margin-top: 0;
   /*padding-top: 50px;*/
 }
 
