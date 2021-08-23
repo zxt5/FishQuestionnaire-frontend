@@ -79,9 +79,20 @@ const routes = [
     component: FillQuestionnaire
   },
   {
-    path: '/questionnairs',
+    path: '/questionnairs/:id',
     name: 'Questionnairs',
     component: Questionnairs,
+    meta:{
+      title:'创建问卷'
+    }
+  },
+  {
+    path: '/questionnairs/:id',
+    name: 'Questionnairs',
+    component: Questionnairs,
+    meta:{
+      title:'创建问卷'
+    }
   },
   {
     path: '/about',
