@@ -6,7 +6,7 @@
         别看啦 这里啥也没有 <i class="el-icon-cold-drink"></i>
       </div>
       <div class="a_block" v-for="(item, index) in info.slice(4 * (page-1), 4 * page)" :key="index" >
-        <h1 @click="toDiscuss(item.id)">
+        <h1 @click="toCheck(item.id)">
           <el-tag class="label" v-if="item.status === 'closed'">未发布</el-tag>
           <el-tag class="label" type="success" v-if="item.status === 'shared'">已发布</el-tag>
 <!--          <el-tag class="label" type="danger" v-if="item.status === 'deleted'">已删除</el-tag>-->
@@ -85,9 +85,9 @@ export default {
       const date = new Date(iso_date_string);
       return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
     },
-    // toDiscuss(id){
-    //   this.$router.push({path: '/discuss/' + id});
-    // },
+    toCheck(id){
+      this.$router.push({path: '/check/' + id});
+    },
     // toCenter(username){
     //   this.$router.push({path: '/center/' + username});
     // },

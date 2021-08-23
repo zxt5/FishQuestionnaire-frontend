@@ -55,7 +55,7 @@ const routes = [
         name: 'Questionnaire',
         component: Questionnaire,
         meta: {
-          title: '全部问卷',
+          title: '创建问卷',
         }
       },
       {
@@ -69,13 +69,13 @@ const routes = [
     ]
   },
   {
-    path: '/checkQuestionnaire',
-    name: 'CheckQuestionnaire',
+    path: '/check/:id',
+    name: 'check',
     component: checkQuestionnaire
   },
   {
-    path: '/fillQuestionnaire',
-    name: 'fillQuestionnaire',
+    path: '/fill/:id',
+    name: 'fill',
     component: FillQuestionnaire
   },
   {
