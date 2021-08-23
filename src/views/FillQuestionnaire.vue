@@ -137,60 +137,73 @@ export default {
     // },
     click(){
       const that = this;
-      if(this.info.status==='closed') alert('此问卷暂未发布，无法填写！');
-      for(let item of this.info.question_list){
-        if(item.type === 'multiple-choice'){
-          for(let i of item.option_list){
-            if(i.is_answer_choice === true){
-              let data = {
-                questionnaire: that.info.id,
-                question: item.id,
-                option: i.id,
-              };
-              that.answer_list.push(data);
-              // console.log(i.title);
-            }
-          }
-        }
-        else if(item.type === 'single-choice'){
-          for(let i of item.option_list){
-            if(item.option_list.indexOf(i) === item.answer){
-              let data = {
-                questionnaire: that.info.id,
-                question: item.id,
-                option: i.id,
-              };
-              that.answer_list.push(data);
-            }
-          }
-          // console.log(item.answer);
-        }
-        else if(item.type === 'completion'){
-          let data = {
-            questionnaire: that.info.id,
-            question: item.id,
-            option: 1,
-            content: item.answer,
-          };
-          that.answer_list.push(data);
-        }
+      if(this.info.status==='closed'){
+        this.$notify.error({
+          title: '问卷关闭',
+          message: '无法提交'
+        })
       }
-      console.log(that.answer_list);
-      // 提交问卷
-      axios
-          .post('/api/answer/', that.answer_list)
-          .then(function (response){
-            that.$notify.success({
-              title: '问卷提交成功',
-              message: '芜湖'
+      else if(this.info.status==='deleted'){
+        this.$notify.error({
+          title: '问卷已删除',
+          message: '无法提交'
+        })
+      }
+      else{
+        for(let item of this.info.question_list){
+          if(item.type === 'multiple-choice'){
+            for(let i of item.option_list){
+              if(i.is_answer_choice === true){
+                let data = {
+                  questionnaire: that.info.id,
+                  question: item.id,
+                  option: i.id,
+                };
+                that.answer_list.push(data);
+                // console.log(i.title);
+              }
+            }
+          }
+          else if(item.type === 'single-choice'){
+            for(let i of item.option_list){
+              if(item.option_list.indexOf(i) === item.answer){
+                let data = {
+                  questionnaire: that.info.id,
+                  question: item.id,
+                  option: i.id,
+                };
+                that.answer_list.push(data);
+              }
+            }
+            // console.log(item.answer);
+          }
+          else if(item.type === 'completion'){
+            let data = {
+              questionnaire: that.info.id,
+              question: item.id,
+              option: 1,
+              content: item.answer,
+            };
+            that.answer_list.push(data);
+          }
+        }
+        console.log(that.answer_list);
+        // 提交问卷
+        axios
+            .post('/api/answer/', that.answer_list)
+            .then(function (response){
+              that.$notify.success({
+                title: '问卷提交成功',
+                message: '芜湖'
+              })
             })
-          })
-          .catch(function (error){
-            that.$notify.error({
-              title: '好像发生了什么错误',
-              message: error.message
+            .catch(function (error){
+              that.$notify.error({
+                title: '好像发生了什么错误',
+                message: error.message
+              })
             })
-          })
+      }
     },
   }
 }

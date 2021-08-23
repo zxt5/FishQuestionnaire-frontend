@@ -11,6 +11,8 @@
     "core-js": "^3.6.5",
     "element-ui": "^2.15.1",
     "less-loader": "^7.0.0",
+    "qrcode": "^1.4.4",
+    "v-clipboard": "^2.2.3",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
     "vuetify": "^2.4.0",

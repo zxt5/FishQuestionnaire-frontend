@@ -3,7 +3,7 @@
     <div>
       <h2 class="title" style="min-width: 800px">问卷列表</h2>
       <div class="not_found" v-if="!info.length">
-        别看啦 这里啥也没有 <i class="el-icon-cold-drink"></i>
+        快去创建一个新的问卷吧 摸鱼仔~ <i class="el-icon-cold-drink"></i>
       </div>
       <div class="a_block" v-for="(item, index) in info.slice(4 * (page-1), 4 * page)" :key="index" >
         <h1 @click="toCheck(item.id)">
@@ -22,21 +22,24 @@
         <div class="footer">
           <div class="op cur_def">
             <ul>
-              <li v-if="item.status === 'closed'" @click="Start(item.id)"><v-icon small>mdi-motion-play-outline</v-icon>  发布</li>
-              <li v-if="item.status === 'shared'" @click="Close(item.id)"><v-icon small>mdi-stop-circle-outline</v-icon>  停止</li>
-              <li><v-icon small>mdi-content-copy</v-icon>  复制</li>
-              <li @click="Delete(item.id)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
+              <li v-if="item.status === 'closed'" @click="Start(item)"><v-icon>mdi-motion-play-outline</v-icon>  发布</li>
+              <li v-if="item.status === 'shared'" @click="Close(item.id)"><v-icon>mdi-stop-circle-outline</v-icon>  停止</li>
+<!--              <li><v-icon small>mdi-content-copy</v-icon>  复制</li>-->
+              <li><v-icon small>mdi-square-edit-outline</v-icon>  编辑</li>
+              <li @click="showSharePage(item)"><v-icon small>mdi-share-variant-outline</v-icon>  分享</li>
+              <li><v-icon small>mdi-list-status</v-icon>  统计</li>
+              <li @click="Delete(item.id, item.status)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
             </ul>
-            <el-dropdown style="margin-top: 5px" @command="handleCommand" >
-              <span class="el-dropdown-link">
-               更多<i class="el-icon-arrow-down el-icon--right"></i>
-              </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="a">编辑</el-dropdown-item>
-                <el-dropdown-item command="b">分享</el-dropdown-item>
-                <el-dropdown-item command="e" divided>统计</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
+<!--            <el-dropdown style="margin-top: 5px" @command="handleCommand" >-->
+<!--              <span class="el-dropdown-link">-->
+<!--               更多<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
+<!--              </span>-->
+<!--              <el-dropdown-menu slot="dropdown">-->
+<!--                <el-dropdown-item command="a">编辑</el-dropdown-item>-->
+<!--                <el-dropdown-item command="item.id">分享</el-dropdown-item>-->
+<!--                <el-dropdown-item command="e" divided>统计</el-dropdown-item>-->
+<!--              </el-dropdown-menu>-->
+<!--            </el-dropdown>-->
             <div class="created">
               {{ formatted_time(item.create_date) }}
             </div>
@@ -62,6 +65,24 @@
           </v-container>
         </v-app>
       </div>
+      <el-dialog title="分享问卷" :visible.sync="is_show" :close-on-click-modal="true" class="share_window" @opened="makeQrcode" append-to-body>
+        <el-form ref="form" :model="shareInfo" label-width="80px" >
+          <el-form-item label="问卷链接" style="width: 100%;">
+            <el-row>
+              <el-col :span="16">
+                <el-input v-model="shareInfo.url" readonly></el-input>
+              </el-col>
+              <el-col :span="8">
+                <el-button style="margin-left: 5px;" v-clipboard:copy="shareInfo.url" v-clipboard:success="copySuccess" v-clipboard:error="copyError">复制</el-button>
+                <el-button style="margin-left: 5px;" @click="openShareUrl">打开</el-button>
+              </el-col>
+            </el-row>
+          </el-form-item>
+          <el-form-item label="二维码" style="width: 100%;">
+            <canvas id="canvas" style="width: 150px;height: 150px;"></canvas>
+          </el-form-item>
+        </el-form>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -69,8 +90,10 @@
 <script>
 import axios from "axios";
 import authorization from "../utils/authorization";
+import QRCode from 'qrcode';
 export default {
   inject: ['reload'],
+  components:{QRCode},
   data(){
     return {
       info: [],
@@ -78,12 +101,51 @@ export default {
       itemPerpage: 4,
       pageLength: 0,
       pageVisible: 7,
+      is_show: false,
+      shareInfo:{
+        url:'',
+      },
     }
   },
   methods: {
     formatted_time: function (iso_date_string) {
       const date = new Date(iso_date_string);
       return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+    },
+    showSharePage(item) {
+      if(item.status === 'shared'){
+        this.is_show = true;
+        this.shareInfo.url=window.location.origin+"/fill/" + item.id;//问卷链接
+      }
+      else{
+        this.$notify.warning({
+          title: '问卷关闭',
+          message: '请先发布问卷'
+        })
+      }
+    },
+    makeQrcode(){
+      const canvas = document.getElementById('canvas');
+      QRCode.toCanvas(canvas,this.shareInfo.url);
+    },
+    copySuccess(){
+      // console.log(e);
+      this.$message({
+        type: 'success',
+        message: '已复制链接到剪切板'
+      });
+    },
+    //复制分享链接失败
+    copyError(){
+      // console.log(e);
+      this.$message({
+        type: 'error',
+        message: '复制失败'
+      });
+    },
+    //打开分享链接
+    openShareUrl(){
+      window.open(this.shareInfo.url);
     },
     toCheck(id){
       this.$router.push({path: '/check/' + id});
@@ -92,12 +154,14 @@ export default {
     //   this.$router.push({path: '/center/' + username});
     // },
     handleCommand(command) {
-      this.$message('click on item ' + command);
+      if(command === 'b'){
+        this.showSharePage()
+      }
     },
-    Start(id) {
+    Start(item) {
       const that = this;
       axios
-          .put('api/questionnaire/' + id + '/status/', {
+          .put('api/questionnaire/' + item.id + '/status/', {
             status: "shared"
           })
           .then(function (response){
@@ -105,10 +169,12 @@ export default {
               title: '问卷成功发布!',
               message: '您可以进行分享'
             })
-            that.reload();
-            that.$alert('这是链接和二维码', '分享', {
-              confirmButtonText: '确定',
-            });
+            // that.reload();
+            item.status = 'shared';
+            that.showSharePage(item);
+            // that.$alert('这是链接和二维码', '分享', {
+            //   confirmButtonText: '确定',
+            // });
           })
           .catch(function (error){
             that.$notify.error({
@@ -137,32 +203,40 @@ export default {
             })
           })
     },
-    Delete(id) {
-      const that = this;
-      this.$confirm('您确定要删除该问卷吗?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-        center: true
-      }).then(() => {
-        axios
-          .put('api/questionnaire/' + id + '/status/', {
-            status: "deleted"
-          })
-          .then(function (response){
-            that.$notify.success({
-              title: '问卷成功删除!',
-              message: '您可以到回收站中恢复问卷'
-            })
-            that.reload();
-          })
-          .catch(function (error){
-            that.$notify.error({
-              title: '出错啦',
-              message: '删除问卷失败'
-            })
-          })
-      })
+    Delete(id, status) {
+      if(status === 'shared'){
+        this.$notify.warning({
+          title: '桥豆麻袋',
+          message: '请先关闭问卷'
+        })
+      }
+      else{
+        const that = this;
+        this.$confirm('您确定要删除该问卷吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+          center: true
+        }).then(() => {
+          axios
+              .put('api/questionnaire/' + id + '/status/', {
+                status: "deleted"
+              })
+              .then(function (response){
+                that.$notify.success({
+                  title: '问卷成功删除!',
+                  message: '您可以到回收站中恢复问卷'
+                })
+                that.reload();
+              })
+              .catch(function (error){
+                that.$notify.error({
+                  title: '出错啦',
+                  message: '删除问卷失败'
+                })
+              })
+        })
+      }
     }
   },
   mounted() {
@@ -296,8 +370,8 @@ h1:hover{
   line-height: 18px;
 }
 .op{
-  margin-top:15px;
-  font-size:15px;
+  margin-top: 15px;
+  font-size: 15px;
 }
 .el-dropdown-link {
   cursor: pointer;
@@ -312,6 +386,11 @@ li{
 .container{
   padding-bottom: 0;
   padding-top: 0;
+}
+.share_window {
+  border-radius: 10px;
+  color: #e67b79;
+  /*background-color: #e67b79;*/
 }
 </style>
 
