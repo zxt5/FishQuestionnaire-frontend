@@ -7,9 +7,11 @@ import 'element-ui/lib/theme-chalk/index.css';
 import vuetify from './plugins/vuetify'
 import Clipboard from "v-clipboard";
 
+const echarts = require('echarts');
 Vue.config.productionTip = false
 Vue.use(ElementUI);
 Vue.use(Clipboard);
+Vue.prototype.$echarts = echarts
 
 router.beforeEach((to, from, next) => {
   /* 路由发生变化修改页面title */

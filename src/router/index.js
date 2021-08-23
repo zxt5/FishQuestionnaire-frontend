@@ -8,6 +8,7 @@ import RecycleBin from "../components/RecycleBin";
 import checkQuestionnaire from "../views/checkQuestionnaire";
 import FillQuestionnaire from "../views/FillQuestionnaire";
 import Questionnairs from "../views/Questionnairs";
+import Charts from "../views/Charts";
 
 Vue.use(VueRouter)
 
@@ -79,9 +80,17 @@ const routes = [
     component: FillQuestionnaire
   },
   {
-    path: '/questionnairs',
+    path: '/questionnairs/:id',
     name: 'Questionnairs',
     component: Questionnairs,
+    meta:{
+      title:'创建问卷'
+    }
+  },
+  {
+    path: '/charts',
+    name: 'Charts',
+    component: Charts
   },
   {
     path: '/about',

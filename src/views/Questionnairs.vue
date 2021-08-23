@@ -28,10 +28,13 @@
         <el-main style="height: fit-content" class="questionnaire">
           <!--标题区域-->
           <div class="question-title">
-            <h2>{{questionnair.title}}</h2>
+            <h2>{{info.title}}</h2>
+            <h1></h1>
+            <h1></h1>
+            <h1></h1>
           </div>
-          <div class="intro">{{questionnair.content}}</div>
-          <el-card  v-for="(item, index) in questionnair.questions" :key="item.key">
+          <div class="intro">{{info.content}}</div>
+          <el-card  v-for="(item, index) in info.question_list" :key="index">
             <div class="button-top">
               <el-tooltip placement="top" content="上移" effect="dark" :enterable="false">
                 <el-button icon="el-icon-caret-top" type="text" @click="cardUp(index)">    </el-button>
@@ -49,51 +52,51 @@
             <!--单选框模板-->
             <template v-if="item.type === 'single-choice'">
               <div>
-                <span v-if="item.ismust" style="color: #F56C6C">* </span>
+                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
                 <span>{{(index+1)}}. </span>
-                <span style="margin-top: 20px"> {{item.content}} </span>
+                <span style="margin-top: 20px"> {{item.title}} </span>
               </div>
               <el-radio-group v-model="item.answer">
-                <el-radio v-for="subItem in item.groups" :key="subItem.key" :label="subItem.key">
-                  {{subItem.content}}
+                <el-radio v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex">
+                  {{subItem.title}}
                 </el-radio>
               </el-radio-group>
             </template>
             <!--多选框模板-->
             <template v-if="item.type === 'multiple-choice'">
               <div>
-                <span v-if="item.ismust" style="color: #F56C6C">* </span>
+                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
                 <span>{{(index+1)}}. </span>
-                <span style="margin-top: 20px"> {{item.content}} </span>
+                <span style="margin-top: 20px"> {{item.title}} </span>
               </div>
-              <el-checkbox-group v-model="item.answer">
-                <el-checkbox v-for="subItem in item.groups" :key="subItem.key" :label="subItem.key">
-                  {{subItem.content}}
+              <el-checkbox-group v-model="answer[item.ordering - 1]">
+                <el-checkbox  v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex" >
+                  {{subItem.title}}
                 </el-checkbox>
               </el-checkbox-group>
             </template>
             <!--单项填空模板-->
-            <template v-if="item.type === 'single-completion'">
-              <div>
-                <span v-if="item.ismust" style="color: #F56C6C">* </span>
-                <span>{{(index+1)}}. </span>
-                <span style="margin-top: 20px"> {{item.content}} </span>
-              </div>
-              <el-input v-model="item.answer" class="single-completion-input" :autosize="true"
-                        type="textarea" :clearable="true" resize="none">
-              </el-input>
-            </template>
+            <!--            <template v-if="item.type === 'completion'">-->
+            <!--              <div>-->
+            <!--                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>-->
+            <!--                <span>{{(index+1)}}. </span>-->
+            <!--                <span style="margin-top: 20px"> {{item.title}} </span>-->
+            <!--              </div>-->
+            <!--              <el-input v-model="item.answer" class="single-completion-input" :autosize="true"-->
+            <!--                        type="textarea" :clearable="true" resize="none">-->
+            <!--              </el-input>-->
+            <!--            </template>-->
             <!--多项填空模板-->
-            <template v-if="item.type === 'multiple-completion'">
+            <template v-if="item.type === 'completion'">
               <div>
-                <span v-if="item.ismust" style="color: #F56C6C">* </span>
+                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
                 <span>{{(index+1)}}. </span>
-                <span style="margin-top: 20px"> {{item.content}} </span>
+                <span style="margin-top: 20px"> {{item.title}} </span>
               </div>
-              <div v-for="(subItem,index) in item.groups" :key="subItem.key" class="multiple-completion-input">
-                <p style="margin-left:10px">{{subItem.content}}</p>
+              <div v-for="(subItem,subIndex) in item.option_list" :key="subIndex" class="multiple-completion-input">
+                <p style="margin-left:10px">{{subItem.title}}</p>
                 <el-input class="single-completion-input" :autosize="true"
-                          type="textarea" :clearable="true" resize="none" v-model="item.answer[index]"></el-input>
+                          type="textarea" :clearable="true" resize="none" v-model="answer[item.ordering - 1][subIndex]"></el-input>
               </div>
             </template>
             <div class="card-footer">
@@ -106,7 +109,7 @@
     </el-container>
 
     <!--波浪-->
-<!--    <wave></wave>-->
+    <!--    <wave></wave>-->
     <!--单选对话框-->
     <single-choice-add-card ref="single-choice"></single-choice-add-card>
     <!--多选对话框-->
@@ -124,6 +127,8 @@ import MultipleChoiceAddCard from "../components/MultipleChoiceAddCard.vue"
 import Wave from "../components/Wave.vue"
 import SingleCompletionAddCard from '../components/SingleCompletionAddCard.vue'
 import MultipleCompletionAddCard from '../components/MultipleCompletionAddCard.vue'
+import authorization from "@/utils/authorization";
+import axios from "axios";
 export default {
   components: {SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, },
   data(){
@@ -159,71 +164,74 @@ export default {
           ]
         }
       ],
+      info: null,
+      answer: [],
       questionnair:{
-        title: 'ABCDEFG',
-        content: '求求各位姥爷填一下小的问卷吧',
-        questions:[
-          {
-            content: "第一题",
-            answer: '',
-            key: 1,
-            type: "single-choice",
-            ismust: 1,
-            groups:[
-              {
-                content: "xxx",
-                key: 2,
-              },
-              {
-                content: "xxx",
-                key: 3,
-              }
-            ]
-          },
-          {
-            content: "第二题",
-            answer: [],
-            key: 4,
-            type: "multiple-choice",
-            ismust: 1,
-            groups:[
-              {
-                content: "xxx",
-                key: 5,
-              },
-              {
-                content: "xxxxx",
-                key: 6,
-              }
-            ]
-          },
-          {
-            content: "第三题",
-            answer: [],
-            key: 7,
-            type: "single-completion",
-            ismust: 1,
-            groups:[
-              {
-                content: "xxx",
-                key: 8,
-              },
-            ]
-          },
-          {
-            content: "第四题",
-            answer: [],
-            key: 9,
-            type: "multiple-completion",
-            ismust: 1,
-            groups:[
-              {
-                content: "xxx",
-                key: 10,
-              },
-            ]
-          }
-        ]
+        title: null,
+        content: null,
+        questions_list: null,
+        // questions:[
+        //   {
+        //     content: "第一题",
+        //     answer: '',
+        //     key: 1,
+        //     type: "single-choice",
+        //     ismust: 1,
+        //     groups:[
+        //       {
+        //         content: "xxx",
+        //         key: 2,
+        //       },
+        //       {
+        //         content: "xxx",
+        //         key: 3,
+        //       }
+        //     ]
+        //   },
+        //   {
+        //     content: "第二题",
+        //     answer: [],
+        //     key: 4,
+        //     type: "multiple-choice",
+        //     ismust: 1,
+        //     groups:[
+        //       {
+        //         content: "xxx",
+        //         key: 5,
+        //       },
+        //       {
+        //         content: "xxxxx",
+        //         key: 6,
+        //       }
+        //     ]
+        //   },
+        //   {
+        //     content: "第三题",
+        //     answer: [],
+        //     key: 7,
+        //     type: "single-completion",
+        //     ismust: 1,
+        //     groups:[
+        //       {
+        //         content: "xxx",
+        //         key: 8,
+        //       },
+        //     ]
+        //   },
+        //   {
+        //     content: "第四题",
+        //     answer: [],
+        //     key: 9,
+        //     type: "multiple-completion",
+        //     ismust: 1,
+        //     groups:[
+        //       {
+        //         content: "xxx",
+        //         key: 10,
+        //       },
+        //     ]
+        //   }
+        // ]
       }
     }
   },
@@ -260,6 +268,37 @@ export default {
     cardCopy(index){
       this.questionnair.questions.push(JSON.parse(JSON.stringify(this.questionnair.questions[index])))
     }
+  },
+  mounted() {
+    const that = this;
+    authorization().then(function (response) {
+      if(response[0]){
+        console.log(that.$route.params.id);
+        // console.log('/api/questionnaire/' + that.$route.params.id);
+        axios
+            .get('/api/questionnaire/' + that.$route.params.id, {
+              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+            })
+            .then(function (response) {
+              that.info = response.data;
+              console.log(that.info);
+              for (let item of that.info.question_list) {
+                that.answer.push([]);
+              }
+            })
+            .catch(function (error) {
+              that.$notify.error({
+                title: '好像发生了什么错误',
+                message: '',
+              })
+            })
+      }
+      else {
+        this.$notify.error({
+          title: '请先登录！',
+          message: '',})
+      }
+    })
   }
 }
 </script>
