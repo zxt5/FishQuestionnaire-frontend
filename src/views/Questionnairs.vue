@@ -76,16 +76,16 @@
               </el-checkbox-group>
             </template>
             <!--单项填空模板-->
-<!--            <template v-if="item.type === 'completion'">-->
-<!--              <div>-->
-<!--                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>-->
-<!--                <span>{{(index+1)}}. </span>-->
-<!--                <span style="margin-top: 20px"> {{item.title}} </span>-->
-<!--              </div>-->
-<!--              <el-input v-model="item.answer" class="single-completion-input" :autosize="true"-->
-<!--                        type="textarea" :clearable="true" resize="none">-->
-<!--              </el-input>-->
-<!--            </template>-->
+            <!--            <template v-if="item.type === 'completion'">-->
+            <!--              <div>-->
+            <!--                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>-->
+            <!--                <span>{{(index+1)}}. </span>-->
+            <!--                <span style="margin-top: 20px"> {{item.title}} </span>-->
+            <!--              </div>-->
+            <!--              <el-input v-model="item.answer" class="single-completion-input" :autosize="true"-->
+            <!--                        type="textarea" :clearable="true" resize="none">-->
+            <!--              </el-input>-->
+            <!--            </template>-->
             <!--多项填空模板-->
             <template v-if="item.type === 'completion'">
               <div>
@@ -109,7 +109,7 @@
     </el-container>
 
     <!--波浪-->
-<!--    <wave></wave>-->
+    <!--    <wave></wave>-->
     <!--单选对话框-->
     <single-choice-add-card ref="single-choice"></single-choice-add-card>
     <!--多选对话框-->

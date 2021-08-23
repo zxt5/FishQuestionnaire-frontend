@@ -117,35 +117,35 @@ export default {
       }
       const that = this;
       authorization()
-            .then(function (response) {
-              if(response[0]){
-                axios
-                    .post('api/questionnaire/',{
-                      title : that.initQ.title,
-                      content : that.initQ.content,
-                    }, {
-                      headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-                    })
-                    .then(function (response){
-                      console.log(response.data);
-                      that.dialog=false;
-                      that.$router.push({path: '/questionnairs/' + response.data.id});
-                    }).catch(function (error){
-                  that.dialog=false;
-                  that.$notify.error({
-                    title: '出错啦',
-                    message: '创建问卷失败',
+          .then(function (response) {
+            if(response[0]){
+              axios
+                  .post('api/questionnaire/',{
+                    title : that.initQ.title,
+                    content : that.initQ.content,
+                  }, {
+                    headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
                   })
-                })
-              }
-              else {
+                  .then(function (response){
+                    console.log(response.data);
+                    that.dialog=false;
+                    that.$router.push({path: '/questionnairs/' + response.data.id});
+                  }).catch(function (error){
                 that.dialog=false;
                 that.$notify.error({
-                  title: '创建问卷失败',
-                  message: '请先登录！'
+                  title: '出错啦',
+                  message: '创建问卷失败',
                 })
-              }
-            })
+              })
+            }
+            else {
+              that.dialog=false;
+              that.$notify.error({
+                title: '创建问卷失败',
+                message: '请先登录！'
+              })
+            }
+          })
 
     },
 

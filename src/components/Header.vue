@@ -13,8 +13,10 @@
         <a class="logo" :style="{backgroundImage: 'url(' +bg + ')'}" @click="$router.push({path:'/index'})"></a>
       </h1>
       <el-menu-item index="/index" @click="toIndex">我的问卷</el-menu-item>
-      <el-menu-item index="/fillQuestionnaire" @click="$router.push({path:'/fillQuestionnaire'})">填写问卷</el-menu-item>
-      <el-menu-item index="/questionnairs" @click="$router.push({path:'/questionnairs'})">创建问卷</el-menu-item>
+      <el-menu-item index="/fill/1" @click="$router.push({path:'/fill/1'})">填写问卷</el-menu-item>
+      <el-menu-item index="/check/1" @click="$router.push({path:'/check/1'})">预览问卷</el-menu-item>
+      <el-menu-item index="/questionnairs/30" @click="$router.push({path:'/questionnairs/30'})">创建问卷</el-menu-item>
+      <el-menu-item index="/charts" @click="$router.push({path:'/charts'})">统计分析</el-menu-item>
       <div class="user">
         <span class="el-dropdown-link" @click="goLogin" v-if="!hasLogin">
           <el-avatar>登录</el-avatar>

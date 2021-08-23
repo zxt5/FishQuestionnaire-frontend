@@ -1,53 +1,87 @@
 <template>
-  <div class="main">
-    <!--提示和返回-->
+  <div>
     <div class="reminder">
-      <h4 class="text1">
-        摸小鱼温馨提示：只能看看，不能填写哦~
-      </h4>
-      <el-button class="button_back">
-        返回
-      </el-button>
+      <h4>摸小鱼温馨提示：只能预览，不能提交哦~</h4>
     </div>
-    <!--问卷-->
     <div class="questionnaire">
       <!--标题-->
-      <h1 class="title">{{title}}</h1>
-
-      <div class="question_block" v-for="(item,index) in questionList">
-        <div slot="header" class="clearfix">
+      <h1 class="title">{{info.title}}</h1>
+      <div class="content">&nbsp;{{info.content}}</div>
+      <div class="line"></div>
+      <div class="question_block" v-for="(item, index) in info.question_list" :key="index">
+        <div slot="header">
           <div class="questionTitle">
             <!--显示必填标识-->
+            {{(index+1)+'. '+item.title}}
             <span style="color: #F56C6C;">
-              <span v-if="item.is_must_answer">*</span>
-              <span v-else>&nbsp;</span>
-            </span>
-            {{(index+1)+'.'+item.title}}
+            <span v-if="item.is_must_answer">*</span>
+          </span>
           </div>
         </div>
 
         <!--单选题展示-->
-        <div class="single_choice" v-if="item.type=='single-choice'" v-for="optionItem in item.option_list">
-          <!--          这里根据哪个属性记录用户的选择还不明确-->
-          <el-radio v-model="single" :label="1" style="margin: 5px;">{{ optionItem.title }}</el-radio>
-        </div>
+        <v-app class="choice" v-if="item.type==='single-choice'">
+          <v-container
+              class="px-0"
+              fluid
+          >
+            <v-radio-group v-model="item.answer">
+              <v-radio
+                  v-for="optionItem in item.option_list"
+                  :key="optionItem.id"
+                  :label="optionItem.title"
+              ></v-radio>
+            </v-radio-group>
+          </v-container>
+        </v-app>
 
         <!--多选题展示-->
-        <el-checkbox-group v-if="item.type=='multiple-choice'" v-model="multiple">
-          <div class="multiple_choice"  v-for="optionItem in item.option_list">
-            <el-checkbox :label="optionItem.id" style="margin: 5px;">{{ optionItem.title }}</el-checkbox>
-          </div>
-        </el-checkbox-group>
+        <!--        <el-checkbox-group v-if="item.type==='multiple-choice'" v-model="answer_list[index]" onload>-->
+        <!--          <div class="multiple_choice"  v-for="optionItem in item.option_list">-->
+        <!--            <el-checkbox :label="optionItem.ordering" style="margin: 5px;">{{ optionItem.title }}{{optionItem.content}}</el-checkbox>-->
+        <!--          </div>-->
+        <!--        </el-checkbox-group>-->
+        <v-app class="choice" v-if="item.type==='multiple-choice'">
+          <v-container fluid>
+            <v-checkbox
+                v-for="optionItem in item.option_list"
+                :key="optionItem.id"
+                :label="optionItem.title"
+                v-model="optionItem.is_answer_choice"
+                hide-details
+            ></v-checkbox>
+          </v-container>
+        </v-app>
+
+        <!--填空题展示-->
+        <!--        <el-input style="padding-left: 12px; padding-top: 5px; width: 98%"-->
+        <!--                  placeholder="请在此输入答案~"-->
+        <!--                  v-if="item.type==='completion'"-->
+        <!--                  type="textarea"-->
+        <!--                  maxlength="150"-->
+        <!--                  show-word-limit-->
+        <!--                  :autosize="{minRows: 2}"-->
+        <!--                  :rows="item.row"-->
+        <!--                  v-model="answer_list[index]"-->
+        <!--                  resize="none">-->
+        <!--        </el-input>-->
+        <v-app class="choice" v-if="item.type==='completion'">
+          <v-text-field
+              v-model="item.answer"
+              label="请在此输入答案~"
+              single-line
+          ></v-text-field>
+        </v-app>
 
       </div>
-
       <!--内容结束-->
-      <el-button class="button_submit" @click="alarm">提交</el-button>
-      <div class="line"></div>
-      <div class="text2"> 摸鱼问卷 提供技术支持 </div>
+
+      <el-button type="primary" @click="click">提交</el-button>
+
+      <!--      <div class="line"></div>-->
+      <!--      <div class="text2"> 摸鱼问卷 提供技术支持 </div>-->
 
     </div>
-
   </div>
 
 </template>
@@ -57,104 +91,70 @@ import authorization from "../utils/authorization";
 import axios from "axios";
 
 export default {
-  name: "CheckQuestionnaire",
+  name: "check",
   components: {},
   data(){
     return {
       single: 0,
       multiple: [],
       questionnaire_id: 1,
-      title: "问卷标题",
-      questionList: [
-        {
-          id: 1,
-          title: '第一题这个题很难啊为什么这么难呢难不难呢',
-          type: 'single-choice',
-          is_must_answer: true,
-          option_list: [
-            {
-              id: 1,
-              title: 'A.窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光窗前明月光',
-            },
-            {
-              id: 2,
-              title: 'B.疑是地上霜',
-            },
-            {
-              id: 3,
-              title: 'C.举头望明月',
-            },
-            {
-              id: 4,
-              title: 'D.低头思故乡',
-            },
-          ],
-        },
-        {
-          id: 2,
-          title: '第二题很简单很简单很简单',
-          type: 'multiple-choice',
-          is_must_answer: false,
-          option_list: [
-            {
-              id: 1,
-              title: 'A.窗前明月光',
-            },
-            {
-              id: 2,
-              title: 'B.疑是地上霜',
-            },
-            {
-              id: 3,
-              title: 'C.举头望明月',
-            },
-            {
-              id: 4,
-              title: 'D.低头思故乡',
-            },
-          ],
-
-        },
-      ],
-
+      content: '',
+      info: '',
+      answer_list: [],
     }
   },
-  // mounted() {
-  //   const that = this;
-  //   authorization()
-  //     .then(function (response){
-  //       axios
-  //         .get('/api/questionnaire/' + that.questionnaire_id,
-  //             {
-  //               headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-  //             }
-  //         )
-  //         .then(function (response){
-  //           that.title= response.title;
-  //           that.questionList = response.questions;
-  //         })
-  //         .catch(function (error) {
-  //           that.$notify.error({
-  //             title: '好像发生了什么错误',
-  //             message: error.message
-  //           })
-  //         });
-  //     })
-  // },
+  mounted() {
+    const that = this;
+    axios
+        .get('/api/questionnaire/' + this.$route.params.id)
+        .then(response => (this.info = response.data))
+        .catch(function (error){
+          that.$notify.error({
+            title: '好像发生了什么错误',
+            message: error.message
+          })
+        })
+  },
   methods: {
-    alarm(){
-      alert('此问卷暂未发布，无法填写！');
+    // init() {
+    //   console.log("zhixing");
+    //   let i = 0;
+    //   for( let a in this.info.question_list) {
+    //     if(a.type === 'single-choice') {
+    //       let t = 'aaa';
+    //       this.answer_list[i++] = t;
+    //     }
+    //     else if(a.type === 'multiple-choice') {
+    //       let t = [];
+    //       this.answer_list[i++] = t;
+    //     }
+    //     else {
+    //       let t = 'bbb';
+    //       this.answer_list[i++] = t;
+    //     }
+    //   }
+    // },
+    click(){
+      // if(this.info.status==='closed') alert('此问卷暂未发布，无法填写！');
+      this.$notify.warning({
+        title: '当前为预览',
+        message: '无法提交'
+      })
     },
   }
 }
 </script>
 
+
+
 <style scoped>
 
-el-radio {
-  width: 100%;
-  text-overflow: ellipsis;
-  white-space: normal;
+.content {
+  /*text-align: center;*/
+  font-size: 15px;
+  color: #555555;
+  margin: 10px 40px 6px;
+  /*text-indent:1em;*/
 }
 p {
   line-height: 20px;
@@ -164,29 +164,34 @@ p {
 .questionTitle {
   padding-bottom: 5px;
 }
-.single_choice {
+.choice {
   padding-left: 15px;
 }
 
-.multiple_choice {
-  padding-left: 15px;
-}
 .questionnaire{
-  background-color: #F4F4F4;
-  border-radius: 10px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 20px;
-  max-width: 1000px;
-  min-width: 1000px;
+  /*background-color: #ffffff;*/
+  /*border-radius: 10px;*/
+  /*margin: 20px auto;*/
+  /*max-width: 1000px;*/
+  /*min-width: 1000px;*/
+  background-color: #fff;
+  width: 50%;
+  margin: 20px auto;
+  border-radius: 15px;
+  opacity: 1;
+  height: fit-content;
+  padding-top: 10px !important;
+  box-shadow: 0 2px 12px 1px rgba(0, 0, 0, 0.1);
+  padding: 20px;
 }
-
 
 .line{
   /*width: 90%;*/
   height: 1px;
-  border-top: solid 1px;
-  margin: 20px;
+  border-top: solid 2px;
+  margin-left: 30px;
+  margin-right: 30px;
+  color: #3F87DA;
 }
 
 .question_block {
@@ -195,45 +200,42 @@ p {
   padding-right: 40px;
 }
 
-/*.choice_question {*/
-/*  margin-top: 20px;*/
-/*  padding-left: 20px;*/
-/*  padding-right: 40px;*/
-/*}*/
-
-.button_submit{
-  margin-top: 20px;
-  margin-left: 465px;
-  margin-right: 465px;
-  border-radius: 10px;
-  background-color: #3F87DA;
-  opacity: 0.7;
-}
-
-.text1{
-  float: left;
-  margin-left: 600px;
-  margin-top: 18px;
-}
-
-.text2 {
+.el-button{
+  width: 20%;
+  /*color: white;*/
+  display: flex;
+  justify-content: center;
+  background-image: linear-gradient(to right, #0250c5, #3F87DA);
   text-align: center;
-  padding-bottom: 20px;
+  margin: 20px auto !important;
+  height: 40px;
+  letter-spacing: 3em;
+  text-indent: 2em;
+}
+
+.el-button:hover{
+  background-color: #3F87DA;
+}
+
+h4{
+  /*display: inline-block;*/
+  text-align: center;
+  line-height: 60px;
 }
 
 .reminder{
   background-color: #3F87DA;
   opacity: 0.7;
-  margin-left: 0px;
-  margin-right: 0px;
-  min-height: 60px;
+  margin-left: 0;
+  margin-right: 0;
+  height: 60px;
   overflow: hidden;
 }
 
 .title{
   text-align: center;
-  padding-top: 30px;
-  padding-bottom: 20px;
+  padding-top: 40px;
+  padding-bottom: 15px;
 }
 
 .button_back{
@@ -242,5 +244,20 @@ p {
   margin-top: 10px;
   border-radius: 10px;
 }
+</style>
 
+<style>
+.v-input--selection-controls {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  margin-bottom: 8px;
+}
+
+.container{
+  padding-left: 0 !important;
+}
+
+.v-messages{
+  min-height: 0 !important;
+}
 </style>

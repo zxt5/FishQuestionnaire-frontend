@@ -8,6 +8,7 @@ import RecycleBin from "../components/RecycleBin";
 import checkQuestionnaire from "../views/checkQuestionnaire";
 import FillQuestionnaire from "../views/FillQuestionnaire";
 import Questionnairs from "../views/Questionnairs";
+import Charts from "../views/Charts";
 
 Vue.use(VueRouter)
 
@@ -55,7 +56,7 @@ const routes = [
         name: 'Questionnaire',
         component: Questionnaire,
         meta: {
-          title: '全部问卷',
+          title: '创建问卷',
         }
       },
       {
@@ -69,13 +70,13 @@ const routes = [
     ]
   },
   {
-    path: '/checkQuestionnaire',
-    name: 'CheckQuestionnaire',
+    path: '/check/:id',
+    name: 'check',
     component: checkQuestionnaire
   },
   {
-    path: '/fillQuestionnaire',
-    name: 'fillQuestionnaire',
+    path: '/fill/:id',
+    name: 'fill',
     component: FillQuestionnaire
   },
   {
@@ -87,12 +88,9 @@ const routes = [
     }
   },
   {
-    path: '/questionnairs/:id',
-    name: 'Questionnairs',
-    component: Questionnairs,
-    meta:{
-      title:'创建问卷'
-    }
+    path: '/charts',
+    name: 'Charts',
+    component: Charts
   },
   {
     path: '/about',
