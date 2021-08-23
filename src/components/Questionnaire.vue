@@ -1,6 +1,14 @@
 <template>
   <div class="questionnaire" direction="vertical">
     <div>
+      <!--      搜索框-->
+      <div class="search">
+        <div>
+          <el-input v-model="search" placeholder="请输入问卷名进行搜索~" maxLength="100" @keyup.native.enter="toSearch">
+            <el-button slot="append" icon="el-icon-search" @click="toSearch"></el-button>
+          </el-input>
+        </div>
+      </div>
       <h2 class="title" style="min-width: 800px">问卷列表</h2>
       <div class="not_found" v-if="!info.length">
         快去创建一个新的问卷吧 摸鱼仔~ <i class="el-icon-cold-drink"></i>
@@ -25,9 +33,9 @@
               <li v-if="item.status === 'closed'" @click="Start(item)"><v-icon>mdi-motion-play-outline</v-icon>  发布</li>
               <li v-if="item.status === 'shared'" @click="Close(item.id)"><v-icon>mdi-stop-circle-outline</v-icon>  停止</li>
 <!--              <li><v-icon small>mdi-content-copy</v-icon>  复制</li>-->
-              <li><v-icon small>mdi-square-edit-outline</v-icon>  编辑</li>
+              <li @click="toEdit(item)"><v-icon small>mdi-square-edit-outline</v-icon>  编辑</li>
               <li @click="showSharePage(item)"><v-icon small>mdi-share-variant-outline</v-icon>  分享</li>
-              <li><v-icon small>mdi-list-status</v-icon>  统计</li>
+              <li @click="toChart(item)"><v-icon small>mdi-list-status</v-icon>  统计</li>
               <li @click="Delete(item.id, item.status)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
             </ul>
 <!--            <el-dropdown style="margin-top: 5px" @command="handleCommand" >-->
@@ -96,6 +104,7 @@ export default {
   components:{QRCode},
   data(){
     return {
+      search:'',
       info: [],
       page: 1,
       itemPerpage: 4,
@@ -108,9 +117,87 @@ export default {
     }
   },
   methods: {
+    toSearch(){
+      if(this.search === ''){
+        this.$notify.warning({
+          title: '别搞',
+          message: '搜索不能为空哦'
+        })
+      }
+      else{
+        this.$router.push({path: '/search/' + this.search})
+      }
+    },
     formatted_time: function (iso_date_string) {
       const date = new Date(iso_date_string);
       return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+    },
+    toEdit(item){
+      if(item.answer_num === 0){
+        this.$router.push({path: '/edit/' + item.id})
+      }
+      else{
+        // this.$notify.warning({
+        //   title: '此问卷暂无答卷',
+        //   message: '请先回收问卷'
+        // })
+        const that = this;
+        this.$confirm('请选择清空所有答卷或者复制这份问卷', '此问卷已存在答卷', {
+          confirmButtonText: '清空答卷',
+          cancelButtonText: '复制问卷',
+          type: 'warning'
+        }).then(() => {
+          console.log(item.id);
+          axios
+            .put('/api/questionnaire/delete-all-answer/', {
+              id: item.id,
+            }, {
+              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+            })
+            .then(function (response){
+              that.reload();
+              that.$notify.success({
+                title: '芜湖',
+                message: '已清空答卷'
+              })
+            })
+            .catch(function (error){
+              that.$notify.error({
+                title: '出错啦',
+                message: '清空失败'
+              })
+            })
+        }).catch(() => {
+            axios
+              .post('/api/questionnaire/copy/', {
+                id: item.id
+              })
+                .then(function (response){
+                  that.reload();
+                  that.$notify.success({
+                    title: '芜湖',
+                    message: '复制成功'
+                  })
+                })
+                .catch(function (error){
+                  that.$notify.error({
+                    title: '出错啦',
+                    message: '复制失败'
+                  })
+                })
+        });
+      }
+    },
+    toChart(item){
+      if(item.answer_num === 0){
+        this.$notify.warning({
+          title: '此问卷暂无答卷',
+          message: '请先回收问卷'
+        })
+      }
+      else{
+        this.$router.push({path: '/charts/' + item.id});
+      }
     },
     showSharePage(item) {
       if(item.status === 'shared'){
@@ -159,29 +246,37 @@ export default {
       }
     },
     Start(item) {
-      const that = this;
-      axios
-          .put('api/questionnaire/' + item.id + '/status/', {
-            status: "shared"
-          })
-          .then(function (response){
-            that.$notify.success({
-              title: '问卷成功发布!',
-              message: '您可以进行分享'
+      // if(item.question_list === undefined || item.question_list.length === 0){
+      //   this.$notify.warning({
+      //     title: '问卷为空',
+      //     message: '请先创建问题'
+      //   })
+      // }
+      // else{
+        const that = this;
+        axios
+            .put('api/questionnaire/' + item.id + '/status/', {
+              status: "shared"
             })
-            // that.reload();
-            item.status = 'shared';
-            that.showSharePage(item);
-            // that.$alert('这是链接和二维码', '分享', {
-            //   confirmButtonText: '确定',
-            // });
-          })
-          .catch(function (error){
-            that.$notify.error({
-              title: '出错啦',
-              message: '发布问卷失败'
+            .then(function (response){
+              that.$notify.success({
+                title: '问卷成功发布!',
+                message: '您可以进行分享'
+              })
+              // that.reload();
+              item.status = 'shared';
+              that.showSharePage(item);
+              // that.$alert('这是链接和二维码', '分享', {
+              //   confirmButtonText: '确定',
+              // });
             })
-          })
+            .catch(function (error){
+              that.$notify.error({
+                title: '出错啦',
+                message: '发布问卷失败'
+              })
+            })
+      // }
     },
     Close(id) {
       const that = this;
@@ -266,6 +361,13 @@ export default {
 
 <style scoped>
 @import url("../assets/common.css");
+.search{
+  /*background-color: #333333;*/
+  float: right;
+  width: 300px;
+  /*margin: 10px 20px !important;*/
+  height: 40px;
+}
 .a_block{
   background-color: #fff;
   width: 100%;

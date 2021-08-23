@@ -7,7 +7,8 @@
       <!--标题-->
       <h1 class="title">{{info.title}}</h1>
       <div class="content">&nbsp;{{info.content}}</div>
-      <div class="line"></div>
+<!--      <div class="line"></div>-->
+      <el-divider/>
       <div class="question_block" v-for="(item, index) in info.question_list" :key="index">
         <div slot="header">
           <div class="questionTitle">
@@ -16,6 +17,10 @@
             <span style="color: #F56C6C;">
             <span v-if="item.is_must_answer">*</span>
           </span>
+            <span style="color: lightgrey" v-if="item.type==='single-choice'">[单选题]</span>
+            <span style="color: lightgrey" v-if="item.type==='multiple-choice'">[多选题]</span>
+            <span style="color: lightgrey" v-if="item.type==='completion'">[填空题]</span>
+            <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]</span>
           </div>
         </div>
 
@@ -73,6 +78,17 @@
           ></v-text-field>
         </v-app>
 
+        <v-app class="choice" style="margin-top: 20px" v-if="item.type==='scoring'">
+          <v-card-text>
+            <v-slider
+                v-model="item.answer"
+                step="1"
+                thumb-label
+                ticks="always"
+                :max="item.option_list.length - 1"
+            ></v-slider>
+          </v-card-text>
+        </v-app>
       </div>
       <!--内容结束-->
 

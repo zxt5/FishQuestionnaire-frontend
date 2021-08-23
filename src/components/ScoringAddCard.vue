@@ -1,14 +1,13 @@
 <template>
   <!--添加题目的对话框-->
   <el-dialog
-      title="添加题目[多选题]"
+      title="添加题目[评分题]"
       width="50%"
       :visible.sync="addDialogVisible">
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"
-             label-width="80px"
-    >
+             label-width="80px">
       <el-form-item label="题目描述" prop="title">
         <el-input placeholder="请输入题目描述"
                   v-model="questionForm.title" :autosize="true"
@@ -19,22 +18,12 @@
                    active-color="#409eff"
                    inactive-color="#dcdfe6"></el-switch>
       </el-form-item>
-
-      <el-form-item
-          v-for="(option, index) in questionForm.option_list"
-          :label="'选项 ' + (index + 1) "
-          :prop="'option_list.' + index + '.title'"
-          :rules="{
-                    required: true,  message: '内容不能为空', trigger: 'blur'
-                }"
-      >
-        <el-input v-model="option.title" class="choiceinput">
-        </el-input >
-        <el-button @click.prevent="removeChoice(option)" type="danger">删除</el-button>
+      <el-form-item label="最大分值" prop="answer">
+        <el-input-number v-model="questionForm.answer" controls-position="right" @change="handleChange" :min="1" :max="10"></el-input-number>
       </el-form-item>
     </el-form>
     <div class="dialog-footer">
-      <el-button icon="el-icon-edit" @click="addChoice" type="primary">新增选项</el-button>
+      <span> </span>
       <div>
         <el-button icon="el-icon-check" @click="finishQuestion()" type="success">完成</el-button>
         <el-button icon="el-icon-close" @click="cancelQuestion" type="danger"> 取消</el-button>
@@ -48,7 +37,7 @@ import axios from "axios";
 
 export default {
   inject: ['reload'],
-  name: "multiple-choice-addcard",
+  name: "scoring-addcard",
   data(){
     return{
       temp: '',
@@ -71,7 +60,7 @@ export default {
         is_must_answer: false,
         option_list: [
         ],
-        answer: ''
+        answer: 0
       },
       questionFormRules:{
         title:[
@@ -85,6 +74,9 @@ export default {
     }
   },
   methods:{
+    handleChange(value) {
+      console.log(value);
+    },
     resetForm(questionType){
       this.questionForm = {
         // key: Date.now(),
@@ -105,12 +97,13 @@ export default {
       this.temp = question
       this.questionForm = JSON.parse(JSON.stringify(question))
       this.flag = question.id
-      // console.log(this.questionForm);
+      this.questionForm.option_list.splice(0, this.questionForm.option_list.length)
+
       this.addDialogVisible = true
     },
-    addChoice() {
+    addChoice(title) {
       this.questionForm.option_list.push({
-        title: '',
+        title: title,
         content: '',
         ordering: this.questionForm.option_list.length + 1,
         // key: Date.now()
@@ -124,16 +117,17 @@ export default {
     },
 
     finishQuestion(){
+      console.log(this.questionForm.answer);
       this.$refs.questionFormRef.validate(valid => {
         if (!valid) return this.$notify.error({
           title: '表单有错误'
         });
-        if (this.questionForm.option_list.length < 2) return this.$notify.error({
-          title: '请至少添加两个选项噢~'
-        })
         this.addDialogVisible = false;
         const that = this;
         if(this.flag === 0){
+          for(var i = 0; i <= that.questionForm.answer; ++i){
+            that.addChoice(i);
+          }
           axios
               .post('/api/question/', {
                 option_list: that.questionForm.option_list,
@@ -158,6 +152,9 @@ export default {
               })
         }
         else{
+          for(var i = 0; i <= that.questionForm.answer; ++i){
+            that.addChoice(i);
+          }
           axios
               .patch('/api/question/' + that.flag + '/', {
                 option_list: that.questionForm.option_list,

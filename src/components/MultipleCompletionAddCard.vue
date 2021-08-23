@@ -3,8 +3,7 @@
   <el-dialog
       title="添加题目(多项填空题)"
       width="50%"
-      :visible.sync="addDialogVisible"
-      @close="cancelQuesiton">
+      :visible.sync="addDialogVisible">
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"

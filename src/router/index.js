@@ -9,6 +9,9 @@ import checkQuestionnaire from "../views/checkQuestionnaire";
 import FillQuestionnaire from "../views/FillQuestionnaire";
 import Questionnairs from "../views/Questionnairs";
 import Charts from "../views/Charts";
+import Search from "../views/Search";
+import NotFound from "../views/NotFound";
+import Thank from "../views/Thank";
 
 Vue.use(VueRouter)
 
@@ -80,7 +83,7 @@ const routes = [
     component: FillQuestionnaire
   },
   {
-    path: '/questionnairs/:id',
+    path: '/edit/:id',
     name: 'Questionnairs',
     component: Questionnairs,
     meta:{
@@ -91,6 +94,29 @@ const routes = [
     path: '/charts/:id',
     name: 'Charts',
     component: Charts
+  },
+  {
+    path: '/thank',
+    name: 'Thank',
+    component: Thank,
+  },
+  {
+    path: '/notfound',
+    name: 'NotFound',
+    component: NotFound,
+  },
+// {
+//   path: '/search',
+//   name: 'Search',
+//   component: Search,
+// },
+  {
+    path:'/search/:text',
+    name: 'SearchResult',
+    component: Search,
+    meta: {
+      title: '搜索结果'
+    }
   },
   {
     path: '/about',
@@ -107,5 +133,10 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
+
+// const routerPush = Router.prototype.push
+// Router.prototype.push = function push(location) {
+//   return routerPush.call(this, location).catch(error=> error)
+// }
 
 export default router

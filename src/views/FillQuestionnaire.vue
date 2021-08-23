@@ -7,7 +7,8 @@
       <!--标题-->
       <h1 class="title">{{info.title}}</h1>
       <div class="content">&nbsp;{{info.content}}</div>
-      <div class="line"></div>
+<!--      <div class="line"></div>-->
+      <el-divider/>
       <div class="question_block" v-for="(item, index) in info.question_list" :key="index">
         <div slot="header">
           <div class="questionTitle">
@@ -16,6 +17,10 @@
             <span style="color: #F56C6C;">
             <span v-if="item.is_must_answer">*</span>
           </span>
+            <span style="color: lightgrey" v-if="item.type==='single-choice'">[单选题]</span>
+            <span style="color: lightgrey" v-if="item.type==='multiple-choice'">[多选题]</span>
+            <span style="color: lightgrey" v-if="item.type==='completion'">[填空题]</span>
+            <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]</span>
           </div>
         </div>
 
@@ -73,6 +78,17 @@
           ></v-text-field>
         </v-app>
 
+        <v-app class="choice" style="margin-top: 20px" v-if="item.type==='scoring'">
+          <v-card-text>
+            <v-slider
+                v-model="item.answer"
+                step="1"
+                thumb-label
+                ticks="always"
+                :max="item.option_list.length - 1"
+            ></v-slider>
+          </v-card-text>
+        </v-app>
       </div>
       <!--内容结束-->
 
@@ -139,7 +155,7 @@ export default {
       const that = this;
       if(this.info.status==='closed'){
         this.$notify.error({
-          title: '问卷关闭',
+          title: '问卷已关闭',
           message: '无法提交'
         })
       }
@@ -164,7 +180,7 @@ export default {
               }
             }
           }
-          else if(item.type === 'single-choice'){
+          else if(item.type === 'single-choice' || item.type === 'scoring'){
             for(let i of item.option_list){
               if(item.option_list.indexOf(i) === item.answer){
                 let data = {
@@ -181,7 +197,7 @@ export default {
             let data = {
               questionnaire: that.info.id,
               question: item.id,
-              option: 1,
+              option: item.option_list[0].id,
               content: item.answer,
             };
             that.answer_list.push(data);
@@ -192,10 +208,11 @@ export default {
         axios
             .post('/api/answer/', that.answer_list)
             .then(function (response){
-              that.$notify.success({
-                title: '问卷提交成功',
-                message: '芜湖'
-              })
+              // that.$notify.success({
+              //   title: '问卷提交成功',
+              //   message: '芜湖'
+              // })
+              that.$router.push({path: '/thank/'});
             })
             .catch(function (error){
               that.$notify.error({

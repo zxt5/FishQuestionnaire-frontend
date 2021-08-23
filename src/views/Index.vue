@@ -83,7 +83,7 @@ export default {
       this.$router.push({path: '/book'});
     },
     editQues(){
-      this.$router.push({path: '/questionnairs'});
+      this.$router.push({path: '/edit'});
     },
     toGroupIndex(){
       this.$router.push({path: '/group/index'});
@@ -129,7 +129,7 @@ export default {
                   .then(function (response){
                     console.log(response.data);
                     that.dialog=false;
-                    that.$router.push({path: '/questionnairs/' + response.data.id});
+                    that.$router.push({path: '/edit/' + response.data.id});
                   }).catch(function (error){
                 that.dialog=false;
                 that.$notify.error({

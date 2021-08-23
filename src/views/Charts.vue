@@ -72,14 +72,14 @@ export default {
     authorization().then(function (response) {
       if(response[0]){
         console.log(that.$route.params.id);
-        // console.log('/api/questionnaire/' + that.$route.params.id);
+        console.log('/api/questionnaire/' + that.$route.params.id);
         axios
             .get('/api/questionnaire/' + that.$route.params.id + '/report/', {
               headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
             })
             .then(function (response) {
               that.info = response.data;
-              console.log(that.info);
+              // console.log(that.info);
               if('' + that.info.author.username !== '' + that.userLogin) {
                 that.$notify.error({
                   title: '您无权查看此问卷',
@@ -93,12 +93,12 @@ export default {
                     activeNames: [],
                   });
                   for (let subItem of item.option_list[0].answer_list) {
-                    console.log(subItem.modified_time);
+                    // console.log(subItem.modified_time);
                     var time = subItem.modified_time;
                     var date = new Date(time).toJSON();
-                    console.log(date);
+                    // console.log(date);
                     var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
-                    console.log(str);
+                    // console.log(str);
                     subItem.modified_time = str;
                   }
 
@@ -130,10 +130,11 @@ export default {
                   pair: pair,
                 })
               }
-              console.log(that.tmp);
-              console.log(that.answers);
+              // console.log(that.tmp);
+              // console.log(that.answers);
             })
             .catch(function (error) {
+              console.log(error);
               that.$notify.error({
                 title: '好像发生了什么错误',
                 // message: '',
