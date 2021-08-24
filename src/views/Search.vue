@@ -80,7 +80,7 @@
               </el-row>
             </el-form-item>
             <el-form-item label="二维码" style="width: 100%;">
-              <canvas id="canvas" style="width: 150px;height: 150px; margin-left: 200px"></canvas>
+              <canvas id="canvas" style="width: 150px;height: 150px; margin-left: 35%"></canvas>
             </el-form-item>
           </el-form>
         </el-dialog>
