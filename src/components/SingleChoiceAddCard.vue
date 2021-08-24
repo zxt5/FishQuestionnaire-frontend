@@ -152,6 +152,8 @@ export default {
                 ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
+              }, {
+                headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
               .then(function (response){
                 that.reload();
@@ -176,6 +178,8 @@ export default {
                 ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
+              }, {
+                headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
               .then(function (response){
                 that.reload();

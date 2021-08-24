@@ -97,6 +97,7 @@ export default {
               that.info = response.data;
               // console.log(that.info);
               if('' + that.info.author.username !== '' + that.userLogin) {
+                that.$router.push({path: '/index'});
                 that.$notify.error({
                   title: '您无权查看此问卷',
                   // message: '爬',

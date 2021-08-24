@@ -120,13 +120,23 @@ export default {
       content: '',
       info: '',
       answer_list: [],
+      userLogin: localStorage.getItem('username.myblog'),
     }
   },
   mounted() {
     const that = this;
     axios
         .get('/api/questionnaire/' + this.$route.params.id)
-        .then(response => (this.info = response.data))
+        .then(function (response){
+          that.info = response.data;
+          if('' + that.info.author.username !== '' + that.userLogin) {
+            that.$router.push({path: '/index'});
+            that.$notify.error({
+              title: '您无权预览此问卷',
+              // message: '爬',
+            });
+          }
+        })
         .catch(function (error){
           that.$notify.error({
             title: '好像发生了什么错误',

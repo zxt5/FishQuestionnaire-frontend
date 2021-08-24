@@ -241,6 +241,7 @@ export default {
           ]
         }
       ],
+      userLogin: localStorage.getItem('username.myblog'),
       info: null,
       answer: [],
     }
@@ -381,6 +382,13 @@ export default {
             .then(function (response) {
               that.info = response.data;
               console.log(that.info);
+              if('' + that.info.author.username !== '' + that.userLogin) {
+                that.$router.push({path: '/index'});
+                that.$notify.error({
+                  title: '您无权编辑此问卷',
+                  // message: '爬',
+                });
+              }
               for (let item of that.info.question_list) {
                 that.answer.push([]);
               }
