@@ -106,8 +106,8 @@ p {
   text-align: center;
   margin: 20px auto !important;
   height: 40px;
-  letter-spacing: 3em;
-  text-indent: 2em;
+  /*letter-spacing: 3em;*/
+  /*text-indent: 2em;*/
 }
 
 .el-button:hover{
