@@ -76,6 +76,9 @@
                 <span style="color: lightgrey">[单选题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
               </div>
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+                {{item.content}}
+              </div>
               <el-radio-group v-model="item.answer">
                 <el-radio v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex">
                   {{subItem.title}}
@@ -89,6 +92,9 @@
                 <span style="margin-top: 20px"> {{item.title}} </span>
                 <span style="color: lightgrey">[多选题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+              </div>
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+                {{item.content}}
               </div>
               <el-checkbox-group v-model="answer[item.ordering - 1]">
                 <el-checkbox  v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex" >
@@ -115,6 +121,9 @@
                 <span style="color: lightgrey">[填空题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
               </div>
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+                {{item.content}}
+              </div>
               <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex" class="multiple-completion-input">
 <!--                <p style="margin-left:10px">{{subItem.title}}</p>-->
                 <el-input class="single-completion-input" :autosize="true"
@@ -128,6 +137,9 @@
                 <span style="margin-top: 20px"> {{item.title}} </span>
                 <span style="color: lightgrey">[评分题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+              </div>
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+                {{item.content}}
               </div>
 <!--              <el-radio-group v-model="item.answer">-->
 <!--                <el-radio v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex">-->

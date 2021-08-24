@@ -23,7 +23,9 @@
             <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]（默认评分0）</span>
           </div>
         </div>
-
+        <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+          {{item.content}}
+        </div>
         <!--单选题展示-->
         <v-app class="choice" v-if="item.type==='single-choice'">
           <v-container

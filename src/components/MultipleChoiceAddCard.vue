@@ -9,9 +9,18 @@
              ref="questionFormRef"
              label-width="80px"
     >
-      <el-form-item label="题目描述" prop="title">
-        <el-input placeholder="请输入题目描述"
+      <el-form-item label="题目标题" prop="title">
+        <el-input placeholder="请输入题目标题"
+                  maxlength="30"
+                  show-word-limit
                   v-model="questionForm.title" :autosize="true"
+                  type="textarea" :clearable="true" resize="none"> </el-input>
+      </el-form-item>
+      <el-form-item label="备注" prop="content">
+        <el-input placeholder="请输入题目备注"
+                  maxlength="60"
+                  show-word-limit
+                  v-model="questionForm.content" :autosize="true"
                   type="textarea" :clearable="true" resize="none"> </el-input>
       </el-form-item>
       <el-form-item label="是否必选" prop="is_must_answer">
