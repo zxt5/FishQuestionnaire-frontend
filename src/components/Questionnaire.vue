@@ -32,8 +32,8 @@
             <ul>
               <li v-if="item.status === 'closed'" @click="Start(item)"><v-icon>mdi-motion-play-outline</v-icon>  发布</li>
               <li v-if="item.status === 'shared'" @click="Close(item.id)"><v-icon>mdi-stop-circle-outline</v-icon>  停止</li>
-<!--              <li><v-icon small>mdi-content-copy</v-icon>  复制</li>-->
               <li @click="toEdit(item)"><v-icon small>mdi-square-edit-outline</v-icon>  编辑</li>
+              <li @click="Copy(item.id)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
               <li @click="showSharePage(item)"><v-icon small>mdi-share-variant-outline</v-icon>  分享</li>
               <li @click="toChart(item)"><v-icon small>mdi-list-status</v-icon>  统计</li>
               <li @click="Delete(item.id, item.status)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
@@ -142,9 +142,9 @@ export default {
         //   message: '请先回收问卷'
         // })
         const that = this;
-        this.$confirm('请选择清空所有答卷或者复制这份问卷', '此问卷已存在答卷', {
+        this.$confirm('请先选择清空答卷或者复制问卷', '此问卷已存在答卷', {
           confirmButtonText: '清空答卷',
-          cancelButtonText: '复制问卷',
+          cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           console.log(item.id);
@@ -167,25 +167,7 @@ export default {
                 message: '清空失败'
               })
             })
-        }).catch(() => {
-            axios
-              .post('/api/questionnaire/copy/', {
-                id: item.id
-              })
-                .then(function (response){
-                  that.reload();
-                  that.$notify.success({
-                    title: '芜湖',
-                    message: '复制成功'
-                  })
-                })
-                .catch(function (error){
-                  that.$notify.error({
-                    title: '出错啦',
-                    message: '复制失败'
-                  })
-                })
-        });
+        })
       }
     },
     toChart(item){
@@ -295,6 +277,26 @@ export default {
             that.$notify.error({
               title: '出错啦',
               message: '关闭问卷失败'
+            })
+          })
+    },
+    Copy(id){
+      const that = this;
+      axios
+          .post('/api/questionnaire/copy/', {
+            id: id
+          })
+          .then(function (response){
+            that.reload();
+            that.$notify.success({
+              title: '芜湖',
+              message: '复制成功'
+            })
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '复制失败'
             })
           })
     },

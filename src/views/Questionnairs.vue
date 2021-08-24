@@ -145,8 +145,8 @@
               <el-button icon="el-icon-edit" type="primary" size="small" @click="editQuestion(item.type, index)">编辑</el-button>
             </div>
           </el-card>
-          <div class="not_found" v-if="!info.length">
-            左侧选择题型可以创建问题噢  摸鱼仔o(*￣▽￣*)ブ <i class="el-icon-cold-drink"></i>
+          <div class="not_found" style="line-height: 100px">
+            快去侧边栏选择题型创建新的问题o(*￣▽￣*)ブ <i class="el-icon-cold-drink"></i>
           </div>
           <el-button type="danger" class="main-footer" @click="Finish">完成编辑</el-button>
         </el-main>
@@ -243,11 +243,18 @@ export default {
       }
     },
     Finish(){
-      this.$router.push({path: '/index'});
-      this.$notify.success({
-        title: '问卷编辑完成',
-        message: '快去发布吧'
-      })
+      if(this.info.question_list.length === 0){
+        this.$notify.warning({
+          title: '请至少创建一个问题哦'
+        })
+      }
+      else{
+        this.$router.push({path: '/index'});
+        this.$notify.success({
+          title: '问卷编辑完成',
+          message: '快去发布吧'
+        })
+      }
     },
     addQuestion(questionType){
       this.$refs[questionType].addQuestion(questionType)

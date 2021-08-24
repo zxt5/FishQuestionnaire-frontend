@@ -34,12 +34,18 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    meta:{
+      title:'登录'
+    }
   },
   {
     path: '/register',
     name: 'Register',
-    component: Register
+    component: Register,
+    meta:{
+      title:'注册'
+    }
   },
   {
     path: '/index',
@@ -59,7 +65,7 @@ const routes = [
         name: 'Questionnaire',
         component: Questionnaire,
         meta: {
-          title: '创建问卷',
+          title: '全部问卷',
         }
       },
       {
@@ -75,35 +81,50 @@ const routes = [
   {
     path: '/check/:id',
     name: 'check',
-    component: checkQuestionnaire
+    component: checkQuestionnaire,
+    meta:{
+      title:'问卷预览'
+    }
   },
   {
     path: '/fill/:id',
     name: 'fill',
-    component: FillQuestionnaire
+    component: FillQuestionnaire,
+    meta:{
+      title:'问卷填写'
+    }
   },
   {
     path: '/edit/:id',
     name: 'Questionnairs',
     component: Questionnairs,
     meta:{
-      title:'创建问卷'
+      title:'问卷编辑'
     }
   },
   {
     path: '/charts/:id',
     name: 'Charts',
-    component: Charts
+    component: Charts,
+    meta:{
+      title:'结果统计'
+    }
   },
   {
     path: '/thank',
     name: 'Thank',
     component: Thank,
+    meta:{
+      title:'填写完成'
+    }
   },
   {
     path: '/notfound',
     name: 'NotFound',
     component: NotFound,
+    meta:{
+      title:'找不到页面'
+    }
   },
 // {
 //   path: '/search',
