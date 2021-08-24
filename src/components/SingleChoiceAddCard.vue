@@ -22,6 +22,7 @@
       <el-form-item
           v-for="(option, index) in questionForm.option_list"
           :label="'选项 ' + (index + 1) "
+          :key="index"
           :prop="'option_list.' + index + '.title'"
           :rules="{
                     required: true,  message: '内容不能为空', trigger: 'blur'

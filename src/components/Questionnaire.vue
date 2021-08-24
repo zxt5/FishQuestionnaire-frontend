@@ -25,7 +25,9 @@
         <div style="float:right !important;">
           <v-icon small style="vertical-align: center">mdi-file-document-multiple-outline</v-icon>  {{ item.answer_num }}
         </div>
-        <div class="intro">{{item.content}}</div>
+        <div class="intro">
+          {{item.content}}
+        </div>
 
         <div class="footer">
           <div class="op cur_def">
