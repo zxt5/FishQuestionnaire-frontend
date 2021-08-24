@@ -2,8 +2,8 @@
   <div >
     <!--主题内容区域-->
     <div class="button-header">
-      <el-button type="primary" >导出excel</el-button>
-      <el-button type="danger">导出pdf</el-button>
+<!--      <el-button type="primary" >导出excel</el-button>-->
+<!--      <el-button type="danger">导出pdf</el-button>-->
     </div>
     <el-container class="main">
       <!--图像区域-->
@@ -15,14 +15,30 @@
           <span style="margin-top: 20px;margin-left: 6px;color: darkgray" v-if="answer.type === 'single-choice'">[单选题]</span>
           <span style="margin-top: 20px;margin-left: 6px;color: darkgray" v-if="answer.type === 'multiple-choice'">[多选题]</span>
           <span style="margin-top: 20px;margin-left: 6px;color: darkgray" v-if="answer.type === 'completion'">[填空题]</span>
+          <span style="margin-top: 20px;margin-left: 6px;color: darkgray" v-if="answer.type === 'scoring'">[评分题]</span>
 <!--          <span style="margin-top: 20px;margin-left: 10px"> [单选题] </span>-->
           <el-collapse v-model="tmp[index].activeNames" @change="handleChange(index)" style="margin-top: 10px">
             <el-collapse-item  name="2" style="margin-left: 10px">
-              <template slot="title">
-                选项结果<i class="header-icon el-icon-info"></i>
+              <template slot="title" v-if="answer.type === 'single-choice' || answer.type === 'multiple-choice'">
+                选项结果 <i class="header-icon el-icon-info"></i>
               </template>
-              <el-table :data="answer.option_list" stripe style="margin-left: 20px" v-if="answer.type !== 'completion'">
+              <template slot="title" v-if="answer.type === 'completion'">
+                填空结果 <i class="header-icon el-icon-info"></i>
+              </template>
+              <template slot="title" v-if="answer.type === 'scoring'">
+                评分结果 <i class="header-icon el-icon-info"></i>
+              </template>
+              <el-table :data="answer.option_list" stripe style="margin-left: 20px" v-if="answer.type === 'single-choice' || answer.type === 'multiple-choice'">
                 <el-table-column prop="title" label="选项">
+                </el-table-column>
+                <el-table-column prop="number" label="数量">
+                </el-table-column>
+                <el-table-column prop="percent_string" label="占比">
+                </el-table-column>
+              </el-table>
+
+              <el-table :data="answer.option_list" stripe style="margin-left: 20px" v-if="answer.type === 'scoring'">
+                <el-table-column prop="title" label="评分">
                 </el-table-column>
                 <el-table-column prop="number" label="数量">
                 </el-table-column>
@@ -365,7 +381,7 @@ export default {
   width: 70%;
   left: 50%;
   height: 100%;
-  margin-top: 10pt;
+  margin-top: 20pt;
   transform: translate(-50%);
 }
 
@@ -375,6 +391,7 @@ export default {
   background-color: #fff;
   opacity: 0.95;
   margin-bottom: 40px;
+  margin-top: 20px;
 }
 
 .el-main {
