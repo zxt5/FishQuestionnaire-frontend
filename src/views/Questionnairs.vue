@@ -45,7 +45,7 @@
           <div class="question-title">
             <h2>{{info.title}}</h2>
           </div>
-          <div class="intro"><h2 style="margin-bottom:20px">问卷描述</h2> {{info.content}}</div>
+          <div class="intro"> {{info.content}}</div>
           <div class="title-footer">
             <span></span>
             <el-button icon="el-icon-edit" type="primary" size="small" @click="editTitle">编辑</el-button>
