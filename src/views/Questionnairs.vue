@@ -45,7 +45,12 @@
           <div class="question-title">
             <h2>{{info.title}}</h2>
           </div>
-          <div class="intro">{{info.content}}</div>
+          <div class="intro"><h2 style="margin-bottom:20px">问卷描述</h2> {{info.content}}</div>
+          <div class="title-footer">
+            <span></span>
+            <el-button icon="el-icon-edit" type="primary" size="small" @click="editTitle">编辑</el-button>
+          </div>
+          <title-content-dialog ref="title-content-dialog" :prop_title="info.title" :prop_content="info.content"></title-content-dialog>
           <el-divider/>
           <el-card  v-for="(item, index) in info.question_list" :key="index">
             <div class="op">
@@ -190,8 +195,9 @@ import MultipleCompletionAddCard from '../components/MultipleCompletionAddCard.v
 import authorization from "@/utils/authorization";
 import ScoringAddCard from "../components/ScoringAddCard";
 import axios from "axios";
+import TitleContentDialog from '../components/TitleContentDialog.vue'
 export default {
-  components: {SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard},
+  components: {SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard, TitleContentDialog},
   data(){
     return {
       // 菜单栏
@@ -357,6 +363,9 @@ export default {
               message: '复制失败'
             })
           })
+    },
+    editTitle(){
+      this.$refs["title-content-dialog"].edit()
     }
   },
   mounted() {
@@ -507,7 +516,12 @@ export default {
   margin: 10px;
   /*border-radius : 50%;*/
 }
-
+.title-footer{
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin: 35px;
+}
 .button:hover{
   background-color: #d43f8d;
 }
