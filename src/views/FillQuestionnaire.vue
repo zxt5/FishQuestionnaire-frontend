@@ -20,7 +20,7 @@
             <span style="color: lightgrey" v-if="item.type==='single-choice'">[单选题]</span>
             <span style="color: lightgrey" v-if="item.type==='multiple-choice'">[多选题]</span>
             <span style="color: lightgrey" v-if="item.type==='completion'">[填空题]</span>
-            <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]</span>
+            <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]（默认评分0）</span>
           </div>
         </div>
 
@@ -117,6 +117,7 @@ export default {
       content: '',
       info: '',
       answer_list: [],
+      flag: true,
     }
   },
   mounted() {
@@ -152,6 +153,7 @@ export default {
     //   }
     // },
     click(){
+      let tmp;
       const that = this;
       if(this.info.status==='closed'){
         this.$notify.error({
@@ -166,8 +168,11 @@ export default {
         })
       }
       else{
+        this.answer_list.splice(0, this.answer_list.length);
+        this.flag = true;
         for(let item of this.info.question_list){
           if(item.type === 'multiple-choice'){
+            tmp = false;
             for(let i of item.option_list){
               if(i.is_answer_choice === true){
                 let data = {
@@ -176,11 +181,17 @@ export default {
                   option: i.id,
                 };
                 that.answer_list.push(data);
+                tmp = true;
                 // console.log(i.title);
               }
             }
+            if(tmp === false && item.is_must_answer) {
+              that.flag = false;
+              console.log('多选')
+            }
           }
           else if(item.type === 'single-choice' || item.type === 'scoring'){
+            tmp = false;
             for(let i of item.option_list){
               if(item.option_list.indexOf(i) === item.answer){
                 let data = {
@@ -188,38 +199,57 @@ export default {
                   question: item.id,
                   option: i.id,
                 };
+                tmp = true;
                 that.answer_list.push(data);
               }
+            }
+            if(tmp === false && item.is_must_answer) {
+              that.flag = false;
+              console.log('单选 | 评分')
             }
             // console.log(item.answer);
           }
           else if(item.type === 'completion'){
-            let data = {
-              questionnaire: that.info.id,
-              question: item.id,
-              option: item.option_list[0].id,
-              content: item.answer,
-            };
-            that.answer_list.push(data);
+            if(item.answer === '' && item.is_must_answer) {
+              that.flag = false;
+              console.log('填空')
+            }
+            else {
+              let data = {
+                questionnaire: that.info.id,
+                question: item.id,
+                option: item.option_list[0].id,
+                content: item.answer,
+              };
+              that.answer_list.push(data);
+            }
           }
         }
         console.log(that.answer_list);
-        // 提交问卷
-        axios
-            .post('/api/answer/', that.answer_list)
-            .then(function (response){
-              // that.$notify.success({
-              //   title: '问卷提交成功',
-              //   message: '芜湖'
-              // })
-              that.$router.push({path: '/thank/'});
-            })
-            .catch(function (error){
-              that.$notify.error({
-                title: '好像发生了什么错误',
-                message: error.message
+        if(that.flag === true) {
+          // 提交问卷
+          axios
+              .post('/api/answer/', that.answer_list)
+              .then(function (response){
+                // that.$notify.success({
+                //   title: '问卷提交成功',
+                //   message: '芜湖'
+                // })
+                that.$router.push({path: '/thank/'});
               })
-            })
+              .catch(function (error){
+                that.$notify.error({
+                  title: '好像发生了什么错误',
+                  message: error.message
+                })
+              })
+        }
+        else {
+          that.$notify.warning({
+            title: '请完成所有的必选项题目!',
+          })
+        }
+
       }
     },
   }
@@ -264,6 +294,7 @@ p {
   padding-top: 10px !important;
   box-shadow: 0 2px 12px 1px rgba(0, 0, 0, 0.1);
   padding: 20px;
+  margin-bottom: 40px;
 }
 
 .line{

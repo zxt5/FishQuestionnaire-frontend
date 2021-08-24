@@ -20,7 +20,7 @@
             <span style="color: lightgrey" v-if="item.type==='single-choice'">[单选题]</span>
             <span style="color: lightgrey" v-if="item.type==='multiple-choice'">[多选题]</span>
             <span style="color: lightgrey" v-if="item.type==='completion'">[填空题]</span>
-            <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]</span>
+            <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]（默认评分0）</span>
           </div>
         </div>
 
