@@ -118,7 +118,7 @@ export default {
       questionnaire_id: 1,
       content: '',
       info: '',
-      answer_list: [],
+      submit_list: [],
       flag: true,
     }
   },
@@ -170,7 +170,7 @@ export default {
         })
       }
       else{
-        this.answer_list.splice(0, this.answer_list.length);
+        this.submit_list.splice(0, this.submit_list.length);
         this.flag = true;
         for(let item of this.info.question_list){
           if(item.type === 'multiple-choice'){
@@ -178,11 +178,11 @@ export default {
             for(let i of item.option_list){
               if(i.is_answer_choice === true){
                 let data = {
-                  questionnaire: that.info.id,
+                  // questionnaire: that.info.id,
                   question: item.id,
                   option: i.id,
                 };
-                that.answer_list.push(data);
+                that.submit_list.push(data);
                 tmp = true;
                 // console.log(i.title);
               }
@@ -197,12 +197,12 @@ export default {
             for(let i of item.option_list){
               if(item.option_list.indexOf(i) === item.answer){
                 let data = {
-                  questionnaire: that.info.id,
+                  // questionnaire: that.info.id,
                   question: item.id,
                   option: i.id,
                 };
                 tmp = true;
-                that.answer_list.push(data);
+                that.submit_list.push(data);
               }
             }
             if(tmp === false && item.is_must_answer) {
@@ -218,20 +218,25 @@ export default {
             }
             else {
               let data = {
-                questionnaire: that.info.id,
+                // questionnaire: that.info.id,
                 question: item.id,
                 option: item.option_list[0].id,
                 content: item.answer,
               };
-              that.answer_list.push(data);
+              that.submit_list.push(data);
             }
           }
         }
-        console.log(that.answer_list);
+        console.log(that.submit_list);
         if(that.flag === true) {
           // 提交问卷
           axios
-              .post('/api/answer/', that.answer_list)
+              .post('/api/answer/', {
+                ip: returnCitySN.cip,
+                cname: returnCitySN.cname,
+                questionnaire: that.info.id,
+                answer_list: that.submit_list,
+              })
               .then(function (response){
                 // that.$notify.success({
                 //   title: '问卷提交成功',
