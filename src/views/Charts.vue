@@ -2,10 +2,10 @@
   <div >
     <!--主题内容区域-->
     <div class="button-header">
-<!--      <el-button type="primary" >导出excel</el-button>-->
-<!--      <el-button type="danger">导出pdf</el-button>-->
+      <el-button type="primary" @click="downloadExcel">导出excel</el-button>
+      <el-button type="danger" @click="getPdf()">导出pdf</el-button>
     </div>
-    <el-container class="main">
+    <el-container class="main" id="pdfDom">
       <!--图像区域-->
       <el-main style="height: fit-content" class="questionnaire">
         <!--折叠面板-->
@@ -95,6 +95,7 @@ export default {
             })
             .then(function (response) {
               that.info = response.data;
+              that.htmlTitle = response.data.title + '_数据分析';
               // console.log(that.info);
               if('' + that.info.author.username !== '' + that.userLogin) {
                 that.$router.push({path: '/index'});
@@ -167,6 +168,7 @@ export default {
   },
   data(){
     return {
+      htmlTitle:'',
       // 当前用户
       userLogin: localStorage.getItem('username.myblog'),
       info: null,
@@ -258,6 +260,11 @@ export default {
     }
   },
   methods: {
+    downloadExcel() {
+      let a = document.createElement('a')
+      a.href ="http://49.233.52.139:8000/api/questionnaire/"+this.info.id+"/export-xls/";
+      a.click();
+    },
     init(){
       console.log(this.tmp);
       for (let i = 0; i < this.answers.length; i++){

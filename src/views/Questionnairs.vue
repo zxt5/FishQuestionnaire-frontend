@@ -46,8 +46,16 @@
             <h2>{{info.title}}</h2>
           </div>
           <div class="intro"> {{info.content}}</div>
+<!--          是否显示题号-->
+<!--          <el-switch-->
+<!--              @change="is_show_num"-->
+<!--              v-model="show_num"-->
+<!--              active-color="#13ce66"-->
+<!--              inactive-color="#ff4949">-->
+<!--          </el-switch>-->
           <div class="title-footer">
             <span></span>
+            <el-button @click="is_show_num" type="primary" size="small" class="button_1">{{text_1}}</el-button>
             <el-button icon="el-icon-edit" type="primary" size="small" @click="editTitle">编辑</el-button>
           </div>
           <title-content-dialog ref="title-content-dialog" :prop_title="info.title" :prop_content="info.content"></title-content-dialog>
@@ -76,7 +84,7 @@
             <!--单选框模板-->
             <template v-if="item.type === 'single-choice'">
               <div>
-                <span>{{(index+1)}}. </span>
+                <span v-if="show_num">{{(index+1)}}. </span>
                 <span style="margin-top: 20px"> {{item.title}} </span>
                 <span style="color: lightgrey">[单选题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
@@ -93,7 +101,7 @@
             <!--多选框模板-->
             <template v-if="item.type === 'multiple-choice'">
               <div>
-                <span>{{(index+1)}}. </span>
+                <span v-if="show_num">{{(index+1)}}. </span>
                 <span style="margin-top: 20px"> {{item.title}} </span>
                 <span style="color: lightgrey">[多选题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
@@ -121,7 +129,7 @@
             <!--多项填空模板-->
             <template v-if="item.type === 'completion'">
               <div>
-                <span>{{(index+1)}}. </span>
+                <span v-if="show_num">{{(index+1)}}. </span>
                 <span style="margin-top: 20px"> {{item.title}} </span>
                 <span style="color: lightgrey">[填空题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
@@ -138,7 +146,7 @@
 <!--            评分模板-->
             <template v-if="item.type === 'scoring'">
               <div>
-                <span>{{(index+1)}}. </span>
+                <span v-if="show_num">{{(index+1)}}. </span>
                 <span style="margin-top: 20px"> {{item.title}} </span>
                 <span style="color: lightgrey">[评分题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
@@ -244,9 +252,36 @@ export default {
       userLogin: localStorage.getItem('username.myblog'),
       info: null,
       answer: [],
+      text_1:'',
+      show_num: '',
     }
   },
   methods:{
+    is_show_num() {
+      if(this.text_1 === '显示题号') {
+        this.text_1 = '隐藏题号';
+        this.show_num = true;
+      }
+      else {
+        this.text_1 = '显示题号';
+        this.show_num = false;
+      }
+      const that = this;
+      axios
+          .patch('/api/questionnaire/' + that.info.id + '/', {
+            is_show_question_num: this.show_num,
+          }, {
+            headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+          })
+          .then(function (response){
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '设置失败'
+            })
+          })
+    },
     check(){
       this.$router.push({path: '/check/' + this.$route.params.id});
     },
@@ -381,6 +416,9 @@ export default {
             })
             .then(function (response) {
               that.info = response.data;
+              that.show_num = response.data.is_show_question_num;
+              if(that.show_num === true) that.text_1 = '隐藏题号';
+              else that.text_1 = '显示题号';
               console.log(that.info);
               if('' + that.info.author.username !== '' + that.userLogin) {
                 that.$router.push({path: '/index'});
@@ -419,12 +457,6 @@ export default {
   margin-bottom: 5pt;
   font-size: 20px !important;
   font-weight: bolder;
-  //background-color: white;
-  //opacity: 0.95;
-  //border-radius: 10px;
-  //padding: 25px 10px 20px;
-  //text-align: center;
-  //justify-content: center;
 }
 .question-title{
   text-align: center;
