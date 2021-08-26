@@ -1,6 +1,6 @@
 <template>
   <!--添加题目的对话框-->
-  <div class="add-question-card">
+    <div class="add-question-card">
     <el-divider></el-divider>
     <el-form :model="questionForm"
              :rules="questionFormRules"
@@ -36,7 +36,7 @@
         <el-button icon="el-icon-close" @click="cancelQuestion" type="danger"> 取消</el-button>
       </div>
     </div>
-  </div>
+    </div>
 </template>
 <script>
 
@@ -104,7 +104,7 @@ export default {
       if (this.addDialogVisible) {
         this.addDialogVisible = false
         this.finishQuestion()
-        return
+        return 
       }
       this.addDialogVisible = true
       this.questionForm = question

@@ -1,6 +1,6 @@
 <template>
   <!--添加题目的对话框-->
-  <div class="add-question-card">
+    <div class="add-question-card">
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"
@@ -24,7 +24,7 @@
         <el-button icon="el-icon-close" @click="cancelQuestion" type="danger"> 取消</el-button>
       </div>
     </div> -->
-  </div>
+    </div>
 </template>
 <script>
 
@@ -92,30 +92,30 @@ export default {
     },
     finishQuestion(){
       this.$refs.questionFormRef.validate(valid => {
-            if (!valid) return this.$notify.error({
-              title: '表单有错误'
-            });
-            this.addDialogVisible = false;
-            const that = this;
-            axios
-                .patch('/api/questionnaire/'+ that.$route.params.id+'/', {
-                  title: that.questionForm.title,
-                  content: that.questionForm.content,
+        if (!valid) return this.$notify.error({
+          title: '表单有错误'
+        });
+        this.addDialogVisible = false;
+        const that = this;
+          axios
+              .patch('/api/questionnaire/'+ that.$route.params.id+'/', {
+                title: that.questionForm.title,
+                content: that.questionForm.content,
+              })
+              .then(function (response){
+                // that.reload();
+                that.$notify.success({
+                  title: '保存成功'
                 })
-                .then(function (response){
-                  // that.reload();
-                  that.$notify.success({
-                    title: '保存成功'
-                  })
+              })
+              .catch(function (error){
+                that.$notify.error({
+                  title: '出错啦',
+                  message: '编辑失败'
                 })
-                .catch(function (error){
-                  that.$notify.error({
-                    title: '出错啦',
-                    message: '编辑失败'
-                  })
-                })
-          }
-      )
+              })
+        }
+        )
     },
 
     cancelQuestion(){

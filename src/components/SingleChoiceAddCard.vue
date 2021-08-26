@@ -1,6 +1,6 @@
 <template>
   <!--添加题目的对话框-->
-  <div class="add-question-card">
+    <div class="add-question-card">
     <el-divider></el-divider>
     <el-form :model="questionForm"
              :rules="questionFormRules"
@@ -98,13 +98,13 @@ export default {
     addQuestion(questionType){
       this.resetForm(questionType)
       this.flag = 0
-      this.addDialogVisible = true
+      this.addDialogVisible = true  
     },
     editQuestion(question){
       if (this.addDialogVisible) {
         this.addDialogVisible = false
         this.finishQuestion()
-        return
+        return 
       }
       this.addDialogVisible = true
       this.questionForm = question
