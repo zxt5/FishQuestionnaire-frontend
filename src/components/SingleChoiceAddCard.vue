@@ -1,9 +1,7 @@
 <template>
   <!--添加题目的对话框-->
-  <el-dialog
-      title="添加题目[单选题]"
-      width="50%"
-      :visible.sync="addDialogVisible">
+    <div class="add-question-card">
+    <el-divider></el-divider>
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"
@@ -45,11 +43,11 @@
     <div class="dialog-footer">
       <el-button icon="el-icon-edit" @click="addChoice" type="primary">新增选项</el-button>
       <div>
-        <el-button icon="el-icon-check" @click="finishQuestion()" type="success">完成</el-button>
-        <el-button icon="el-icon-close" @click="cancelQuestion" type="danger"> 取消</el-button>
+        <span>
+        </span>
       </div>
     </div>
-  </el-dialog>
+  </div>
 </template>
 <script>
 
@@ -62,14 +60,6 @@ export default {
     return{
       temp: '',
       addDialogVisible : false,
-      // title: '',
-      // content: '',
-      // type: '',
-      // ordering: 0,
-      // questionnaire: 0,
-      // is_must_answer: false,
-      // option_list: [],
-      // answer: '',
       flag : 0,//判断创建还是修改问题
       questionForm: {
         title: '',
@@ -108,14 +98,17 @@ export default {
     addQuestion(questionType){
       this.resetForm(questionType)
       this.flag = 0
-      this.addDialogVisible = true
+      this.addDialogVisible = true  
     },
     editQuestion(question){
-      this.temp = question
-      this.questionForm = JSON.parse(JSON.stringify(question))
-      this.flag = question.id
-      // console.log(this.questionForm);
+      if (this.addDialogVisible) {
+        this.addDialogVisible = false
+        this.finishQuestion()
+        return 
+      }
       this.addDialogVisible = true
+      this.questionForm = question
+      this.flag = question.id
     },
     addChoice() {
       this.questionForm.option_list.push({
@@ -156,7 +149,6 @@ export default {
                 headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
               .then(function (response){
-                that.reload();
                 that.$notify.success({
                   title: '保存成功'
                 })
@@ -182,7 +174,6 @@ export default {
                 headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
               .then(function (response){
-                that.reload();
                 that.$notify.success({
                   title: '保存成功'
                 })
@@ -194,18 +185,8 @@ export default {
                 })
               })
         }
-        // console.log(this.$parent.info.questions_list.length);
-        // var index = this.$parent.info.questions_list.indexOf(this.temp)
-        // if (index === -1){
-        //   this.$parent.info.questions_list.push(this.questionForm);
-        // }
-        // else{
-        //   this.$parent.info.questions_list[index] = this.questionForm
-        //   this.$parent.$forceUpdate()
-        // }
       })
     },
-
     cancelQuestion(){
       this.$refs.questionFormRef.resetFields()
       this.addDialogVisible = false
@@ -215,6 +196,11 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+add-question-card{
+  background: #fff;
+  width: 100%;
+  position: relative;
+}
 .el-button{
   color: #fff;
 }

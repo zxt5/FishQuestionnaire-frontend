@@ -1,9 +1,7 @@
 <template>
   <!--添加题目的对话框-->
-  <el-dialog
-      title="添加题目[单项填空题]"
-      width="50%"
-      :visible.sync="addDialogVisible">
+    <div class="add-question-card">
+    <el-divider></el-divider>
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"
@@ -30,12 +28,12 @@
     </el-form>
     <div class="dialog-footer">
       <span> </span>
-      <div>
+      <!-- <div>
         <el-button icon="el-icon-check" @click="finishQuestion()" type="success">完成</el-button>
         <el-button icon="el-icon-close" @click="cancelQuestion" type="danger">取消</el-button>
-      </div>
+      </div> -->
     </div>
-  </el-dialog>
+    </div>
 </template>
 <script>
 
@@ -97,11 +95,14 @@ export default {
       this.addDialogVisible = true
     },
     editQuestion(question){
-      this.temp = question
-      this.questionForm = JSON.parse(JSON.stringify(question))
-      this.flag = question.id
-      // console.log(this.questionForm);
+      if (this.addDialogVisible) {
+        this.addDialogVisible = false
+        this.finishQuestion()
+        return 
+      }
       this.addDialogVisible = true
+      this.questionForm = question
+      this.flag = question.id
     },
     addChoice() {
       this.questionForm.option_list.push({
@@ -143,7 +144,7 @@ export default {
                 is_must_answer: that.questionForm.is_must_answer,
               })
               .then(function (response){
-                that.reload();
+                // that.reload();
                 that.$notify.success({
                   title: '保存成功'
                 })
@@ -168,7 +169,7 @@ export default {
                 is_must_answer: that.questionForm.is_must_answer,
               })
               .then(function (response){
-                that.reload();
+                // that.reload();
                 that.$notify.success({
                   title: '保存成功'
                 })

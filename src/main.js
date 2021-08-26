@@ -8,6 +8,7 @@ import vuetify from './plugins/vuetify'
 import Clipboard from "v-clipboard";
 import axios from 'axios';
 const echarts = require('echarts');
+
 Vue.config.productionTip = false
 Vue.use(ElementUI);
 Vue.use(Clipboard);
