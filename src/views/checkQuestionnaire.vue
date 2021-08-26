@@ -3,7 +3,8 @@
     <div class="reminder">
       <h4>摸小鱼温馨提示：只能预览，不能提交哦~</h4>
     </div>
-    <div class="questionnaire">
+    <el-button @click="getPdf()"> 导出PDF</el-button>
+    <div class="questionnaire" id="pdfDom">
       <!--标题-->
       <h1 class="title">{{info.title}}</h1>
       <div class="content">&nbsp;{{info.content}}</div>
@@ -13,8 +14,9 @@
         <div slot="header">
           <div class="questionTitle">
             <!--显示必填标识-->
-            {{(index+1)+'. '+item.title}}
-            <span style="color: #F56C6C;">
+            <span v-if="info.is_show_question_num">{{(index+1)+'. '}}</span>
+            {{item.title}}
+          <span style="color: #F56C6C;">
             <span v-if="item.is_must_answer">*</span>
           </span>
             <span style="color: lightgrey" v-if="item.type==='single-choice'">[单选题]</span>
@@ -114,6 +116,7 @@ export default {
   components: {},
   data(){
     return {
+      htmlTitle:'',
       single: 0,
       multiple: [],
       questionnaire_id: 1,
@@ -129,6 +132,7 @@ export default {
         .get('/api/questionnaire/' + this.$route.params.id)
         .then(function (response){
           that.info = response.data;
+          that.htmlTitle = response.data.title;
           if('' + that.info.author.username !== '' + that.userLogin) {
             that.$router.push({path: '/index'});
             that.$notify.error({
@@ -145,24 +149,6 @@ export default {
         })
   },
   methods: {
-    // init() {
-    //   console.log("zhixing");
-    //   let i = 0;
-    //   for( let a in this.info.question_list) {
-    //     if(a.type === 'single-choice') {
-    //       let t = 'aaa';
-    //       this.answer_list[i++] = t;
-    //     }
-    //     else if(a.type === 'multiple-choice') {
-    //       let t = [];
-    //       this.answer_list[i++] = t;
-    //     }
-    //     else {
-    //       let t = 'bbb';
-    //       this.answer_list[i++] = t;
-    //     }
-    //   }
-    // },
     click(){
       // if(this.info.status==='closed') alert('此问卷暂未发布，无法填写！');
       this.$notify.warning({
