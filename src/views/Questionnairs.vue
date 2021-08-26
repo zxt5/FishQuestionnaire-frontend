@@ -46,130 +46,149 @@
             <h2>{{info.title}}</h2>
           </div>
           <div class="intro"> {{info.content}}</div>
-<!--          是否显示题号-->
-<!--          <el-switch-->
-<!--              @change="is_show_num"-->
-<!--              v-model="show_num"-->
-<!--              active-color="#13ce66"-->
-<!--              inactive-color="#ff4949">-->
-<!--          </el-switch>-->
-          <div class="title-footer">
+          <div >
             <span></span>
-            <el-button @click="is_show_num" type="primary" size="small" class="button_1">{{text_1}}</el-button>
-            <el-button icon="el-icon-edit" type="primary" size="small" @click="editTitle">编辑</el-button>
+            <el-collapse @change="editTitle">
+              <el-collapse-item >
+                <title-content-dialog ref="title-content-dialog" :prop_title="info.title" :prop_content="info.content"></title-content-dialog>
+
+
+              </el-collapse-item>
+            </el-collapse>
+
           </div>
-          <title-content-dialog ref="title-content-dialog" :prop_title="info.title" :prop_content="info.content"></title-content-dialog>
           <el-divider/>
-          <el-card  v-for="(item, index) in info.question_list" :key="index">
-            <div class="op">
-<!--              <el-tooltip placement="top" content="上移" effect="dark" :enterable="false">-->
-<!--                <el-button icon="el-icon-caret-top" type="text" @click="cardUp(index)">    </el-button>-->
-<!--              </el-tooltip>-->
-<!--              <el-tooltip placement="top" content="下移" effect="dark" :enterable="false">-->
-<!--                <el-button icon="el-icon-caret-bottom" type="text" @click="cardDown(index)">   </el-button>-->
-<!--              </el-tooltip>-->
-<!--              <el-tooltip placement="top" content="删除" effect="dark" :enterable="false">-->
-<!--                <el-button icon="el-icon-delete" type="text" @click="cardDelete(index)">    </el-button>-->
-<!--              </el-tooltip>-->
-<!--              <el-tooltip placement="top" content="复制" effect="dark" :enterable="false">-->
-<!--                <el-button icon="el-icon-copy-document" type="text" @click="cardCopy(index)"></el-button>-->
-<!--              </el-tooltip>-->
-              <ul>
-                <li @click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
-                <li @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
-                <li @click="cardDown(index, item)"><v-icon small>mdi-arrow-down-circle-outline</v-icon>  下移</li>
-                <li @click="cardUp(index, item)"><v-icon small>mdi-arrow-up-circle-outline</v-icon>  上移</li>
-              </ul>
-            </div>
-            <!--单选框模板-->
-            <template v-if="item.type === 'single-choice'">
-              <div>
-                <span v-if="show_num">{{(index+1)}}. </span>
-                <span style="margin-top: 20px"> {{item.title}} </span>
-                <span style="color: lightgrey">[单选题]</span>
-                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+
+          <draggable :list="info.question_list" animation="500"  force-fallback="true"
+                     chosen-class="chosen"
+                     :disabled="disabled"
+                     @start="onStart"
+                     @end="onEnd"
+          >
+            <transition-group>
+              <div class="card"  v-for="(item, index) in info.question_list" :key="index">
+                <div style="padding: 20px">
+                  <div class="op">
+                    <ul>
+                      <li @click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
+                      <li @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
+                      <li @click="cardDown(index, item)"><v-icon small>mdi-arrow-down-circle-outline</v-icon>  下移</li>
+                      <li @click="cardUp(index, item)"><v-icon small>mdi-arrow-up-circle-outline</v-icon>  上移</li>
+                    </ul>
+                  </div>
+                  <!--单选框模板-->
+                  <template v-if="item.type === 'single-choice'">
+                    <div>
+                      <span>{{(index+1)}}. </span>
+                      <span style="margin-top: 20px"> {{item.title}} </span>
+                      <span style="color: lightgrey">[单选题]</span>
+                      <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+                    </div>
+                    <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+                      {{item.content}}
+                    </div>
+                    <el-radio-group v-model="item.answer">
+                      <el-radio v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex">
+                        {{subItem.title}}
+                      </el-radio>
+                    </el-radio-group>
+
+                  </template>
+                  <!--多选框模板-->
+                  <template v-if="item.type === 'multiple-choice'">
+                    <div>
+                      <span>{{(index+1)}}. </span>
+                      <span style="margin-top: 20px"> {{item.title}} </span>
+                      <span style="color: lightgrey">[多选题]</span>
+                      <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+                    </div>
+                    <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+                      {{item.content}}
+                    </div>
+                    <el-checkbox-group v-model="answer[item.ordering - 1]">
+                      <el-checkbox  v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex" >
+                        {{subItem.title}}
+                      </el-checkbox>
+                    </el-checkbox-group>
+                  </template>
+                  <!--单项填空模板-->
+                  <!--            <template v-if="item.type === 'completion'">-->
+                  <!--              <div>-->
+                  <!--                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>-->
+                  <!--                <span>{{(index+1)}}. </span>-->
+                  <!--                <span style="margin-top: 20px"> {{item.title}} </span>-->
+                  <!--              </div>-->
+                  <!--              <el-input v-model="item.answer" class="single-completion-input" :autosize="true"-->
+                  <!--                        type="textarea" :clearable="true" resize="none">-->
+                  <!--              </el-input>-->
+                  <!--            </template>-->
+                  <!--多项填空模板-->
+                  <template v-if="item.type === 'completion'">
+                    <div>
+                      <span>{{(index+1)}}. </span>
+                      <span style="margin-top: 20px"> {{item.title}} </span>
+                      <span style="color: lightgrey">[填空题]</span>
+                      <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+                    </div>
+                    <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+                      {{item.content}}
+                    </div>
+                    <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex" class="multiple-completion-input">
+                      <!--                <p style="margin-left:10px">{{subItem.title}}</p>-->
+                      <el-input class="single-completion-input" :autosize="true"
+                                type="textarea" :clearable="true" resize="none" v-model="answer[item.ordering - 1][subIndex]"></el-input>
+                    </div>
+                  </template>
+                  <!--            评分模板-->
+                  <template v-if="item.type === 'scoring'">
+                    <div>
+                      <span>{{(index+1)}}. </span>
+                      <span style="margin-top: 20px"> {{item.title}} </span>
+                      <span style="color: lightgrey">[评分题]</span>
+                      <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+                    </div>
+                    <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+                      {{item.content}}
+                    </div>
+                    <!--              <el-radio-group v-model="item.answer">-->
+                    <!--                <el-radio v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex">-->
+                    <!--                  {{subItem.title}}-->
+                    <!--                </el-radio>-->
+                    <!--              </el-radio-group>-->
+                    <el-slider class="scoring-input"
+                               v-model="item.answer"
+                               :step="1"
+                               :max="item.option_list.length - 1"
+                    >
+                    </el-slider>
+                  </template>
+                  <!--单选题目框-->
+                </div>
+                <el-collapse
+                    @mouseover.native = "mouseEnter"
+                    @mouseout.native = "mouseLeave"
+                    v-model="editPlace"
+                    @change="editQuestion(item.type, index)"
+                    style="padding:20px"
+                >
+                  <el-collapse-item title="编辑">
+                    <single-choice-add-card :ref="'single-choice'+index" v-if="item.type === 'single-choice'"></single-choice-add-card>
+
+                    <!--多选对话框-->
+                    <multiple-choice-add-card :ref="'multiple-choice'+index" v-if="item.type === 'multiple-choice'"></multiple-choice-add-card>
+
+                    <!--单项填空对话框-->
+                    <single-completion-add-card :ref="'completion'+index" v-if="item.type === 'completion'"></single-completion-add-card>
+
+                    <!--    评分对话框-->
+                    <scoring-add-card :ref="'scoring'+index" v-if="item.type === 'scoring'"></scoring-add-card>
+                  </el-collapse-item>
+                </el-collapse>
+
               </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
-                {{item.content}}
-              </div>
-              <el-radio-group v-model="item.answer">
-                <el-radio v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex">
-                  {{subItem.title}}
-                </el-radio>
-              </el-radio-group>
-            </template>
-            <!--多选框模板-->
-            <template v-if="item.type === 'multiple-choice'">
-              <div>
-                <span v-if="show_num">{{(index+1)}}. </span>
-                <span style="margin-top: 20px"> {{item.title}} </span>
-                <span style="color: lightgrey">[多选题]</span>
-                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
-              </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
-                {{item.content}}
-              </div>
-              <el-checkbox-group v-model="answer[item.ordering - 1]">
-                <el-checkbox  v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex" >
-                  {{subItem.title}}
-                </el-checkbox>
-              </el-checkbox-group>
-            </template>
-            <!--单项填空模板-->
-            <!--            <template v-if="item.type === 'completion'">-->
-            <!--              <div>-->
-            <!--                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>-->
-            <!--                <span>{{(index+1)}}. </span>-->
-            <!--                <span style="margin-top: 20px"> {{item.title}} </span>-->
-            <!--              </div>-->
-            <!--              <el-input v-model="item.answer" class="single-completion-input" :autosize="true"-->
-            <!--                        type="textarea" :clearable="true" resize="none">-->
-            <!--              </el-input>-->
-            <!--            </template>-->
-            <!--多项填空模板-->
-            <template v-if="item.type === 'completion'">
-              <div>
-                <span v-if="show_num">{{(index+1)}}. </span>
-                <span style="margin-top: 20px"> {{item.title}} </span>
-                <span style="color: lightgrey">[填空题]</span>
-                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
-              </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
-                {{item.content}}
-              </div>
-              <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex" class="multiple-completion-input">
-<!--                <p style="margin-left:10px">{{subItem.title}}</p>-->
-                <el-input class="single-completion-input" :autosize="true"
-                          type="textarea" :clearable="true" resize="none" v-model="answer[item.ordering - 1][subIndex]"></el-input>
-              </div>
-            </template>
-<!--            评分模板-->
-            <template v-if="item.type === 'scoring'">
-              <div>
-                <span v-if="show_num">{{(index+1)}}. </span>
-                <span style="margin-top: 20px"> {{item.title}} </span>
-                <span style="color: lightgrey">[评分题]</span>
-                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
-              </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
-                {{item.content}}
-              </div>
-<!--              <el-radio-group v-model="item.answer">-->
-<!--                <el-radio v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex">-->
-<!--                  {{subItem.title}}-->
-<!--                </el-radio>-->
-<!--              </el-radio-group>-->
-              <el-slider class="scoring-input"
-                  v-model="item.answer"
-                  :step="1"
-                  :max="item.option_list.length - 1"
-              >
-              </el-slider>
-            </template>
-            <div class="card-footer">
-              <el-button icon="el-icon-edit" type="primary" size="small" @click="editQuestion(item.type, index)">编辑</el-button>
-            </div>
-          </el-card>
+            </transition-group>
+          </draggable>
+
           <div class="not_found" style="line-height: 100px">
             快去侧边栏选择题型创建新的问题o(*￣▽￣*)ブ <i class="el-icon-cold-drink"></i>
           </div>
@@ -180,16 +199,7 @@
 
     <!--波浪-->
     <!--    <wave></wave>-->
-    <!--单选对话框-->
-    <single-choice-add-card ref="single-choice"></single-choice-add-card>
-    <!--多选对话框-->
-    <multiple-choice-add-card ref="multiple-choice"></multiple-choice-add-card>
-    <!--单项填空对话框-->
-    <single-completion-add-card ref="completion"></single-completion-add-card>
-    <!--多项填空对话框-->
-    <multiple-completion-add-card ref="multiple-completion"></multiple-completion-add-card>
-<!--    评分对话框-->
-    <scoring-add-card ref="scoring"></scoring-add-card>
+
     <el-backtop></el-backtop>
   </div>
 </template>
@@ -204,11 +214,23 @@ import authorization from "@/utils/authorization";
 import ScoringAddCard from "../components/ScoringAddCard";
 import axios from "axios";
 import TitleContentDialog from '../components/TitleContentDialog.vue'
+import draggable from 'vuedraggable'
+// fade/zoom 等
+import 'element-ui/lib/theme-chalk/base.css';
+// collapse 展开折叠
+import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
+import Vue from 'vue'
+
+Vue.component(CollapseTransition.name, CollapseTransition)
+
+
 export default {
-  components: {SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard, TitleContentDialog},
+  components: {SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard, TitleContentDialog,draggable},
   data(){
     return {
       // 菜单栏
+      disabled: false,
+      editPlace: [],
       menuList:[
         {
           name: "选择题",
@@ -252,36 +274,9 @@ export default {
       userLogin: localStorage.getItem('username.myblog'),
       info: null,
       answer: [],
-      text_1:'',
-      show_num: '',
     }
   },
   methods:{
-    is_show_num() {
-      if(this.text_1 === '显示题号') {
-        this.text_1 = '隐藏题号';
-        this.show_num = true;
-      }
-      else {
-        this.text_1 = '显示题号';
-        this.show_num = false;
-      }
-      const that = this;
-      axios
-          .patch('/api/questionnaire/' + that.info.id + '/', {
-            is_show_question_num: this.show_num,
-          }, {
-            headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-          })
-          .then(function (response){
-          })
-          .catch(function (error){
-            that.$notify.error({
-              title: '出错啦',
-              message: '设置失败'
-            })
-          })
-    },
     check(){
       this.$router.push({path: '/check/' + this.$route.params.id});
     },
@@ -311,10 +306,10 @@ export default {
       }
     },
     addQuestion(questionType){
-      this.$refs[questionType].addQuestion(questionType)
+
     },
     editQuestion(questionType, index){
-      this.$refs[questionType].editQuestion(this.info.question_list[index])
+      this.$refs[questionType+index][0].editQuestion(this.info.question_list[index])
     },
     cardUp(index, item){
       if (index === 0){
@@ -323,23 +318,23 @@ export default {
       const that = this;
       console.log(index);
       axios
-        .patch('/api/question/' + item.id + '/', {
-          ordering: index,
-        }, {
-          headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-        })
-        .then(function (response){
-          let temp = that.info.question_list[index];
-          that.info.question_list[index] = that.info.question_list[index-1];
-          that.info.question_list[index-1] = temp;
-          that.$forceUpdate();
-        })
-        .catch(function (error){
-          that.$notify.error({
-            title: '出错啦',
-            message: '更换顺序失败'
+          .patch('/api/question/' + item.id + '/', {
+            ordering: index,
+          }, {
+            headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
           })
-        })
+          .then(function (response){
+            let temp = that.info.question_list[index];
+            that.info.question_list[index] = that.info.question_list[index-1];
+            that.info.question_list[index-1] = temp;
+            that.$forceUpdate();
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '更换顺序失败'
+            })
+          })
     },
     cardDown(index, item){
       if (index === this.info.question_list.length - 1){
@@ -402,7 +397,43 @@ export default {
     },
     editTitle(){
       this.$refs["title-content-dialog"].edit()
+    },
+    onStart() {
+      this.drag = true;
+      console.log("start")
+    },
+//拖拽结束事件
+    onEnd(e) {
+      this.drag = false;
+      if (e.oldIndex == e.newIndex){
+        return
+      }
+      // console.log(this.info.question_list[e.newIndex].id)
+      var id = this.info.question_list[e.newIndex].id
+      axios
+          .patch('/api/question/' + id + '/', {
+            ordering: e.newIndex + 1,
+          }, {
+            headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+          })
+          .then(function (response){
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '更换顺序失败'
+            })
+          })
+    },
+    mouseEnter(){
+      this.mouseActivate = true
+      this.disabled = true
+    },
+    mouseLeave(){
+      this.mouseActivate = true
+      this.disabled = false
     }
+    // 添加成功的事件
   },
   mounted() {
     const that = this;
@@ -416,9 +447,6 @@ export default {
             })
             .then(function (response) {
               that.info = response.data;
-              that.show_num = response.data.is_show_question_num;
-              if(that.show_num === true) that.text_1 = '隐藏题号';
-              else that.text_1 = '显示题号';
               console.log(that.info);
               if('' + that.info.author.username !== '' + that.userLogin) {
                 that.$router.push({path: '/index'});
@@ -451,12 +479,20 @@ export default {
 
 <style lang="less" scoped>
 
+
 // 侧边栏标题布局
 .aside-top{
+
   text-align: center;
   margin-bottom: 5pt;
   font-size: 20px !important;
   font-weight: bolder;
+  //background-color: white;
+  //opacity: 0.95;
+  //border-radius: 10px;
+  //padding: 25px 10px 20px;
+  //text-align: center;
+  //justify-content: center;
 }
 .question-title{
   text-align: center;
@@ -495,18 +531,33 @@ export default {
   margin: 40px auto 40px;
 }
 
-.el-card {
+.card {
   margin: 15px;
+  padding: 0px;
+  border: solid 1px #9EC1E0 !important;
+  border-radius: 10px;
 }
 
 // 侧边栏布局
-//.el-aside {
-//  background-color: #FFFFFF;
-//  opacity: 0.95;
-//  margin-top: 0;
-//  padding-top: 10pt;
-//  border-radius: 3%;
-//}
+.el-aside {
+  background-color: #FFFFFF;
+  opacity: 0.95;
+  margin-top: 0;
+  padding-top: 10pt;
+  border-radius: 3%;
+}
+
+
+.bottom-button{
+  height: 100%;
+  width: 100% !important;
+  padding: 0;
+  font-size: 15pt;
+  color: #83a1ce;
+  border: none;
+  display: flex;
+  justify-content: center;
+}
 .el-aside {
   background-color: transparent;
   color: #333;
@@ -599,13 +650,16 @@ export default {
 
 //卡片底部
 .card-footer{
-  //position: absolute;
+  position: relative;
   //color: #fff;
   //right: 13%;
-  transform: translate(0, -80%);
-  display: inline-block;
-  float: right;
+  width: 100%;
   //margin-bottom: 10px;
+  text-align: center;
+  height: 35px;
+}
+.el-divider--horizontal{
+  margin: 0;
 }
 
 // el-main footer
@@ -620,6 +674,12 @@ export default {
 .single-completion-input, .multiple-completion-input{
   margin-top: 20pt !important;
   width: 80% !important;
+}
+
+.chosen {
+  border: solid 2px #0d9fcf !important;
+  background: #F7F8F9;
+  opacity: 0.5;
 }
 </style>
 

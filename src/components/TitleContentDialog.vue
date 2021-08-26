@@ -1,10 +1,6 @@
 <template>
   <!--添加题目的对话框-->
-  <el-dialog
-      title="问卷标题与描述"
-      width="50%"
-      :visible.sync="addDialogVisible"
-      append-to-body>
+  <div class="add-question-card">
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"
@@ -21,14 +17,14 @@
                   type="textarea" :clearable="true" resize="none"> </el-input>
       </el-form-item>
     </el-form>
-    <div class="dialog-footer">
+    <!-- <div class="dialog-footer">
       <span></span>
       <div>
         <el-button icon="el-icon-check" @click="finishQuestion" type="success">完成</el-button>
         <el-button icon="el-icon-close" @click="cancelQuestion" type="danger"> 取消</el-button>
       </div>
-    </div>
-  </el-dialog>
+    </div> -->
+  </div>
 </template>
 <script>
 
@@ -96,30 +92,30 @@ export default {
     },
     finishQuestion(){
       this.$refs.questionFormRef.validate(valid => {
-        if (!valid) return this.$notify.error({
-          title: '表单有错误'
-        });
-        this.addDialogVisible = false;
-        const that = this;
-          axios
-              .patch('/api/questionnaire/'+ that.$route.params.id+'/', {
-                title: that.questionForm.title,
-                content: that.questionForm.content,
-              })
-              .then(function (response){
-                that.reload();
-                that.$notify.success({
-                  title: '保存成功'
+            if (!valid) return this.$notify.error({
+              title: '表单有错误'
+            });
+            this.addDialogVisible = false;
+            const that = this;
+            axios
+                .patch('/api/questionnaire/'+ that.$route.params.id+'/', {
+                  title: that.questionForm.title,
+                  content: that.questionForm.content,
                 })
-              })
-              .catch(function (error){
-                that.$notify.error({
-                  title: '出错啦',
-                  message: '编辑失败'
+                .then(function (response){
+                  // that.reload();
+                  that.$notify.success({
+                    title: '保存成功'
+                  })
                 })
-              })
-        }
-        )
+                .catch(function (error){
+                  that.$notify.error({
+                    title: '出错啦',
+                    message: '编辑失败'
+                  })
+                })
+          }
+      )
     },
 
     cancelQuestion(){
@@ -138,10 +134,16 @@ export default {
   width: 70%;
   margin-right: 10%;
 }
-.dialog-footer{
+add-question-card{
+  background: #fff;
   width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0;
+  position: relative;
+  padding: 35px;
 }
+// .dialog-footer{
+//   width: 100%;
+//   display: flex;
+//   justify-content: space-between;
+//   padding: 0;
+// }
 </style>
