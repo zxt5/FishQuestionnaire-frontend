@@ -1,10 +1,6 @@
 <template>
   <!--添加题目的对话框-->
-  <el-dialog
-      title="添加题目[单选题]"
-      width="50%"
-      :visible.sync="addDialogVisible"
-      append-to-body>
+    <div class="add-question-card">
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"
@@ -21,14 +17,14 @@
                   type="textarea" :clearable="true" resize="none"> </el-input>
       </el-form-item>
     </el-form>
-    <div class="dialog-footer">
+    <!-- <div class="dialog-footer">
       <span></span>
       <div>
         <el-button icon="el-icon-check" @click="finishQuestion" type="success">完成</el-button>
         <el-button icon="el-icon-close" @click="cancelQuestion" type="danger"> 取消</el-button>
       </div>
+    </div> -->
     </div>
-  </el-dialog>
 </template>
 <script>
 
@@ -107,7 +103,7 @@ export default {
                 content: that.questionForm.content,
               })
               .then(function (response){
-                that.reload();
+                // that.reload();
                 that.$notify.success({
                   title: '保存成功'
                 })
@@ -138,10 +134,16 @@ export default {
   width: 70%;
   margin-right: 10%;
 }
-.dialog-footer{
+add-question-card{
+  background: #fff;
   width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0;
+  position: relative;
+  padding: 35px;
 }
+// .dialog-footer{
+//   width: 100%;
+//   display: flex;
+//   justify-content: space-between;
+//   padding: 0;
+// }
 </style>

@@ -3,7 +3,10 @@
     <div class="reminder">
       <h4>摸小鱼温馨提示：只能预览，不能提交哦~</h4>
     </div>
-    <div class="questionnaire">
+    <div class="button-header">
+      <el-button type="danger" @click="getPdf()">导出pdf</el-button>
+    </div>
+    <div class="questionnaire" id="pdfDom">
       <!--标题-->
       <h1 class="title">{{info.title}}</h1>
       <div class="content">&nbsp;{{info.content}}</div>
@@ -13,8 +16,9 @@
         <div slot="header">
           <div class="questionTitle">
             <!--显示必填标识-->
-            {{(index+1)+'. '+item.title}}
-            <span style="color: #F56C6C;">
+            <span v-if="info.is_show_question_num">{{(index+1)+'. '}}</span>
+            {{item.title}}
+          <span style="color: #F56C6C;">
             <span v-if="item.is_must_answer">*</span>
           </span>
             <span style="color: lightgrey" v-if="item.type==='single-choice'">[单选题]</span>
@@ -95,7 +99,7 @@
       </div>
       <!--内容结束-->
 
-      <el-button type="primary" @click="click">提交</el-button>
+      <el-button type="primary" @click="click" class="submit">提交</el-button>
 
       <!--      <div class="line"></div>-->
       <!--      <div class="text2"> 摸鱼问卷 提供技术支持 </div>-->
@@ -108,12 +112,14 @@
 <script>
 import authorization from "../utils/authorization";
 import axios from "axios";
+import {Base64} from "js-base64";
 
 export default {
   name: "check",
   components: {},
   data(){
     return {
+      htmlTitle:'',
       single: 0,
       multiple: [],
       questionnaire_id: 1,
@@ -125,10 +131,14 @@ export default {
   },
   mounted() {
     const that = this;
+    let s1 = that.$route.params.text;
+    s1 = Base64.decode(s1);
+    s1 = s1.substring(4,s1.length - 7);
     axios
-        .get('/api/questionnaire/' + this.$route.params.id)
+        .get('/api/questionnaire/' + parseInt(s1))
         .then(function (response){
           that.info = response.data;
+          that.htmlTitle = response.data.title;
           if('' + that.info.author.username !== '' + that.userLogin) {
             that.$router.push({path: '/index'});
             that.$notify.error({
@@ -145,24 +155,6 @@ export default {
         })
   },
   methods: {
-    // init() {
-    //   console.log("zhixing");
-    //   let i = 0;
-    //   for( let a in this.info.question_list) {
-    //     if(a.type === 'single-choice') {
-    //       let t = 'aaa';
-    //       this.answer_list[i++] = t;
-    //     }
-    //     else if(a.type === 'multiple-choice') {
-    //       let t = [];
-    //       this.answer_list[i++] = t;
-    //     }
-    //     else {
-    //       let t = 'bbb';
-    //       this.answer_list[i++] = t;
-    //     }
-    //   }
-    // },
     click(){
       // if(this.info.status==='closed') alert('此问卷暂未发布，无法填写！');
       this.$notify.warning({
@@ -229,7 +221,7 @@ p {
   padding-right: 40px;
 }
 
-.el-button{
+.submit{
   width: 20%;
   /*color: white;*/
   display: flex;
@@ -242,10 +234,15 @@ p {
   /*text-indent: 2em;*/
 }
 
-.el-button:hover{
+.submit:hover{
   background-color: #3F87DA;
 }
-
+.button-header{
+  position: relative !important;
+  text-align: center !important;
+  margin-top: 20pt !important;
+  color: #fff !important;
+}
 h4{
   /*display: inline-block;*/
   text-align: center;

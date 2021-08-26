@@ -2,10 +2,10 @@
   <div >
     <!--主题内容区域-->
     <div class="button-header">
-<!--      <el-button type="primary" >导出excel</el-button>-->
-<!--      <el-button type="danger">导出pdf</el-button>-->
+      <el-button type="primary" @click="downloadExcel">导出excel</el-button>
+      <el-button type="danger" @click="getPdf()" style="margin-left: 20px">导出pdf</el-button>
     </div>
-    <el-container class="main">
+    <el-container class="main" id="pdfDom">
       <!--图像区域-->
       <el-main style="height: fit-content" class="questionnaire">
         <!--折叠面板-->
@@ -80,6 +80,7 @@
 import Wave from "../components/Wave.vue"
 import authorization from "@/utils/authorization";
 import axios from "axios";
+import {Base64} from "js-base64";
 var option;
 export default {
   components: {Wave},
@@ -87,14 +88,16 @@ export default {
     const that = this;
     authorization().then(function (response) {
       if(response[0]){
-        console.log(that.$route.params.id);
-        console.log('/api/questionnaire/' + that.$route.params.id);
+        let s1 = that.$route.params.text;
+        s1 = Base64.decode(s1);
+        s1 = s1.substring(4,s1.length - 7);
         axios
-            .get('/api/questionnaire/' + that.$route.params.id + '/report/', {
+            .get('/api/questionnaire/' + parseInt(s1) + '/report/', {
               headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
             })
             .then(function (response) {
               that.info = response.data;
+              that.htmlTitle = response.data.title + '_数据分析';
               // console.log(that.info);
               if('' + that.info.author.username !== '' + that.userLogin) {
                 that.$router.push({path: '/index'});
@@ -109,6 +112,7 @@ export default {
                     activeChart: '0',
                     activeNames: [],
                   });
+                  let ord = 1;
                   for (let subItem of item.option_list[0].answer_list) {
                     // console.log(subItem.modified_time);
                     var time = subItem.modified_time;
@@ -117,8 +121,8 @@ export default {
                     var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
                     // console.log(str);
                     subItem.modified_time = str;
+                    subItem.ordering = ord ++;
                   }
-
                 }
                 else {
                   that.tmp.push({
@@ -167,6 +171,7 @@ export default {
   },
   data(){
     return {
+      htmlTitle:'',
       // 当前用户
       userLogin: localStorage.getItem('username.myblog'),
       info: null,
@@ -258,6 +263,11 @@ export default {
     }
   },
   methods: {
+    downloadExcel() {
+      let a = document.createElement('a')
+      a.href ="http://49.233.52.139:8000/api/questionnaire/"+this.info.id+"/export-xls/";
+      a.click();
+    },
     init(){
       console.log(this.tmp);
       for (let i = 0; i < this.answers.length; i++){
@@ -265,7 +275,7 @@ export default {
           this.generateChart(i+'-'+j, j)
         }
       }
-    },
+      },
     handleChange(index) {
       for (let j = 0; j < 3; j++) {
         this.generateChart(index, index + '-' + j, j);

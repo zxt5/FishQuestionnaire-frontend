@@ -2,7 +2,17 @@
   <div class="el-main" >
     <div class="questionnaire" direction="vertical">
       <div>
+        <v-app style="width: 10%;float: right">
+          <v-btn
+              class="white-space"
+              color="primary"
+              depressed
+              elevation="2"
+              @click="back()"
+          ><v-icon small>mdi-arrow-left</v-icon>    返回</v-btn>
+        </v-app>
         <h2 class="title" style="min-width: 800px">搜索结果</h2>
+
         <div class="not_found" v-if="!info.length">
           无搜索结果~ <i class="el-icon-cold-drink"></i>
         </div>
@@ -31,16 +41,6 @@
                 <li @click="toChart(item)"><v-icon small>mdi-list-status</v-icon>  统计</li>
                 <li @click="Delete(item.id, item.status)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
               </ul>
-              <!--            <el-dropdown style="margin-top: 5px" @command="handleCommand" >-->
-              <!--              <span class="el-dropdown-link">-->
-              <!--               更多<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
-              <!--              </span>-->
-              <!--              <el-dropdown-menu slot="dropdown">-->
-              <!--                <el-dropdown-item command="a">编辑</el-dropdown-item>-->
-              <!--                <el-dropdown-item command="item.id">分享</el-dropdown-item>-->
-              <!--                <el-dropdown-item command="e" divided>统计</el-dropdown-item>-->
-              <!--              </el-dropdown-menu>-->
-              <!--            </el-dropdown>-->
               <div class="created">
                 {{ formatted_time(item.create_date) }}
               </div>
@@ -93,6 +93,7 @@
 import axios from "axios";
 import authorization from "../utils/authorization";
 import QRCode from 'qrcode';
+import {Base64} from "js-base64";
 export default {
   inject: ['reload'],
   components:{QRCode},
@@ -111,16 +112,25 @@ export default {
     }
   },
   methods: {
-    toSearch(){
-      if(this.search === ''){
-        this.$notify.warning({
-          title: '别搞',
-          message: '搜索不能为空哦'
-        })
-      }
-      else{
-        this.$router.push({path: '/search/' + this.search})
-      }
+    back() {
+      this.$router.push({path: '/index'});
+    },
+    test() {
+      let str1 = "//";
+      let str2 = "/测试";
+      let str3 = "/ceshi";
+      let s1 = Base64.encode('moyu' + str1 + 'wenjuan');
+      let s2 = Base64.encode('moyu' + str2 + 'wenjuan');
+      let s3 = Base64.encode('moyu' + str3 + 'wenjuan');
+      console.log(s1);
+      console.log(s2);
+      console.log(s3);
+      s1 = Base64.decode(s1);
+      s2 = Base64.decode(s2);
+      s3 = Base64.decode(s3);
+      console.log(s1.substring(4,s1.length - 7));
+      console.log(s2.substring(4,s2.length - 7));
+      console.log(s3.substring(4,s3.length - 7));
     },
 
     formatted_time: function (iso_date_string) {
@@ -190,13 +200,17 @@ export default {
         })
       }
       else{
-        this.$router.push({path: '/charts/' + item.id});
+        let s1 = Base64.encode('moyu' + item.id + 'wenjuan');
+        let url = window.location.origin+ "/charts/" + s1; // 统计链接
+        window.open(url);
       }
     },
     showSharePage(item) {
       if(item.status === 'shared'){
         this.is_show = true;
-        this.shareInfo.url=window.location.origin+"/fill/" + item.id;//问卷链接
+        let s1 = Base64.encode('moyu' + item.id + 'wenjuan');
+        let url = window.location.origin+ "/fill/" + s1; // 问卷链接
+        this.shareInfo.url = url;
       }
       else{
         this.$notify.warning({
@@ -229,7 +243,9 @@ export default {
       window.open(this.shareInfo.url);
     },
     toCheck(id){
-      this.$router.push({path: '/check/' + id});
+      let s1 = Base64.encode('moyu' + id + 'wenjuan');
+      let url = window.location.origin+ "/check/" + s1; //预览链接
+      window.open(url);
     },
     // toCenter(username){
     //   this.$router.push({path: '/center/' + username});
@@ -322,7 +338,7 @@ export default {
   },
   mounted() {
     const that = this;
-    console.log(that.$route.query.type)
+    console.log(that.$route.query.type);
     if(that.$route.query.type) {
       that.search = JSON.parse(that.$route.query.type);
     }
@@ -330,9 +346,13 @@ export default {
       authorization()
           .then(function (response){
             if(response[0]){
+              let s1 = that.$route.params.text;
+              s1 = Base64.decode(s1);
+              s1 = s1.substring(3,s1.length - 4);
+              console.log(s1);
               axios
                   .put('/api/questionnaire/search/',{
-                    keyword: that.$route.params.text,
+                    keyword: s1,
                   }, {
                     headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
                   })
@@ -390,6 +410,9 @@ export default {
   width: fit-content;
   cursor: pointer;
   display: inline-block;
+}
+.white-space {
+  white-space:pre
 }
 .el-main {
   background-color: transparent;

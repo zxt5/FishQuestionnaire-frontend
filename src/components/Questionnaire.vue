@@ -1,6 +1,7 @@
 <template>
   <div class="questionnaire" direction="vertical">
     <div>
+
       <!--      搜索框-->
       <div class="search">
         <div>
@@ -9,10 +10,26 @@
           </el-input>
         </div>
       </div>
-      <h2 class="title" style="min-width: 800px">问卷列表</h2>
+      <el-dropdown @command="sort" style="float: right; margin-right: 15%; margin-top: 7px">
+          <span class="el-dropdown-link" style="color: darkblue; float: left; font-size: 17px">
+            选择排序方式<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command = '-create_date'>创建时间</el-dropdown-item>
+          <el-dropdown-item command = '-answer_num'>答卷数量</el-dropdown-item>
+          <el-dropdown-item command = '-last_shared_date'>最后分享时间</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+
+      <div>
+        <h2 class="title" style="min-width: 800px">问卷列表</h2>
+
+      </div>
+
       <div class="not_found" v-if="!info.length">
         快去创建一个新的问卷吧 摸鱼仔~ <i class="el-icon-cold-drink"></i>
       </div>
+
       <div class="a_block" v-for="(item, index) in info.slice(4 * (page-1), 4 * page)" :key="index" >
         <h1 @click="toCheck(item.id)">
           <el-tag class="label" v-if="item.status === 'closed'">未发布</el-tag>
@@ -40,16 +57,7 @@
               <li @click="toChart(item)"><v-icon small>mdi-list-status</v-icon>  统计</li>
               <li @click="Delete(item.id, item.status)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
             </ul>
-<!--            <el-dropdown style="margin-top: 5px" @command="handleCommand" >-->
-<!--              <span class="el-dropdown-link">-->
-<!--               更多<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
-<!--              </span>-->
-<!--              <el-dropdown-menu slot="dropdown">-->
-<!--                <el-dropdown-item command="a">编辑</el-dropdown-item>-->
-<!--                <el-dropdown-item command="item.id">分享</el-dropdown-item>-->
-<!--                <el-dropdown-item command="e" divided>统计</el-dropdown-item>-->
-<!--              </el-dropdown-menu>-->
-<!--            </el-dropdown>-->
+
             <div class="created">
               {{ formatted_time(item.create_date) }}
             </div>
@@ -101,6 +109,7 @@
 import axios from "axios";
 import authorization from "../utils/authorization";
 import QRCode from 'qrcode';
+import {Base64} from "js-base64";
 export default {
   inject: ['reload'],
   components:{QRCode},
@@ -116,9 +125,29 @@ export default {
       shareInfo:{
         url:'',
       },
+      sort_way:'hh',
     }
   },
   methods: {
+    sort(command) {
+      const that = this;
+      axios
+          .put('api/questionnaire/sort/',{
+            keyword: command,
+          },{
+            headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+          })
+          .then(function (response){
+            that.info = response.data;
+            that.pageLength = parseInt((that.info.length + that.itemPerpage - 1) / that.itemPerpage);
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '排序失败'
+            })
+          })
+    },
     toSearch(){
       if(this.search === ''){
         this.$notify.warning({
@@ -127,7 +156,8 @@ export default {
         })
       }
       else{
-        this.$router.push({path: '/search/' + this.search})
+        let s1 = Base64.encode('wen' + this.search + 'juan');
+        this.$router.push({path: '/search/' + s1})
       }
     },
     formatted_time: function (iso_date_string) {
@@ -180,13 +210,17 @@ export default {
         })
       }
       else{
-        this.$router.push({path: '/charts/' + item.id});
+        let s1 = Base64.encode('moyu' + item.id + 'wenjuan');
+        let url = window.location.origin+ "/charts/" + s1; // 统计链接
+        window.open(url);
       }
     },
     showSharePage(item) {
       if(item.status === 'shared'){
         this.is_show = true;
-        this.shareInfo.url=window.location.origin+"/fill/" + item.id;//问卷链接
+        let s1 = Base64.encode('moyu' + item.id + 'wenjuan');
+        let url = window.location.origin+ "/fill/" + s1; // 问卷链接
+        this.shareInfo.url = url;
       }
       else{
         this.$notify.warning({
@@ -219,7 +253,9 @@ export default {
       window.open(this.shareInfo.url);
     },
     toCheck(id){
-      this.$router.push({path: '/check/' + id});
+      let s1 = Base64.encode('moyu' + id + 'wenjuan');
+      let url = window.location.origin+ "/check/" + s1; //预览链接
+      window.open(url);
     },
     // toCenter(username){
     //   this.$router.push({path: '/center/' + username});
@@ -230,13 +266,6 @@ export default {
       }
     },
     Start(item) {
-      // if(item.question_list === undefined || item.question_list.length === 0){
-      //   this.$notify.warning({
-      //     title: '问卷为空',
-      //     message: '请先创建问题'
-      //   })
-      // }
-      // else{
         const that = this;
         axios
             .put('api/questionnaire/' + item.id + '/status/', {
@@ -247,12 +276,8 @@ export default {
                 title: '问卷成功发布!',
                 message: '您可以进行分享'
               })
-              // that.reload();
               item.status = 'shared';
               that.showSharePage(item);
-              // that.$alert('这是链接和二维码', '分享', {
-              //   confirmButtonText: '确定',
-              // });
             })
             .catch(function (error){
               that.$notify.error({
@@ -260,7 +285,6 @@ export default {
                 message: '发布问卷失败'
               })
             })
-      // }
     },
     Close(id) {
       const that = this;
@@ -365,6 +389,14 @@ export default {
 
 <style scoped>
 @import url("../assets/common.css");
+
+.el-dropdown-link {
+  cursor: pointer;
+  color: purple;
+}
+.el-icon-arrow-down {
+  font-size: 12px;
+}
 .search{
   /*background-color: #333333;*/
   float: right;

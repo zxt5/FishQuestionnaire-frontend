@@ -46,26 +46,29 @@
             <h2>{{info.title}}</h2>
           </div>
           <div class="intro"> {{info.content}}</div>
-          <div class="title-footer">
+          <div >
             <span></span>
-            <el-button icon="el-icon-edit" type="primary" size="small" @click="editTitle">编辑</el-button>
+            <el-collapse @change="editTitle">
+              <el-collapse-item >
+            <title-content-dialog ref="title-content-dialog" :prop_title="info.title" :prop_content="info.content"></title-content-dialog>
+          
+
+              </el-collapse-item>
+            </el-collapse>
+            
           </div>
-          <title-content-dialog ref="title-content-dialog" :prop_title="info.title" :prop_content="info.content"></title-content-dialog>
           <el-divider/>
-          <el-card  v-for="(item, index) in info.question_list" :key="index">
+
+          <draggable :list="info.question_list" animation="500"  force-fallback="true"
+          chosen-class="chosen" 
+          :disabled="disabled" 
+          @start="onStart" 
+          @end="onEnd"
+          >
+          <transition-group>              
+          <div class="card"  v-for="(item, index) in info.question_list" :key="item.id">
+            <div style="padding: 20px">
             <div class="op">
-<!--              <el-tooltip placement="top" content="上移" effect="dark" :enterable="false">-->
-<!--                <el-button icon="el-icon-caret-top" type="text" @click="cardUp(index)">    </el-button>-->
-<!--              </el-tooltip>-->
-<!--              <el-tooltip placement="top" content="下移" effect="dark" :enterable="false">-->
-<!--                <el-button icon="el-icon-caret-bottom" type="text" @click="cardDown(index)">   </el-button>-->
-<!--              </el-tooltip>-->
-<!--              <el-tooltip placement="top" content="删除" effect="dark" :enterable="false">-->
-<!--                <el-button icon="el-icon-delete" type="text" @click="cardDelete(index)">    </el-button>-->
-<!--              </el-tooltip>-->
-<!--              <el-tooltip placement="top" content="复制" effect="dark" :enterable="false">-->
-<!--                <el-button icon="el-icon-copy-document" type="text" @click="cardCopy(index)"></el-button>-->
-<!--              </el-tooltip>-->
               <ul>
                 <li @click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
                 <li @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
@@ -85,10 +88,11 @@
                 {{item.content}}
               </div>
               <el-radio-group v-model="item.answer">
-                <el-radio v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex">
+                <el-radio v-for="(subItem, subIndex) in item.option_list" :key="subItem.id" :label="subIndex">
                   {{subItem.title}}
                 </el-radio>
               </el-radio-group>
+
             </template>
             <!--多选框模板-->
             <template v-if="item.type === 'multiple-choice'">
@@ -102,7 +106,7 @@
                 {{item.content}}
               </div>
               <el-checkbox-group v-model="answer[item.ordering - 1]">
-                <el-checkbox  v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex" >
+                <el-checkbox  v-for="(subItem, subIndex) in item.option_list" :key="subItem.id" :label="subIndex" >
                   {{subItem.title}}
                 </el-checkbox>
               </el-checkbox-group>
@@ -129,7 +133,7 @@
               <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
                 {{item.content}}
               </div>
-              <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex" class="multiple-completion-input">
+              <div v-for="(subItem, subIndex) in item.option_list" :key="subItem.id" class="multiple-completion-input">
 <!--                <p style="margin-left:10px">{{subItem.title}}</p>-->
                 <el-input class="single-completion-input" :autosize="true"
                           type="textarea" :clearable="true" resize="none" v-model="answer[item.ordering - 1][subIndex]"></el-input>
@@ -158,10 +162,33 @@
               >
               </el-slider>
             </template>
-            <div class="card-footer">
-              <el-button icon="el-icon-edit" type="primary" size="small" @click="editQuestion(item.type, index)">编辑</el-button>
+                <!--单选题目框-->
             </div>
-          </el-card>
+            <el-collapse
+            @mouseover.native = "mouseEnter"
+            @mouseout.native = "mouseLeave"
+            v-model="editPlace"
+            @change="editQuestion(item.type, index)"
+            style="padding:20px"
+            >
+              <el-collapse-item title="编辑">
+                    <single-choice-add-card :ref="'single-choice'+index" v-if="item.type === 'single-choice'"></single-choice-add-card>
+        
+                    <!--多选对话框-->
+                    <multiple-choice-add-card :ref="'multiple-choice'+index" v-if="item.type === 'multiple-choice'"></multiple-choice-add-card>
+           
+                    <!--单项填空对话框-->
+                    <single-completion-add-card :ref="'completion'+index" v-if="item.type === 'completion'"></single-completion-add-card>
+
+                    <!--    评分对话框-->
+                    <scoring-add-card :ref="'scoring'+index" v-if="item.type === 'scoring'"></scoring-add-card>
+              </el-collapse-item>
+            </el-collapse>
+            
+            </div>
+            </transition-group>
+          </draggable>
+
           <div class="not_found" style="line-height: 100px">
             快去侧边栏选择题型创建新的问题o(*￣▽￣*)ブ <i class="el-icon-cold-drink"></i>
           </div>
@@ -172,16 +199,7 @@
 
     <!--波浪-->
     <!--    <wave></wave>-->
-    <!--单选对话框-->
-    <single-choice-add-card ref="single-choice"></single-choice-add-card>
-    <!--多选对话框-->
-    <multiple-choice-add-card ref="multiple-choice"></multiple-choice-add-card>
-    <!--单项填空对话框-->
-    <single-completion-add-card ref="completion"></single-completion-add-card>
-    <!--多项填空对话框-->
-    <multiple-completion-add-card ref="multiple-completion"></multiple-completion-add-card>
-<!--    评分对话框-->
-    <scoring-add-card ref="scoring"></scoring-add-card>
+
     <el-backtop></el-backtop>
   </div>
 </template>
@@ -196,11 +214,24 @@ import authorization from "@/utils/authorization";
 import ScoringAddCard from "../components/ScoringAddCard";
 import axios from "axios";
 import TitleContentDialog from '../components/TitleContentDialog.vue'
+import draggable from 'vuedraggable'
+// fade/zoom 等
+import 'element-ui/lib/theme-chalk/base.css';
+// collapse 展开折叠
+import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
+import Vue from 'vue'
+import {Base64} from "js-base64";
+ 
+Vue.component(CollapseTransition.name, CollapseTransition)
+
+
 export default {
-  components: {SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard, TitleContentDialog},
+  components: {SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard, TitleContentDialog,draggable},
   data(){
     return {
       // 菜单栏
+      disabled: false,
+      editPlace: [],
       menuList:[
         {
           name: "选择题",
@@ -258,7 +289,9 @@ export default {
         })
       }
       else{
-        this.$router.push({path: '/charts/' + this.info.id});
+        let s1 = Base64.encode('moyu' + this.info.id + 'wenjuan');
+        let url = window.location.origin+ "/charts/" + s1; // 统计链接
+        window.open(url);
       }
     },
     Finish(){
@@ -276,10 +309,10 @@ export default {
       }
     },
     addQuestion(questionType){
-      this.$refs[questionType].addQuestion(questionType)
+
     },
     editQuestion(questionType, index){
-      this.$refs[questionType].editQuestion(this.info.question_list[index])
+      this.$refs[questionType+index][0].editQuestion(this.info.question_list[index])
     },
     cardUp(index, item){
       if (index === 0){
@@ -367,7 +400,43 @@ export default {
     },
     editTitle(){
       this.$refs["title-content-dialog"].edit()
+    },
+    onStart() {
+    this.drag = true;
+    console.log("start")
+    },
+//拖拽结束事件
+    onEnd(e) {
+      this.drag = false;
+      if (e.oldIndex == e.newIndex){
+        return
+      }
+      // console.log(this.info.question_list[e.newIndex].id)
+      var id = this.info.question_list[e.newIndex].id
+      axios
+          .patch('/api/question/' + id + '/', {
+            ordering: e.newIndex + 1,
+          }, {
+            headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+          })
+          .then(function (response){
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '更换顺序失败'
+            })
+          })
+    },
+    mouseEnter(){
+      this.mouseActivate = true
+      this.disabled = true
+    },
+    mouseLeave(){
+      this.mouseActivate = true
+      this.disabled = false
     }
+    // 添加成功的事件
   },
   mounted() {
     const that = this;
@@ -413,8 +482,10 @@ export default {
 
 <style lang="less" scoped>
 
+
 // 侧边栏标题布局
 .aside-top{
+  
   text-align: center;
   margin-bottom: 5pt;
   font-size: 20px !important;
@@ -463,18 +534,33 @@ export default {
   margin: 40px auto 40px;
 }
 
-.el-card {
+.card {
   margin: 15px;
+  padding: 0px;
+  border: solid 1px #9EC1E0 !important;
+  border-radius: 10px;
 }
 
 // 侧边栏布局
-//.el-aside {
-//  background-color: #FFFFFF;
-//  opacity: 0.95;
-//  margin-top: 0;
-//  padding-top: 10pt;
-//  border-radius: 3%;
-//}
+.el-aside {
+ background-color: #FFFFFF;
+ opacity: 0.95;
+ margin-top: 0;
+ padding-top: 10pt;
+ border-radius: 3%;
+}
+
+
+.bottom-button{
+  height: 100%;
+  width: 100% !important;
+  padding: 0;
+  font-size: 15pt;
+  color: #83a1ce;
+  border: none;
+  display: flex;
+  justify-content: center;
+}
 .el-aside {
   background-color: transparent;
   color: #333;
@@ -567,13 +653,16 @@ export default {
 
 //卡片底部
 .card-footer{
-  //position: absolute;
+  position: relative;
   //color: #fff;
   //right: 13%;
-  transform: translate(0, -80%);
-  display: inline-block;
-  float: right;
+  width: 100%;
   //margin-bottom: 10px;
+  text-align: center;
+  height: 35px;
+}
+.el-divider--horizontal{
+  margin: 0;
 }
 
 // el-main footer
@@ -588,6 +677,12 @@ export default {
 .single-completion-input, .multiple-completion-input{
   margin-top: 20pt !important;
   width: 80% !important;
+}
+
+.chosen {
+    border: solid 2px #0d9fcf !important;
+    background: #F7F8F9;
+    opacity: 0.5;
 }
 </style>
 
