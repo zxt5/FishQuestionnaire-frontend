@@ -66,7 +66,7 @@
           @end="onEnd"
           >
           <transition-group>              
-          <div class="card"  v-for="(item, index) in info.question_list" :key="index">
+          <div class="card"  v-for="(item, index) in info.question_list" :key="item.id">
             <div style="padding: 20px">
             <div class="op">
               <ul>
@@ -88,7 +88,7 @@
                 {{item.content}}
               </div>
               <el-radio-group v-model="item.answer">
-                <el-radio v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex">
+                <el-radio v-for="(subItem, subIndex) in item.option_list" :key="subItem.id" :label="subIndex">
                   {{subItem.title}}
                 </el-radio>
               </el-radio-group>
@@ -106,7 +106,7 @@
                 {{item.content}}
               </div>
               <el-checkbox-group v-model="answer[item.ordering - 1]">
-                <el-checkbox  v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex" >
+                <el-checkbox  v-for="(subItem, subIndex) in item.option_list" :key="subItem.id" :label="subIndex" >
                   {{subItem.title}}
                 </el-checkbox>
               </el-checkbox-group>
@@ -133,7 +133,7 @@
               <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
                 {{item.content}}
               </div>
-              <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex" class="multiple-completion-input">
+              <div v-for="(subItem, subIndex) in item.option_list" :key="subItem.id" class="multiple-completion-input">
 <!--                <p style="margin-left:10px">{{subItem.title}}</p>-->
                 <el-input class="single-completion-input" :autosize="true"
                           type="textarea" :clearable="true" resize="none" v-model="answer[item.ordering - 1][subIndex]"></el-input>
