@@ -41,16 +41,6 @@
                 <li @click="toChart(item)"><v-icon small>mdi-list-status</v-icon>  统计</li>
                 <li @click="Delete(item.id, item.status)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
               </ul>
-              <!--            <el-dropdown style="margin-top: 5px" @command="handleCommand" >-->
-              <!--              <span class="el-dropdown-link">-->
-              <!--               更多<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
-              <!--              </span>-->
-              <!--              <el-dropdown-menu slot="dropdown">-->
-              <!--                <el-dropdown-item command="a">编辑</el-dropdown-item>-->
-              <!--                <el-dropdown-item command="item.id">分享</el-dropdown-item>-->
-              <!--                <el-dropdown-item command="e" divided>统计</el-dropdown-item>-->
-              <!--              </el-dropdown-menu>-->
-              <!--            </el-dropdown>-->
               <div class="created">
                 {{ formatted_time(item.create_date) }}
               </div>
@@ -142,17 +132,6 @@ export default {
       console.log(s2.substring(4,s2.length - 7));
       console.log(s3.substring(4,s3.length - 7));
     },
-    toSearch(){
-      if(this.search === ''){
-        this.$notify.warning({
-          title: '别搞',
-          message: '搜索不能为空哦'
-        })
-      }
-      else{
-        this.$router.push({path: '/search/' + this.search})
-      }
-    },
 
     formatted_time: function (iso_date_string) {
       const date = new Date(iso_date_string);
@@ -221,14 +200,17 @@ export default {
         })
       }
       else{
-        let url = window.location.origin + "/charts/" + item.id; //预览链接
+        let s1 = Base64.encode('moyu' + item.id + 'wenjuan');
+        let url = window.location.origin+ "/charts/" + s1; // 统计链接
         window.open(url);
       }
     },
     showSharePage(item) {
       if(item.status === 'shared'){
         this.is_show = true;
-        this.shareInfo.url=window.location.origin+"/fill/" + item.id;//问卷链接
+        let s1 = Base64.encode('moyu' + item.id + 'wenjuan');
+        let url = window.location.origin+ "/fill/" + s1; // 问卷链接
+        this.shareInfo.url = url;
       }
       else{
         this.$notify.warning({
@@ -261,7 +243,8 @@ export default {
       window.open(this.shareInfo.url);
     },
     toCheck(id){
-      let url = window.location.origin+ "/check/" + id; //预览链接
+      let s1 = Base64.encode('moyu' + id + 'wenjuan');
+      let url = window.location.origin+ "/check/" + s1; //预览链接
       window.open(url);
     },
     // toCenter(username){
@@ -365,7 +348,8 @@ export default {
             if(response[0]){
               let s1 = that.$route.params.text;
               s1 = Base64.decode(s1);
-              s1 = s1.substring(4,s1.length - 7);
+              s1 = s1.substring(3,s1.length - 4);
+              console.log(s1);
               axios
                   .put('/api/questionnaire/search/',{
                     keyword: s1,

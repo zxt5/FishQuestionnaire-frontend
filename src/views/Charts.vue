@@ -80,6 +80,7 @@
 import Wave from "../components/Wave.vue"
 import authorization from "@/utils/authorization";
 import axios from "axios";
+import {Base64} from "js-base64";
 var option;
 export default {
   components: {Wave},
@@ -87,10 +88,11 @@ export default {
     const that = this;
     authorization().then(function (response) {
       if(response[0]){
-        console.log(that.$route.params.id);
-        console.log('/api/questionnaire/' + that.$route.params.id);
+        let s1 = that.$route.params.text;
+        s1 = Base64.decode(s1);
+        s1 = s1.substring(4,s1.length - 7);
         axios
-            .get('/api/questionnaire/' + that.$route.params.id + '/report/', {
+            .get('/api/questionnaire/' + parseInt(s1) + '/report/', {
               headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
             })
             .then(function (response) {

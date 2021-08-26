@@ -157,7 +157,7 @@ export default {
         })
       }
       else{
-        let s1 = Base64.encode('moyu' + this.search + 'wenjuan');
+        let s1 = Base64.encode('wen' + this.search + 'juan');
         this.$router.push({path: '/search/' + s1})
       }
     },
@@ -211,14 +211,17 @@ export default {
         })
       }
       else{
-        let url = window.location.origin + "/charts/" + item.id; //预览链接
+        let s1 = Base64.encode('moyu' + item.id + 'wenjuan');
+        let url = window.location.origin+ "/charts/" + s1; // 统计链接
         window.open(url);
       }
     },
     showSharePage(item) {
       if(item.status === 'shared'){
         this.is_show = true;
-        this.shareInfo.url=window.location.origin+"/fill/" + item.id;//问卷链接
+        let s1 = Base64.encode('moyu' + item.id + 'wenjuan');
+        let url = window.location.origin+ "/fill/" + s1; // 问卷链接
+        this.shareInfo.url = url;
       }
       else{
         this.$notify.warning({
@@ -251,7 +254,8 @@ export default {
       window.open(this.shareInfo.url);
     },
     toCheck(id){
-      let url = window.location.origin+ "/check/" + id; //预览链接
+      let s1 = Base64.encode('moyu' + id + 'wenjuan');
+      let url = window.location.origin+ "/check/" + s1; //预览链接
       window.open(url);
     },
     // toCenter(username){

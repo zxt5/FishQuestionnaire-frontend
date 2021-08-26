@@ -220,6 +220,7 @@ import 'element-ui/lib/theme-chalk/base.css';
 // collapse 展开折叠
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 import Vue from 'vue'
+import {Base64} from "js-base64";
  
 Vue.component(CollapseTransition.name, CollapseTransition)
 
@@ -288,7 +289,9 @@ export default {
         })
       }
       else{
-        this.$router.push({path: '/charts/' + this.info.id});
+        let s1 = Base64.encode('moyu' + this.info.id + 'wenjuan');
+        let url = window.location.origin+ "/charts/" + s1; // 统计链接
+        window.open(url);
       }
     },
     Finish(){

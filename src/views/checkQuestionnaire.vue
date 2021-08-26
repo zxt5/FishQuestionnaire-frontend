@@ -110,6 +110,7 @@
 <script>
 import authorization from "../utils/authorization";
 import axios from "axios";
+import {Base64} from "js-base64";
 
 export default {
   name: "check",
@@ -128,8 +129,11 @@ export default {
   },
   mounted() {
     const that = this;
+    let s1 = that.$route.params.text;
+    s1 = Base64.decode(s1);
+    s1 = s1.substring(4,s1.length - 7);
     axios
-        .get('/api/questionnaire/' + this.$route.params.id)
+        .get('/api/questionnaire/' + parseInt(s1))
         .then(function (response){
           that.info = response.data;
           that.htmlTitle = response.data.title;

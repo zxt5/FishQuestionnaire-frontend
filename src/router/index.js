@@ -79,7 +79,7 @@ const routes = [
     ]
   },
   {
-    path: '/check/:id',
+    path: '/check/:text',
     name: 'check',
     component: checkQuestionnaire,
     meta:{
@@ -87,7 +87,7 @@ const routes = [
     }
   },
   {
-    path: '/fill/:id',
+    path: '/fill/:text',
     name: 'fill',
     component: FillQuestionnaire,
     meta:{
@@ -103,7 +103,7 @@ const routes = [
     }
   },
   {
-    path: '/charts/:id',
+    path: '/charts/:text',
     name: 'Charts',
     component: Charts,
     meta:{
