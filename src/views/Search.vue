@@ -2,7 +2,17 @@
   <div class="el-main" >
     <div class="questionnaire" direction="vertical">
       <div>
+        <v-app style="width: 10%;float: right">
+          <v-btn
+              class="white-space"
+              color="primary"
+              depressed
+              elevation="2"
+              @click="back()"
+          ><v-icon small>mdi-arrow-left</v-icon>    返回</v-btn>
+        </v-app>
         <h2 class="title" style="min-width: 800px">搜索结果</h2>
+
         <div class="not_found" v-if="!info.length">
           无搜索结果~ <i class="el-icon-cold-drink"></i>
         </div>
@@ -93,6 +103,7 @@
 import axios from "axios";
 import authorization from "../utils/authorization";
 import QRCode from 'qrcode';
+import {Base64} from "js-base64";
 export default {
   inject: ['reload'],
   components:{QRCode},
@@ -111,6 +122,26 @@ export default {
     }
   },
   methods: {
+    back() {
+      this.$router.push({path: '/index'});
+    },
+    test() {
+      let str1 = "//";
+      let str2 = "/测试";
+      let str3 = "/ceshi";
+      let s1 = Base64.encode('moyu' + str1 + 'wenjuan');
+      let s2 = Base64.encode('moyu' + str2 + 'wenjuan');
+      let s3 = Base64.encode('moyu' + str3 + 'wenjuan');
+      console.log(s1);
+      console.log(s2);
+      console.log(s3);
+      s1 = Base64.decode(s1);
+      s2 = Base64.decode(s2);
+      s3 = Base64.decode(s3);
+      console.log(s1.substring(4,s1.length - 7));
+      console.log(s2.substring(4,s2.length - 7));
+      console.log(s3.substring(4,s3.length - 7));
+    },
     toSearch(){
       if(this.search === ''){
         this.$notify.warning({
@@ -190,7 +221,8 @@ export default {
         })
       }
       else{
-        this.$router.push({path: '/charts/' + item.id});
+        let url = window.location.origin + "/charts/" + item.id; //预览链接
+        window.open(url);
       }
     },
     showSharePage(item) {
@@ -229,7 +261,8 @@ export default {
       window.open(this.shareInfo.url);
     },
     toCheck(id){
-      this.$router.push({path: '/check/' + id});
+      let url = window.location.origin+ "/check/" + id; //预览链接
+      window.open(url);
     },
     // toCenter(username){
     //   this.$router.push({path: '/center/' + username});
@@ -322,7 +355,7 @@ export default {
   },
   mounted() {
     const that = this;
-    console.log(that.$route.query.type)
+    console.log(that.$route.query.type);
     if(that.$route.query.type) {
       that.search = JSON.parse(that.$route.query.type);
     }
@@ -330,9 +363,12 @@ export default {
       authorization()
           .then(function (response){
             if(response[0]){
+              let s1 = that.$route.params.text;
+              s1 = Base64.decode(s1);
+              s1 = s1.substring(4,s1.length - 7);
               axios
                   .put('/api/questionnaire/search/',{
-                    keyword: that.$route.params.text,
+                    keyword: s1,
                   }, {
                     headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
                   })
@@ -390,6 +426,9 @@ export default {
   width: fit-content;
   cursor: pointer;
   display: inline-block;
+}
+.white-space {
+  white-space:pre
 }
 .el-main {
   background-color: transparent;

@@ -8,6 +8,7 @@ import vuetify from './plugins/vuetify'
 import Clipboard from "v-clipboard";
 import axios from 'axios';
 const echarts = require('echarts');
+let Base64 = require('js-base64').Base64;
 Vue.config.productionTip = false
 Vue.use(ElementUI);
 Vue.use(Clipboard);

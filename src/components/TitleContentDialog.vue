@@ -1,7 +1,7 @@
 <template>
   <!--添加题目的对话框-->
   <el-dialog
-      title="添加题目[单选题]"
+      title="问卷标题与描述"
       width="50%"
       :visible.sync="addDialogVisible"
       append-to-body>

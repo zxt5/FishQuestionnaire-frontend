@@ -12,18 +12,18 @@ export default {
   data() {
     return {
       bannerList: [
-        {
-          id:0,
-          url:"https://z3.ax1x.com/2021/06/17/2jnzin.jpg",
-        },
+        // {
+        //   id:0,
+        //   url:"https://z3.ax1x.com/2021/06/17/2jnzin.jpg",
+        // },
         {
           id:1,
           url:"https://z3.ax1x.com/2021/06/17/2juuz6.jpg",
         },
-        {
-          id:2,
-          url:"https://z3.ax1x.com/2021/06/17/2ju6Fs.jpg",
-        },
+        // {
+        //   id:2,
+        //   url:"https://z3.ax1x.com/2021/06/17/2ju6Fs.jpg",
+        // },
         {
           id:3,
           url:"https://z3.ax1x.com/2021/06/17/2juLSx.jpg",
@@ -32,10 +32,10 @@ export default {
           id:4,
           url:"https://z3.ax1x.com/2021/06/17/2juHYR.jpg",
         },
-        {
-          id:5,
-          url:"https://z3.ax1x.com/2021/06/17/2jKZnS.jpg",
-        }
+        // {
+        //   id:5,
+        //   url:"https://z3.ax1x.com/2021/06/17/2jKZnS.jpg",
+        // }
       ],
       isShowBg: 0,
       count:0.01,
@@ -53,7 +53,7 @@ export default {
         }else{
           this.isShowBg = 0
         }
-      },6000)
+      },10000)
     }
   },
   beforeDestroy(){

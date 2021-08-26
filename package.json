@@ -10,6 +10,7 @@
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "element-ui": "^2.15.1",
+    "js-base64": "^3.6.1",
     "less-loader": "^7.0.0",
     "qrcode": "^1.4.4",
     "v-clipboard": "^2.2.3",

@@ -101,6 +101,7 @@
 import axios from "axios";
 import authorization from "../utils/authorization";
 import QRCode from 'qrcode';
+import {Base64} from "js-base64";
 export default {
   inject: ['reload'],
   components:{QRCode},
@@ -127,7 +128,8 @@ export default {
         })
       }
       else{
-        this.$router.push({path: '/search/' + this.search})
+        let s1 = Base64.encode('moyu' + this.search + 'wenjuan');
+        this.$router.push({path: '/search/' + s1})
       }
     },
     formatted_time: function (iso_date_string) {
@@ -180,7 +182,8 @@ export default {
         })
       }
       else{
-        this.$router.push({path: '/charts/' + item.id});
+        let url = window.location.origin + "/charts/" + item.id; //预览链接
+        window.open(url);
       }
     },
     showSharePage(item) {
@@ -219,7 +222,8 @@ export default {
       window.open(this.shareInfo.url);
     },
     toCheck(id){
-      this.$router.push({path: '/check/' + id});
+      let url = window.location.origin+ "/check/" + id; //预览链接
+      window.open(url);
     },
     // toCenter(username){
     //   this.$router.push({path: '/center/' + username});
