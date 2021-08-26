@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Header/>
-    <div class="index_swiper">
+    <div class="index_swiper" v-show="this.$route.path !== '/'">
       <Swiper/>
     </div>
     <transition>
@@ -40,14 +40,17 @@ export default {
 </script>
 
 <style>
-
 body{
-  /*background-color: whitesmoke;*/
+  background-color: whitesmoke;
   margin:0;
   padding:0;
-  min-width:1400px;
+  min-width:1600px;
   width:100vw !important;
-  overflow-x: hidden;
+  /*overflow-x: hidden !important;*/
+  /*display: flex;*/
+}
+html{
+  overflow-x: auto !important;
 }
 .index_swiper {
   width: 100%;

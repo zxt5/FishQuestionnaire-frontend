@@ -10,10 +10,14 @@
         text-color="#333"
         active-text-color="#3F87DA">
       <h1>
-        <a class="logo" :style="{backgroundImage: 'url(' +bg + ')'}" @click="$router.push({path:'/index'})"></a>
+        <a class="logo" :style="{backgroundImage: 'url(' +bg + ')'}" @click="$router.push({path:'/'})"></a>
       </h1>
-      <el-menu-item index="/index" @click="toIndex">我的问卷</el-menu-item>
-<!--      <el-menu-item index="/fill/1" @click="$router.push({path:'/fill/1'})" disabled>填写问卷</el-menu-item>-->
+<!--      <el-menu-item index="/">首页</el-menu-item>-->
+      <el-menu-item index="/index">我的问卷</el-menu-item>
+      <el-menu-item>🐟</el-menu-item>
+      <el-menu-item>🐟</el-menu-item>
+      <el-menu-item>🐟</el-menu-item>
+<!--      <el-menu-item index="/help">帮助与支持</el-menu-item>-->
 <!--      <el-menu-item index="/check/1" @click="$router.push({path:'/check/1'})" disabled>预览问卷</el-menu-item>-->
 <!--      <el-menu-item index="/edit/30" @click="$router.push({path:'/edit/30'})" disabled>创建问卷</el-menu-item>-->
 <!--      <el-menu-item index="/charts/1" @click="$router.push({path:'/charts/1'})" disabled>统计分析</el-menu-item>-->
@@ -24,7 +28,7 @@
           <el-avatar>登录</el-avatar>
         </span>
         <el-dropdown @command="handleCommand"  v-else>
-          <span class="el-dropdown-link" @click="">
+          <span class="el-dropdown-link">
             <el-avatar>{{username}}</el-avatar>
           </span>
           <el-dropdown-menu slot="dropdown">
@@ -34,6 +38,7 @@
           </el-dropdown-menu>
         </el-dropdown>
       </div>
+
 <!--      <div class="search">-->
 <!--        <div>-->
 <!--          <el-input v-model="search" placeholder="搜索图书" maxLength="100" @keyup.native.enter="toSearch">-->
@@ -58,6 +63,7 @@ export default {
       search: '',
       avatar: '',
       username: '',
+      username1: '',
       id:'',
     };
   },
@@ -120,6 +126,7 @@ export default {
                     const data = response.data;
                     // that.avatar = data.profile.avatar;
                     that.username = data.username.substr(0, 2).toUpperCase();
+                    that.username1 = data.username;
                     // that.id = data.profile.id;
                     // console.log('header ' + that.username);
                   })
@@ -150,17 +157,13 @@ export default {
 @import url("../assets/common.css");
 .header{
   z-index: 5;
-  opacity: 0.95;
+  /*opacity: 1;*/
   /*font-family: "lucida grande", "lucida sans unicode", lucida, helvetica, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;*/
 }
 
-.header li{
-  font-size: medium;
-}
-
-.header .el-menu-item.is-active{
-  font-weight: bolder;
-}
+/*.header .el-menu-item.is-active{*/
+/*  font-weight: bolder;*/
+/*}*/
 
 .header .el-menu-item:hover{
   background: whitesmoke !important;
@@ -170,11 +173,9 @@ export default {
   margin:0 10px !important;
 }
 
-
-
 h1{
   float: left;
-  height: 61px;
+  height: 75px;
   margin: 0;
   width: 150px;
   cursor: pointer;
@@ -203,9 +204,10 @@ h1 a:hover{
 
 .user{
   float: right;
-  margin: 10px 40px 10px 20px;
+  margin: 18px 40px 10px 20px;
   height: 40px;
   overflow: hidden;
+  /*margin-right: 20%;*/
 }
 
 .el-dropdown-link{
@@ -227,4 +229,18 @@ h1 a:hover{
   height: 40px;
 }
 
+</style>
+
+<style>
+.header li{
+  font-size: large !important;
+}
+.el-menu.el-menu--horizontal {
+  height: 75px !important;
+   border-bottom: solid 0px #e6e6e6 !important;
+}
+.el-menu--horizontal>.el-menu-item {
+  height: 75px !important;
+  line-height: 75px !important;
+}
 </style>

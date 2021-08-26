@@ -12,24 +12,18 @@ import Charts from "../views/Charts";
 import Search from "../views/Search";
 import NotFound from "../views/NotFound";
 import Thank from "../views/Thank";
+import Welcome from "../views/Welcome";
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'Index',
-    component: Index,
-    children: [
-      {
-        path: '',
-        name: 'Questionnaire',
-        component: Questionnaire,
-        meta: {
-          title: '摸鱼问卷',
-        }
-      },
-    ]
+    name: 'Welcome',
+    component: Welcome,
+    meta: {
+      title: '欢迎使用摸鱼问卷',
+    }
   },
   {
     path: '/login',
