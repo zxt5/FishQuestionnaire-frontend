@@ -3,7 +3,7 @@
     <!--主题内容区域-->
     <div class="button-header">
       <el-button type="primary" @click="downloadExcel">导出excel</el-button>
-      <el-button type="danger" @click="getPdf()">导出pdf</el-button>
+      <el-button type="danger" @click="getPdf()" style="margin-left: 20px">导出pdf</el-button>
     </div>
     <el-container class="main" id="pdfDom">
       <!--图像区域-->

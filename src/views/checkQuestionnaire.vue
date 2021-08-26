@@ -3,7 +3,9 @@
     <div class="reminder">
       <h4>摸小鱼温馨提示：只能预览，不能提交哦~</h4>
     </div>
-    <el-button @click="getPdf()"> 导出PDF</el-button>
+    <div class="button-header">
+      <el-button type="danger" @click="getPdf()">导出pdf</el-button>
+    </div>
     <div class="questionnaire" id="pdfDom">
       <!--标题-->
       <h1 class="title">{{info.title}}</h1>
@@ -97,7 +99,7 @@
       </div>
       <!--内容结束-->
 
-      <el-button type="primary" @click="click">提交</el-button>
+      <el-button type="primary" @click="click" class="submit">提交</el-button>
 
       <!--      <div class="line"></div>-->
       <!--      <div class="text2"> 摸鱼问卷 提供技术支持 </div>-->
@@ -219,7 +221,7 @@ p {
   padding-right: 40px;
 }
 
-.el-button{
+.submit{
   width: 20%;
   /*color: white;*/
   display: flex;
@@ -232,10 +234,15 @@ p {
   /*text-indent: 2em;*/
 }
 
-.el-button:hover{
+.submit:hover{
   background-color: #3F87DA;
 }
-
+.button-header{
+  position: relative !important;
+  text-align: center !important;
+  margin-top: 20pt !important;
+  color: #fff !important;
+}
 h4{
   /*display: inline-block;*/
   text-align: center;

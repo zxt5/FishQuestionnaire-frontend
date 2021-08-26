@@ -10,20 +10,19 @@
           </el-input>
         </div>
       </div>
+      <el-dropdown @command="sort" style="float: right; margin-right: 15%; margin-top: 7px">
+          <span class="el-dropdown-link" style="color: darkblue; float: left; font-size: 17px">
+            选择排序方式<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command = '-create_date'>创建时间</el-dropdown-item>
+          <el-dropdown-item command = '-answer_num'>答卷数量</el-dropdown-item>
+          <el-dropdown-item command = '-last_shared_date'>最后分享时间</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
 
       <div>
         <h2 class="title" style="min-width: 800px">问卷列表</h2>
-
-        <el-dropdown @command="sort" >
-          <span class="el-dropdown-link" style="color: purple; float: left">
-            选择排序方式<i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command = '-create_date'>创建时间</el-dropdown-item>
-            <el-dropdown-item command = '-answer_num'>答卷数量</el-dropdown-item>
-            <el-dropdown-item command = '-last_shared_date'>最后分享时间</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
 
       </div>
 
