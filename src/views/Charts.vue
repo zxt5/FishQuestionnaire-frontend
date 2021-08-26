@@ -2,7 +2,7 @@
   <div >
     <!--主题内容区域-->
     <div class="button-header">
-<!--      <el-button type="primary" >导出excel</el-button>-->
+      <el-button type="primary" @click="getExcel()">导出excel</el-button>
 <!--      <el-button type="danger">导出pdf</el-button>-->
     </div>
     <el-container class="main">
@@ -109,6 +109,7 @@ export default {
                     activeChart: '0',
                     activeNames: [],
                   });
+                  let ord = 1;
                   for (let subItem of item.option_list[0].answer_list) {
                     // console.log(subItem.modified_time);
                     var time = subItem.modified_time;
@@ -117,8 +118,8 @@ export default {
                     var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
                     // console.log(str);
                     subItem.modified_time = str;
+                    subItem.ordering = ord ++;
                   }
-
                 }
                 else {
                   that.tmp.push({
@@ -258,13 +259,21 @@ export default {
     }
   },
   methods: {
-    init(){
-      console.log(this.tmp);
-      for (let i = 0; i < this.answers.length; i++){
-        for (let j = 0; j < 3; j++){
-          this.generateChart(i+'-'+j, j)
-        }
-      }
+    getExcel(){
+      // let str = '/api/questionnaire/' + this.$route.params.id + '/export-xls/';
+      // return str;
+      axios
+          .get('/api/questionnaire/' + this.$route.params.id + '/export-xls/')
+          .then(function (response){
+            console.log(response)
+          })
+          .catch(function (error) {
+            console.log(error);
+            this.$notify.error({
+              title: '好像发生了什么错误',
+              // message: '',
+              })
+      })
     },
     handleChange(index) {
       for (let j = 0; j < 3; j++) {
