@@ -181,7 +181,7 @@
             @mouseout.native =  "mouseLeave"
             >
             <div class="question-container">
-              <el-collapse-transition>
+                <el-collapse-transition>
                   <div v-show="item.isShow">
                     <single-choice-add-card :ref="'single-choice'+index" v-if="item.type === 'single-choice'"></single-choice-add-card>
         
@@ -193,8 +193,9 @@
 
                     <!--    评分对话框-->
                     <scoring-add-card :ref="'scoring'+index" v-if="item.type === 'scoring'"></scoring-add-card>
+
                   </div>
-              </el-collapse-transition>
+                </el-collapse-transition>
             </div>
             </el-container>
             <!--编辑按钮-->
@@ -223,9 +224,10 @@
 
     <!--波浪-->
     <!--    <wave></wave>-->
-    <scoring-add-dialog ref="scoring-add-dialog"></scoring-add-dialog>
-    <single-completion-add-dialog ref="single-completion-add-dialog"></single-completion-add-dialog>
-    <single-choice-add-dialog ref="single-choice-add-dialog"></single-choice-add-dialog>
+    <scoring-add-dialog ref="scoring"></scoring-add-dialog>
+    <single-completion-add-dialog ref="completion"></single-completion-add-dialog>
+    <single-choice-add-dialog ref="single-choice"></single-choice-add-dialog>
+    <multiple-choice-add-dialog ref="multiple-choice"> </multiple-choice-add-dialog>
     <el-backtop></el-backtop>
   </div>
 </template>
@@ -247,15 +249,15 @@ import 'element-ui/lib/theme-chalk/base.css';
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 import Vue from 'vue'
 import collapse from "../assets/js/collapse.js";
-import TitleContentAddDialog from '../components/TitleContentAddDialog.vue'
 import ScoringAddDialog from '../components/ScoringAddDialog.vue'
 import SingleCompletionAddDialog from '../components/SingleCompletionAddDialog.vue'
 import SingleChoiceAddDialog from '../components/SingleChoiceAddDialog.vue'
+import MultipleChoiceAddDialog from '../components/MultipleChoiceAddDialog.vue'
 Vue.component(CollapseTransition.name, CollapseTransition)
 
 
 export default {
-  components: {collapse, SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard, TitleContentDialog,draggable, TitleContentAddDialog, ScoringAddDialog, SingleCompletionAddDialog, SingleChoiceAddDialog},
+  components: {collapse, SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard, TitleContentDialog,draggable,  ScoringAddDialog, SingleCompletionAddDialog, SingleChoiceAddDialog, MultipleChoiceAddDialog},
   data(){
     return {
       // 菜单栏
@@ -336,20 +338,17 @@ export default {
       }
     },
     addQuestion(questionType){
-
+      this.$refs[questionType].addQuestion(questionType)
     },
     editQuestion(item, index){
       var questionType = item.type
       // 切换编辑界面显示
       console.log("editquestion", this.$refs, questionType+index)
       var temp = this.$refs[questionType+index][0]
-      console.log(temp)
-      var last = temp.addDialogVisible
+      var last= temp.addDialogVisible
+      console.log(last)
       temp.editQuestion(this.info.question_list[index])
-      
-      if (last = !temp.addDialogVisible) temp.isShow = !temp.isShow
-      
-
+      if (last == !temp.addDialogVisible) item.isShow = !item.isShow
     },
     cardUp(index, item){
       if (index === 0){
@@ -449,16 +448,15 @@ export default {
       if (e.oldIndex == e.newIndex){
         return
       }
-
       // 重新渲染编辑页面
       for (let i = 0; i < this.info.question_list.length; i++){
         var item = this.info.question_list[i]
         // this.$refs[item.type+(e.ordering-1)][0] = item
         if (!item.isShow) continue
         this.$refs[item.type+i][0].questionForm = item
-        console.log("endt",this.$refs[item.type+i][0])
       }
       var id = this.info.question_list[e.newIndex].id
+      const that = this
       axios
           .patch('/api/question/' + id + '/', {
             ordering: e.newIndex + 1,
@@ -466,6 +464,7 @@ export default {
             headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
           })
           .then(function (response){
+            that.$notify.success({title:'交换成功'})
           })
           .catch(function (error){
             that.$notify.error({

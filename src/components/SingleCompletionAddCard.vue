@@ -41,7 +41,7 @@
 import axios from "axios";
 
 export default {
-  inject: ['reload'],
+  // inject: ['reload'],
   name: "single-completion-addcard",
   data(){
     return{
