@@ -757,6 +757,7 @@ export default {
   justify-content: center;
 }
 .el-aside {
+  position: fixed;
   background-color: transparent;
   color: #333;
   padding-top:0 !important;
@@ -771,7 +772,10 @@ export default {
   //background-color: #E9EEF3;
   //color: #333;
   //border-radius: 10px;
-  margin-left: 30pt;
+  margin-left: 25%;
+  margin-bottom: 40px;
+  width: 60% ;
+  position: absolute;
   //margin-top: 0;
   /*padding-top: 50px;*/
 }
