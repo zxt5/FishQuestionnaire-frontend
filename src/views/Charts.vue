@@ -511,11 +511,8 @@ export default {
   margin: 0 auto;
   //padding-left: 15px;
 }
-
-</style>
-
-<style>
 .el-input--suffix .el-input__inner {
   padding-right: 230px !important;
 }
 </style>
+
