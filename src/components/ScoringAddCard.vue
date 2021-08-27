@@ -2,6 +2,7 @@
   <!--添加题目的对话框-->
     <div class="add-question-card">
     <el-divider></el-divider>
+    <div>评分题</div>
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"
@@ -32,7 +33,7 @@
     <div class="dialog-footer">
       <span> </span>
       <div>
-        <el-button icon="el-icon-check" @click="finishQuestion()" type="success">完成</el-button>
+        <el-button icon="el-icon-check" @click="finishQuestion" type="success">完成</el-button>
         <el-button icon="el-icon-close" @click="cancelQuestion" type="danger"> 取消</el-button>
       </div>
     </div>
@@ -47,7 +48,6 @@ export default {
   name: "scoring-addcard",
   data(){
     return{
-      temp: '',
       addDialogVisible : false,
       // title: '',
       // content: '',

@@ -2,6 +2,7 @@
   <!--添加题目的对话框-->
     <div class="add-question-card">
     <el-divider></el-divider>
+    <div>单选题</div>
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"
@@ -102,12 +103,12 @@ export default {
     },
     editQuestion(question){
       if (this.addDialogVisible) {
-        this.addDialogVisible = false
         this.finishQuestion()
         return 
       }
       this.addDialogVisible = true
       this.questionForm = question
+     
       this.flag = question.id
     },
     addChoice() {
@@ -133,7 +134,7 @@ export default {
         if (this.questionForm.option_list.length === 0) return this.$notify.error({
           title: '请至少添加一个选项噢~'
         })
-        this.addDialogVisible = false;
+        console.log("finishQuestion")
         const that = this;
         if(this.flag === 0){
           axios
@@ -152,6 +153,7 @@ export default {
                 that.$notify.success({
                   title: '保存成功'
                 })
+                this.addDialogVisible = false;
               })
               .catch(function (error){
                 that.$notify.error({
@@ -177,6 +179,7 @@ export default {
                 that.$notify.success({
                   title: '保存成功'
                 })
+                this.addDialogVisible = false;
               })
               .catch(function (error){
                 that.$notify.error({
@@ -208,10 +211,14 @@ add-question-card{
   width: 70%;
   margin-right: 10%;
 }
+</style>
+<style>
 .dialog-footer{
   width: 100%;
   display: flex;
   justify-content: space-between;
   padding: 0;
+  margin-bottom: 20px;
 }
+
 </style>

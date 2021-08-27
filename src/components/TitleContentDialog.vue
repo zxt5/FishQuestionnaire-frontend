@@ -31,10 +31,6 @@
 import axios from "axios";
 
 export default {
-  props:{
-    prop_title: String,
-    prop_content: String
-  },
   inject: ['reload'],
   name: "single-choice-addcard",
   data(){
@@ -43,8 +39,7 @@ export default {
       addDialogVisible : false,
       flag : 0,//判断创建还是修改问题
       questionForm: {
-        title:  this.prop_title,
-        content: this.prop_content,
+
       },
       questionFormRules:{
         title:[
@@ -69,20 +64,16 @@ export default {
         answer: ''
       }
     },
-    edit(){
+    edit(info){
       this.flag = 1
-      console.log(this.questionForm);
-
+      // 完成编辑
+      if (this.addDialogVisible){
+        this.finishQuestion()
+        this.addDialogVisible = false
+        return 
+      }  
+      this.questionForm = info
       this.addDialogVisible = true
-
-    },
-    addChoice() {
-      this.questionForm.option_list.push({
-        title: '',
-        content: '',
-        ordering: this.questionForm.option_list.length + 1,
-        // key: Date.now()
-      })
     },
     removeChoice(item) {
       var index = this.questionForm.option_list.indexOf(item)
