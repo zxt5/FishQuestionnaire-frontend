@@ -4,48 +4,51 @@
     <el-container class="main">
       <el-container>
         <!--侧边栏区域-->
-        <el-aside width="23%" style="height: fit-content;">
+        <a-affix style="width: 23%" offset-top="4">
+          <el-aside style="height: fit-content;">
 
-          <el-container class="class" >
-            <div @click="check" style="margin-left: 0px">
-              <el-button class="button" circle>
-                <i class="el-icon-document-checked"></i>
-              </el-button>
-              <h4>预览问卷</h4>
-            </div>
-            <div @click="toChart" style="margin-left: 50px">
-              <el-button class="button" circle>
-                <i class="el-icon-data-line"></i>
-              </el-button>
-              <h4>结果统计</h4>
-            </div>
-          </el-container>
-          <!--              active-text-color="#DA70D6"-->
-          <el-menu class="aside-mid">
-            <div class="aside-top">
-              <span> 题型选择 </span>
-            </div>
-            <!--一级菜单-->
-            <el-submenu v-for="item in menuList" :key="item.type" :index="item.type">
-              <template slot="title">
-                <span>{{item.name}}</span>
-              </template>
-              <!--二级菜单-->
-              <el-menu-item v-for="subItem in item.children" :key="subItem.type" :index="subItem.type" @click="addQuestion(subItem.type)">
+            <el-container class="class" >
+              <div @click="check" style="margin-left: 0px">
+                <el-button class="button" circle>
+                  <i class="el-icon-document-checked"></i>
+                </el-button>
+                <h4>预览问卷</h4>
+              </div>
+              <div @click="Finish" style="margin-left: 50px">
+                <el-button class="button" circle>
+                  <i class="el-icon-finished"></i>
+                </el-button>
+                <h4>完成编辑</h4>
+              </div>
+            </el-container>
+            <!--              active-text-color="#DA70D6"-->
+            <el-menu class="aside-mid">
+              <div class="aside-top">
+                <span> 题型选择 </span>
+              </div>
+              <!--一级菜单-->
+              <el-submenu v-for="item in menuList" :key="item.type" :index="item.type">
                 <template slot="title">
-                  <span>{{subItem.name}}</span>
+                  <span>{{item.name}}</span>
                 </template>
-              </el-menu-item>
-            </el-submenu>
-          </el-menu>
-        </el-aside>
+                <!--二级菜单-->
+                <el-menu-item v-for="subItem in item.children" :key="subItem.type" :index="subItem.type" @click="addQuestion(subItem.type)">
+                  <template slot="title">
+                    <span>{{subItem.name}}</span>
+                  </template>
+                </el-menu-item>
+              </el-submenu>
+            </el-menu>
+          </el-aside>
+        </a-affix>
         <!--问卷区域-->
         <el-main style="height: fit-content" class="questionnaire">
           <!--标题区域-->
-          <div class="question-title">
+          <div class="question-title" contenteditable="true" @input="info.title = $event.target.innerText" @blur="editTitle(info)">
             <h2>{{info.title}}</h2>
           </div>
-          <div class="intro"> {{info.content}}</div>
+
+          <div class="intro" contenteditable="true"> {{info.content}}</div>
 
             <el-container          
             style="display:inline">
@@ -253,6 +256,7 @@ import ScoringAddDialog from '../components/ScoringAddDialog.vue'
 import SingleCompletionAddDialog from '../components/SingleCompletionAddDialog.vue'
 import SingleChoiceAddDialog from '../components/SingleChoiceAddDialog.vue'
 import MultipleChoiceAddDialog from '../components/MultipleChoiceAddDialog.vue'
+import {Base64} from "js-base64";
 Vue.component(CollapseTransition.name, CollapseTransition)
 
 
@@ -310,18 +314,9 @@ export default {
   },
   methods:{
     check(){
-      this.$router.push({path: '/check/' + this.$route.params.id});
-    },
-    toChart(){
-      if(this.info.answer_num === 0){
-        this.$notify.warning({
-          title: '此问卷暂无答卷',
-          message: '请先回收问卷'
-        })
-      }
-      else{
-        this.$router.push({path: '/charts/' + this.info.id});
-      }
+      let s1 = Base64.encode('moyu' + this.$route.params.id + 'wenjuan');
+      let url = window.location.origin+ "/check/" + s1; //预览链接
+      window.open(url);
     },
     Finish(){
       if(this.info.question_list.length === 0){
@@ -438,6 +433,11 @@ export default {
       this.info.isShow = !this.info.isShow
       this.$refs["title-content-dialog"].edit(info)
     },
+    edit2(text){
+      console.log(text)
+      this.info.title = text;
+      this.$refs["title-content-dialog"].edit(info)
+    },
     onStart() {
     this.drag = true;
     console.log("start")
@@ -543,7 +543,6 @@ export default {
 }
 // 侧边栏标题布局
 .aside-top{
-  
   text-align: center;
   margin-bottom: 5pt;
   font-size: 20px !important;
@@ -553,7 +552,8 @@ export default {
   text-align: center;
   font-size: 30px;
   font-weight: bolder;
-  margin-bottom: 20px;
+  padding: 10px 10px;
+  margin:0 20px;
 }
 .questionnaire {
   //padding: 20px;
@@ -562,11 +562,12 @@ export default {
   opacity: 0.95;
 }
 .intro{
-  padding: 0 2em;
-  margin:10px 0;
+  padding: 10px 10px;
+  margin:10px 20px;
   font-size:15px;
   //color:#888;
   line-height: 1.5em;
+  border: #d43f8d !important;
 }
 .aside-mid{
   opacity: 0.95;
@@ -602,7 +603,6 @@ export default {
  border-radius: 3%;
 }
 
-
 .bottom-button{
   height: 100%;
   width: 100% !important;
@@ -618,8 +618,9 @@ export default {
   color: #333;
   padding-top:0 !important;
   padding-bottom:30px;
+  width: auto !important;
   /*border-radius: 15px;*/
-  opacity: 0.9;
+  //opacity: 0.9;
   /*line-height: 200px;*/
 }
 // element ui 的主题区域布局
@@ -649,7 +650,7 @@ export default {
   justify-content: center;
 }
 
-.el-icon-document-checked, .el-icon-data-line{
+.el-icon-document-checked, .el-icon-finished{
   font-size: 30px;
 }
 

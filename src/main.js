@@ -4,7 +4,8 @@ import router from './router'
 import store from './store'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-import vuetify from './plugins/vuetify'
+import vuetify from './plugins/vuetify';
+import Affix from 'ant-design-vue';
 import Clipboard from "v-clipboard";
 import axios from 'axios';
 import htmlToPdf from "./components/htmlToPdf";
@@ -14,6 +15,7 @@ Vue.config.productionTip = false
 Vue.use(ElementUI);
 Vue.use(Clipboard);
 Vue.use(htmlToPdf);
+Vue.use(Affix);
 Vue.prototype.$echarts = echarts
 
 router.beforeEach((to, from, next) => {
