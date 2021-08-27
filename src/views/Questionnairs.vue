@@ -38,6 +38,75 @@
               </el-menu-item>
             </el-submenu>
           </el-menu>
+
+          <el-menu class="aside-mid">
+            <div class="aside-top">
+              <span> 问卷设置 </span>
+            </div>
+            <!--            时间控制-->
+            <div class="time_control" style="margin-top: 20px">
+              <span style="padding-left: 15px">时间控制</span>
+              <el-switch
+                  style="float: right; padding-right: 20px"
+                  @change="delete_time_control"
+                  v-model="control_time"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949">
+              </el-switch>
+              <div v-if="control_time">
+                <!--                开始时间-->
+                <div>
+                  <div style="padding-left: 8px">
+                    <el-checkbox v-model="info.is_start_time">开始时间</el-checkbox>
+                  </div>
+                  <div style="padding-left: 20px">
+                    <el-date-picker
+                        v-if="info.is_start_time"
+                        v-model="info.start_time"
+                        type="datetime"
+                        placeholder="选择开始时间">
+                    </el-date-picker>
+                  </div>
+                </div>
+                <!--                结束时间-->
+                <div>
+                  <div style="padding-left: 8px">
+                    <el-checkbox v-model="info.is_end_time">结束时间</el-checkbox>
+                  </div>
+                  <div style="padding-left: 20px">
+                    <el-date-picker
+                        v-if="info.is_end_time"
+                        v-model="info.end_time"
+                        type="datetime"
+                        placeholder="选择结束时间">
+                    </el-date-picker>
+                  </div>
+                </div>
+                <!--                保存按钮-->
+                <div style="padding-left: 190px;margin-top: 15px;">
+                  <el-button
+                      size="mini"
+                      type="primary"
+                      @click="save_time_control"
+                  >
+                    保存更改
+                  </el-button>
+                </div>
+              </div>
+            </div>
+            <!--            是否显示题号-->
+            <div style="margin-top: 15px">
+              <span style="padding-left: 15px; margin-top: 30px">是否显示题号</span>
+              <el-switch
+                  style="float: right; padding-right: 20px"
+                  @change="is_show_num"
+                  v-model="info.is_show_question_num"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949">
+              </el-switch>
+            </div>
+
+          </el-menu>
         </el-aside>
         <!--问卷区域-->
         <el-main style="height: fit-content" class="questionnaire">
@@ -58,14 +127,6 @@
                 </el-collapse-item>
               </el-collapse>
             </el-container>
-<!-- 
-            <el-button @click="editTitle(info)"
-            class="edit-button"
-            :icon=" info.isShow == true ? 'el-icon-arrow-up':'el-icon-arrow-down'"
-            >
-              <div v-show="info.isShow == true">完成编辑</div>
-              <div v-show="info.isShow == false">进入编辑</div>
-            </el-button> -->
 
 
           <draggable :list="info.question_list" animation="500" 
@@ -88,7 +149,7 @@
             <!--单选框模板-->
             <template v-if="item.type === 'single-choice'">
               <div>
-                <span>{{(index+1)}}. </span>
+                <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
                 <span style="margin-top: 20px"> {{item.title}} </span>
                 <span style="color: lightgrey">[单选题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
@@ -286,10 +347,6 @@ export default {
               name: "单项填空",
               type: "completion"
             },
-            // {
-            //   name: "多项填空",
-            //   type: "multiple-completion"
-            // }
           ]
         },
         {
@@ -306,9 +363,100 @@ export default {
       userLogin: localStorage.getItem('username.myblog'),
       info: null,
       answer: [],
+      control_time: '',
+      show_num: '',
     }
   },
   methods:{
+    delete_time_control() {
+      const that = this;
+      if(this.control_time === false) {
+        axios
+            .patch('/api/questionnaire/' + that.info.id + '/', {
+              is_start_time: false,
+              // start_time: this.info.start_time,
+              is_end_time: false,
+              // end_time: this.info.end_time,
+            }, {
+              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+            })
+            .then(function (response){
+              that.$notify.success({
+                title: '编辑成功',
+                message: '已关闭时间控制！'
+              })
+            })
+            .catch(function (error){
+              that.$notify.error({
+                title: '出错啦',
+                message: '设置时间失败'
+              })
+            })
+      }
+    },
+    save_time_control() {
+      let now = new Date();
+      const that = this;
+      if(this.info.is_start_time === false && this.info.is_end_time === false){
+        this.$notify.warning({
+          title: '设置失败',
+          message: '请至少选择一项时间限制！'
+        })
+      }
+      else if(this.info.is_start_time && this.info.start_time === null) {
+        this.$notify.warning({
+          title: '设置失败',
+          message: '请设置开始时间！'
+        })
+      }
+      else if(this.info.is_end_time && this.info.end_time === null) {
+        this.$notify.warning({
+          title: '设置失败',
+          message: '请设置结束时间！'
+        })
+      }
+      // if(this.is_end_time && Date.parse(this.end_time )< now) console.log("结束时间早于当前时间");
+      else {
+        axios
+            .patch('/api/questionnaire/' + that.info.id + '/', {
+              is_start_time: this.info.is_start_time,
+              start_time: this.info.start_time,
+              is_end_time: this.info.is_end_time,
+              end_time: this.info.end_time,
+            }, {
+              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+            })
+            .then(function (response){
+              that.$notify.success({
+                title: '编辑成功',
+                message: '设置时间控制成功！'
+              })
+            })
+            .catch(function (error){
+              that.$notify.error({
+                title: '出错啦',
+                message: '设置时间失败'
+              })
+            })
+      }
+    },
+    is_show_num() {
+      const that = this;
+      axios
+          .patch('/api/questionnaire/' + that.info.id + '/', {
+            is_show_question_num: this.info.is_show_question_num,
+          }, {
+            headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+          })
+          .then(function (response){
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '设置失败'
+            })
+          })
+    },
     check(){
       this.$router.push({path: '/check/' + this.$route.params.id});
     },
@@ -493,6 +641,8 @@ export default {
             })
             .then(function (response) {
               that.info = response.data;
+              // that.show_num = response.data.is_show_question_num;
+              that.control_time = response.data.is_end_time || response.data.is_start_time;
               that.info.isShow = []
               console.log(that.info);
               if('' + that.info.author.username !== '' + that.userLogin) {
