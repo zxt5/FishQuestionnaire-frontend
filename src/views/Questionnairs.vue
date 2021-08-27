@@ -223,7 +223,9 @@
 
     <!--波浪-->
     <!--    <wave></wave>-->
-
+    <scoring-add-dialog ref="scoring-add-dialog"></scoring-add-dialog>
+    <single-completion-add-dialog ref="single-completion-add-dialog"></single-completion-add-dialog>
+    <single-choice-add-dialog ref="single-choice-add-dialog"></single-choice-add-dialog>
     <el-backtop></el-backtop>
   </div>
 </template>
@@ -245,11 +247,15 @@ import 'element-ui/lib/theme-chalk/base.css';
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 import Vue from 'vue'
 import collapse from "../assets/js/collapse.js";
+import TitleContentAddDialog from '../components/TitleContentAddDialog.vue'
+import ScoringAddDialog from '../components/ScoringAddDialog.vue'
+import SingleCompletionAddDialog from '../components/SingleCompletionAddDialog.vue'
+import SingleChoiceAddDialog from '../components/SingleChoiceAddDialog.vue'
 Vue.component(CollapseTransition.name, CollapseTransition)
 
 
 export default {
-  components: {collapse, SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard, TitleContentDialog,draggable},
+  components: {collapse, SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard, TitleContentDialog,draggable, TitleContentAddDialog, ScoringAddDialog, SingleCompletionAddDialog, SingleChoiceAddDialog},
   data(){
     return {
       // 菜单栏
