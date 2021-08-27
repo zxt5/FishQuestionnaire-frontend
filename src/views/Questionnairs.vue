@@ -167,7 +167,7 @@
             <!--多选框模板-->
             <template v-if="item.type === 'multiple-choice'">
               <div>
-                <span>{{(index+1)}}. </span>
+                <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
                 <span style="margin-top: 20px"> {{item.title}} </span>
                 <span style="color: lightgrey">[多选题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
@@ -195,7 +195,7 @@
             <!--多项填空模板-->
             <template v-if="item.type === 'completion'">
               <div>
-                <span>{{(index+1)}}. </span>
+                <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
                 <span style="margin-top: 20px"> {{item.title}} </span>
                 <span style="color: lightgrey">[填空题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
@@ -212,7 +212,7 @@
             <!--评分模板-->
             <template v-if="item.type === 'scoring'">
               <div>
-                <span>{{(index+1)}}. </span>
+                <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
                 <span style="margin-top: 20px"> {{item.title}} </span>
                 <span style="color: lightgrey">[评分题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
