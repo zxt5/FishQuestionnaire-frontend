@@ -31,13 +31,11 @@ export default {
   },
   methods: {
     click(){
-      this.$router.push({path: '/index'});
+      this.$router.push({path: '/'});
     },
   }
 }
 </script>
-
-
 
 <style scoped>
 

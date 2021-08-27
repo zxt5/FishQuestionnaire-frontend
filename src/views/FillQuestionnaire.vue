@@ -156,7 +156,7 @@ export default {
   },
   methods: {
     toIndex(){
-      this.$router.push({path: '/index'});
+      this.$router.push({path: '/'});
     },
     // init() {
     //   console.log("zhixing");

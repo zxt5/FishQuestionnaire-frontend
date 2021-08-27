@@ -42,11 +42,11 @@
             <ul>
               <li v-if="item.status === 'closed'" @click="Start(item)"><v-icon>mdi-motion-play-outline</v-icon>  发布</li>
               <li v-if="item.status === 'shared'" @click="Close(item.id)"><v-icon>mdi-stop-circle-outline</v-icon>  停止</li>
-              <li @click="toEdit(item)"><v-icon small>mdi-square-edit-outline</v-icon>  编辑</li>
-              <li @click="Copy(item.id)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
-              <li @click="showSharePage(item)"><v-icon small>mdi-share-variant-outline</v-icon>  分享</li>
-              <li @click="toChart(item)"><v-icon small>mdi-list-status</v-icon>  统计</li>
-              <li @click="Delete(item.id, item.status)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
+              <li @click="toEdit(item)"><v-icon>mdi-square-edit-outline</v-icon>  编辑</li>
+              <li @click="Copy(item.id)"><v-icon>mdi-content-copy</v-icon>  复制</li>
+              <li @click="showSharePage(item)"><v-icon>mdi-share-variant-outline</v-icon>  分享</li>
+              <li @click="toChart(item)"><v-icon>mdi-list-status</v-icon>  统计</li>
+              <li @click="Delete(item.id, item.status)"><v-icon>mdi-delete-variant</v-icon>  删除</li>
             </ul>
 
             <div class="created">
@@ -429,7 +429,6 @@ h1:hover{
 
 .op{
   margin-top:15px;
-  font-size:15px;
   vertical-align: text-top;
 }
 
@@ -442,7 +441,7 @@ h1:hover{
   list-style: none;
   float:left;
   margin-right:25px;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .questionnaire {
