@@ -6,7 +6,7 @@
         <!--侧边栏区域-->
         <el-aside width="23%" style="height: fit-content;">
 
-          <el-container class="class">
+          <el-container class="class" >
             <div @click="check" style="margin-left: 0px">
               <el-button class="button" circle>
                 <i class="el-icon-document-checked"></i>
@@ -46,18 +46,29 @@
             <h2>{{info.title}}</h2>
           </div>
           <div class="intro"> {{info.content}}</div>
-          <div >
-            <span></span>
-            <el-collapse @change="editTitle">
-              <el-collapse-item >
-            <title-content-dialog ref="title-content-dialog" :prop_title="info.title" :prop_content="info.content"></title-content-dialog>
-              </el-collapse-item>
-            </el-collapse>
-          </div>
 
-          <el-divider/>
+            <el-container          
+            style="display:inline">
+              <el-collapse v-model="info.isShow" class="question-container" @change="editTitle(info)">
+                <el-collapse-item >
+                    <template slot="title">
+                        <span >  编辑标题和简介 </span>
+                    </template>
+                    <title-content-dialog ref="title-content-dialog"></title-content-dialog>
+                </el-collapse-item>
+              </el-collapse>
+            </el-container>
+<!-- 
+            <el-button @click="editTitle(info)"
+            class="edit-button"
+            :icon=" info.isShow == true ? 'el-icon-arrow-up':'el-icon-arrow-down'"
+            >
+              <div v-show="info.isShow == true">完成编辑</div>
+              <div v-show="info.isShow == false">进入编辑</div>
+            </el-button> -->
 
-          <draggable :list="info.question_list" animation="500"  force-fallback="true"
+
+          <draggable :list="info.question_list" animation="500" 
           chosen-class="chosen" 
           :disabled="disabled" 
           @start="onStart" 
@@ -104,7 +115,7 @@
                 {{item.content}}
               </div>
               <el-checkbox-group v-model="answer[item.ordering - 1]">
-                <el-checkbox  v-for="(subItem, subIndex) in item.option_list" :key="subItem.id" :label="subIndex" >
+                <el-checkbox  v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex" >
                   {{subItem.title}}
                 </el-checkbox>
               </el-checkbox-group>
@@ -131,13 +142,13 @@
               <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
                 {{item.content}}
               </div>
-              <div v-for="(subItem, subIndex) in item.option_list" :key="subItem.id" class="multiple-completion-input">
+              <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex" class="multiple-completion-input">
 <!--                <p style="margin-left:10px">{{subItem.title}}</p>-->
                 <el-input class="single-completion-input" :autosize="true"
                           type="textarea" :clearable="true" resize="none" v-model="answer[item.ordering - 1][subIndex]"></el-input>
               </div>
             </template>
-<!--            评分模板-->
+            <!--评分模板-->
             <template v-if="item.type === 'scoring'">
               <div>
                 <span>{{(index+1)}}. </span>
@@ -162,14 +173,16 @@
             </template>
                 <!--单选题目框-->
             </div>
-            <el-collapse
+            
+            <!--编辑界面-->
+            <el-container          
+            style="display:inline" 
             @mouseover.native = "mouseEnter"
-            @mouseout.native = "mouseLeave"
-            v-model="editPlace"
-            @change="editQuestion(item.type, index)"
-            style="padding:20px"
+            @mouseout.native =  "mouseLeave"
             >
-              <el-collapse-item title="编辑">
+            <div class="question-container">
+                <el-collapse-transition>
+                  <div v-show="item.isShow">
                     <single-choice-add-card :ref="'single-choice'+index" v-if="item.type === 'single-choice'"></single-choice-add-card>
         
                     <!--多选对话框-->
@@ -180,8 +193,22 @@
 
                     <!--    评分对话框-->
                     <scoring-add-card :ref="'scoring'+index" v-if="item.type === 'scoring'"></scoring-add-card>
-              </el-collapse-item>
-            </el-collapse>
+
+                  </div>
+                </el-collapse-transition>
+            </div>
+            </el-container>
+            <!--编辑按钮-->
+            <el-divider ></el-divider>
+            <el-button @click="editQuestion(item, index)"
+            @mouseover.native = "mouseEnter"
+            @mouseout.native = "mouseLeave"
+            class="edit-button"
+            :icon=" item.isShow == true ? 'el-icon-arrow-up':'el-icon-arrow-down'"
+            >
+              <div v-show="item.isShow == true">完成编辑</div>
+              <div v-show="item.isShow == false">进入编辑</div>
+            </el-button>
             
             </div>
             </transition-group>
@@ -197,7 +224,10 @@
 
     <!--波浪-->
     <!--    <wave></wave>-->
-
+    <scoring-add-dialog ref="scoring"></scoring-add-dialog>
+    <single-completion-add-dialog ref="completion"></single-completion-add-dialog>
+    <single-choice-add-dialog ref="single-choice"></single-choice-add-dialog>
+    <multiple-choice-add-dialog ref="multiple-choice"> </multiple-choice-add-dialog>
     <el-backtop></el-backtop>
   </div>
 </template>
@@ -218,18 +248,21 @@ import 'element-ui/lib/theme-chalk/base.css';
 // collapse 展开折叠
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 import Vue from 'vue'
-import {Base64} from "js-base64";
- 
+import collapse from "../assets/js/collapse.js";
+import ScoringAddDialog from '../components/ScoringAddDialog.vue'
+import SingleCompletionAddDialog from '../components/SingleCompletionAddDialog.vue'
+import SingleChoiceAddDialog from '../components/SingleChoiceAddDialog.vue'
+import MultipleChoiceAddDialog from '../components/MultipleChoiceAddDialog.vue'
 Vue.component(CollapseTransition.name, CollapseTransition)
 
 
 export default {
-  components: {SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard, TitleContentDialog,draggable},
+  components: {collapse, SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard, TitleContentDialog,draggable,  ScoringAddDialog, SingleCompletionAddDialog, SingleChoiceAddDialog, MultipleChoiceAddDialog},
   data(){
     return {
       // 菜单栏
       disabled: false,
-      editPlace: [],
+      editPlace: {},
       menuList:[
         {
           name: "选择题",
@@ -287,9 +320,7 @@ export default {
         })
       }
       else{
-        let s1 = Base64.encode('moyu' + this.info.id + 'wenjuan');
-        let url = window.location.origin+ "/charts/" + s1; // 统计链接
-        window.open(url);
+        this.$router.push({path: '/charts/' + this.info.id});
       }
     },
     Finish(){
@@ -307,10 +338,17 @@ export default {
       }
     },
     addQuestion(questionType){
-
+      this.$refs[questionType].addQuestion(questionType)
     },
-    editQuestion(questionType, index){
-      this.$refs[questionType+index][0].editQuestion(this.info.question_list[index])
+    editQuestion(item, index){
+      var questionType = item.type
+      // 切换编辑界面显示
+      console.log("editquestion", this.$refs, questionType+index)
+      var temp = this.$refs[questionType+index][0]
+      var last= temp.addDialogVisible
+      console.log(last)
+      temp.editQuestion(this.info.question_list[index])
+      if (last == !temp.addDialogVisible) item.isShow = !item.isShow
     },
     cardUp(index, item){
       if (index === 0){
@@ -396,8 +434,9 @@ export default {
             })
           })
     },
-    editTitle(){
-      this.$refs["title-content-dialog"].edit()
+    editTitle(info){
+      this.info.isShow = !this.info.isShow
+      this.$refs["title-content-dialog"].edit(info)
     },
     onStart() {
     this.drag = true;
@@ -409,8 +448,15 @@ export default {
       if (e.oldIndex == e.newIndex){
         return
       }
-      // console.log(this.info.question_list[e.newIndex].id)
+      // 重新渲染编辑页面
+      for (let i = 0; i < this.info.question_list.length; i++){
+        var item = this.info.question_list[i]
+        // this.$refs[item.type+(e.ordering-1)][0] = item
+        if (!item.isShow) continue
+        this.$refs[item.type+i][0].questionForm = item
+      }
       var id = this.info.question_list[e.newIndex].id
+      const that = this
       axios
           .patch('/api/question/' + id + '/', {
             ordering: e.newIndex + 1,
@@ -418,6 +464,7 @@ export default {
             headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
           })
           .then(function (response){
+            that.$notify.success({title:'交换成功'})
           })
           .catch(function (error){
             that.$notify.error({
@@ -440,14 +487,13 @@ export default {
     const that = this;
     authorization().then(function (response) {
       if(response[0]){
-        console.log(that.$route.params.id);
-        // console.log('/api/questionnaire/' + that.$route.params.id);
         axios
             .get('/api/questionnaire/' + that.$route.params.id, {
               headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
             })
             .then(function (response) {
               that.info = response.data;
+              that.info.isShow = []
               console.log(that.info);
               if('' + that.info.author.username !== '' + that.userLogin) {
                 that.$router.push({path: '/index'});
@@ -455,6 +501,9 @@ export default {
                   title: '您无权编辑此问卷',
                   // message: '爬',
                 });
+              }
+              for (let item of that.info.question_list){
+                item["isShow"] = false
               }
               for (let item of that.info.question_list) {
                 that.answer.push([]);
@@ -479,8 +528,19 @@ export default {
 
 
 <style lang="less" scoped>
+.question-container{
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: #fafafa;
+}
 
-
+.edit-button{
+  width: 100%; 
+  border: none;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+}
 // 侧边栏标题布局
 .aside-top{
   
@@ -488,12 +548,6 @@ export default {
   margin-bottom: 5pt;
   font-size: 20px !important;
   font-weight: bolder;
-  //background-color: white;
-  //opacity: 0.95;
-  //border-radius: 10px;
-  //padding: 25px 10px 20px;
-  //text-align: center;
-  //justify-content: center;
 }
 .question-title{
   text-align: center;
@@ -682,17 +736,29 @@ export default {
     background: #F7F8F9;
     opacity: 0.5;
 }
-</style>
 
+</style>
 <style>
+.el-collapse-item__header{
+  display: block !important;
+  text-align: end;
+}
 .el-submenu__title{
   font-size: 18px !important;
 }
 .el-menu-item{
   font-size: 16px !important;
 }
+
 .el-slider__runway{
   width: 80% !important;
   margin: 60px 10px !important;
 }
+.el-textarea .el-input__count{
+  background-color: transparent !important;
+}
+.el-collapse-item__content{
+  background-color: #FAFAFA;
+}
+
 </style>

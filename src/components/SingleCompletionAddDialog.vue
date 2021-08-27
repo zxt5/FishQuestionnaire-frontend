@@ -1,8 +1,9 @@
 <template>
   <!--添加题目的对话框-->
-    <div class="add-question-card">
-    <el-divider></el-divider>
-    <div>单选题</div>
+  <el-dialog
+      title="添加题目[单项填空题]"
+      width="50%"
+      :visible.sync="addDialogVisible">
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"
@@ -26,41 +27,35 @@
                    active-color="#409eff"
                    inactive-color="#dcdfe6"></el-switch>
       </el-form-item>
-
-      <el-form-item
-          v-for="(option, index) in questionForm.option_list"
-          :label="'选项 ' + (index + 1) "
-          :key="index"
-          :prop="'option_list.' + index + '.title'"
-          :rules="{
-                    required: true,  message: '内容不能为空', trigger: 'blur'
-                }"
-      >
-        <el-input v-model="option.title" class="choiceinput">
-        </el-input >
-        <el-button @click.prevent="removeChoice(option)" type="danger">删除</el-button>
-      </el-form-item>
     </el-form>
     <div class="dialog-footer">
-      <el-button icon="el-icon-edit" @click="addChoice" type="primary">新增选项</el-button>
+      <span> </span>
       <div>
-        <span>
-        </span>
+        <el-button icon="el-icon-check" @click="finishQuestion()" type="success">完成</el-button>
+        <el-button icon="el-icon-close" @click="cancelQuestion" type="danger">取消</el-button>
       </div>
     </div>
-  </div>
+  </el-dialog>
 </template>
 <script>
 
 import axios from "axios";
 
 export default {
-  // inject: ['reload'],
-  name: "single-choice-addcard",
+  inject: ['reload'],
+  name: "single-completion-adddialog",
   data(){
     return{
       temp: '',
       addDialogVisible : false,
+      // title: '',
+      // content: '',
+      // type: '',
+      // ordering: 0,
+      // questionnaire: 0,
+      // is_must_answer: false,
+      // option_list: [],
+      // answer: '',
       flag : 0,//判断创建还是修改问题
       questionForm: {
         title: '',
@@ -99,17 +94,14 @@ export default {
     addQuestion(questionType){
       this.resetForm(questionType)
       this.flag = 0
-      this.addDialogVisible = true  
+      this.addDialogVisible = true
     },
     editQuestion(question){
-      if (this.addDialogVisible) {
-        this.finishQuestion()
-        this.addDialogVisible = false;
-        return 
-      }
-      this.addDialogVisible = true
-      this.questionForm = question
+      this.temp = question
+      this.questionForm = JSON.parse(JSON.stringify(question))
       this.flag = question.id
+      // console.log(this.questionForm);
+      this.addDialogVisible = true
     },
     addChoice() {
       this.questionForm.option_list.push({
@@ -131,12 +123,15 @@ export default {
         if (!valid) return this.$notify.error({
           title: '表单有错误'
         });
-        if (this.questionForm.option_list.length === 0) return this.$notify.error({
-          title: '请至少添加一个选项噢~'
-        })
-        console.log("finishQuestion")
+        this.addDialogVisible = false;
         const that = this;
         if(this.flag === 0){
+          this.questionForm.option_list.push({
+            title: that.questionForm.title,
+            content: that.questionForm.content,
+            ordering: that.questionForm.option_list.length + 1,
+            // key: Date.now()
+          })
           axios
               .post('/api/question/', {
                 option_list: that.questionForm.option_list,
@@ -146,10 +141,9 @@ export default {
                 ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
-              }, {
-                headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
               .then(function (response){
+                that.reload();
                 that.$notify.success({
                   title: '保存成功'
                 })
@@ -157,8 +151,9 @@ export default {
               .catch(function (error){
                 that.$notify.error({
                   title: '出错啦',
-                  message: '编辑失败'
+                  message: error.message
                 })
+                console.log(error)
               })
         }
         else{
@@ -171,10 +166,9 @@ export default {
                 ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
-              }, {
-                headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
               .then(function (response){
+                that.reload();
                 that.$notify.success({
                   title: '保存成功'
                 })
@@ -186,8 +180,18 @@ export default {
                 })
               })
         }
+        // console.log(this.$parent.info.questions_list.length);
+        // var index = this.$parent.info.questions_list.indexOf(this.temp)
+        // if (index === -1){
+        //   this.$parent.info.questions_list.push(this.questionForm);
+        // }
+        // else{
+        //   this.$parent.info.questions_list[index] = this.questionForm
+        //   this.$parent.$forceUpdate()
+        // }
       })
     },
+
     cancelQuestion(){
       this.$refs.questionFormRef.resetFields()
       this.addDialogVisible = false
@@ -197,11 +201,6 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-.add-question-card{
-  background: #fff;
-  width: 100%;
-  position: relative;
-}
 .el-button{
   color: #fff;
 }
@@ -209,14 +208,10 @@ export default {
   width: 70%;
   margin-right: 10%;
 }
-</style>
-<style>
 .dialog-footer{
   width: 100%;
   display: flex;
   justify-content: space-between;
   padding: 0;
-  margin-bottom: 20px;
 }
-
 </style>

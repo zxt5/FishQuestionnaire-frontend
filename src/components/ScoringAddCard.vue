@@ -2,6 +2,7 @@
   <!--添加题目的对话框-->
     <div class="add-question-card">
     <el-divider></el-divider>
+    <div>评分题</div>
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"
@@ -29,13 +30,13 @@
         <el-input-number v-model="questionForm.answer" controls-position="right" @change="handleChange" :min="1" :max="10"></el-input-number>
       </el-form-item>
     </el-form>
-    <div class="dialog-footer">
+    <!-- <div class="dialog-footer">
       <span> </span>
       <div>
-        <el-button icon="el-icon-check" @click="finishQuestion()" type="success">完成</el-button>
+        <el-button icon="el-icon-check" @click="finishQuestion" type="success">完成</el-button>
         <el-button icon="el-icon-close" @click="cancelQuestion" type="danger"> 取消</el-button>
       </div>
-    </div>
+    </div> -->
     </div>
 </template>
 <script>
@@ -47,7 +48,6 @@ export default {
   name: "scoring-addcard",
   data(){
     return{
-      temp: '',
       addDialogVisible : false,
       // title: '',
       // content: '',
@@ -102,7 +102,6 @@ export default {
     },
     editQuestion(question){
       if (this.addDialogVisible) {
-        this.addDialogVisible = false
         this.finishQuestion()
         return 
       }
@@ -175,7 +174,7 @@ export default {
                 is_must_answer: that.questionForm.is_must_answer,
               })
               .then(function (response){
-                that.reload();
+                // that.reload();
                 that.$notify.success({
                   title: '保存成功'
                 })
@@ -215,10 +214,9 @@ export default {
   width: 70%;
   margin-right: 10%;
 }
-.dialog-footer{
+.add-question-card{
+  background: #fff;
   width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0;
+  position: relative;
 }
 </style>

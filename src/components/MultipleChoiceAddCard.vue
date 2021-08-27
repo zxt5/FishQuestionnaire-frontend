@@ -2,6 +2,7 @@
   <!--添加题目的对话框-->
     <div class="add-question-card">
     <el-divider></el-divider>
+    <div>多选题</div>
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"

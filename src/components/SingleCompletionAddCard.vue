@@ -2,6 +2,7 @@
   <!--添加题目的对话框-->
     <div class="add-question-card">
     <el-divider></el-divider>
+    <div>填空题</div>
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"
@@ -40,7 +41,7 @@
 import axios from "axios";
 
 export default {
-  inject: ['reload'],
+  // inject: ['reload'],
   name: "single-completion-addcard",
   data(){
     return{
@@ -94,11 +95,14 @@ export default {
       this.flag = 0
       this.addDialogVisible = true
     },
+    reloadQuestion(question){
+      this.questionForm = question
+    },
     editQuestion(question){
       if (this.addDialogVisible) {
         this.addDialogVisible = false
         this.finishQuestion()
-        return 
+        return
       }
       this.addDialogVisible = true
       this.questionForm = question
