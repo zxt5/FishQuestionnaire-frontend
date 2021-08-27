@@ -6,6 +6,7 @@
         <!--侧边栏区域-->
         <el-aside width="23%" style="height: fit-content;">
 
+<!--          第一块-->
           <el-container class="class" >
             <div @click="check" style="margin-left: 0px">
               <el-button class="button" circle>
@@ -20,7 +21,8 @@
               <h4>结果统计</h4>
             </div>
           </el-container>
-          <!--              active-text-color="#DA70D6"-->
+
+<!--          第二块-->
           <el-menu class="aside-mid">
             <div class="aside-top">
               <span> 题型选择 </span>
@@ -39,6 +41,16 @@
             </el-submenu>
           </el-menu>
 
+          <el-menu class="aside-mid">
+            <div class="aside-top">
+              <span> 特殊题型 </span>
+            </div>
+            <el-submenu>
+
+            </el-submenu>
+          </el-menu>
+
+<!--          第三块-->
           <el-menu class="aside-mid">
             <div class="aside-top">
               <span> 问卷设置 </span>
@@ -146,6 +158,7 @@
                 <li @click="cardUp(index, item)"><v-icon small>mdi-arrow-up-circle-outline</v-icon>  上移</li>
               </ul>
             </div>
+
             <!--单选框模板-->
             <template v-if="item.type === 'single-choice'">
               <div>
@@ -162,8 +175,8 @@
                   {{subItem.title}}
                 </el-radio>
               </el-radio-group>
-
             </template>
+
             <!--多选框模板-->
             <template v-if="item.type === 'multiple-choice'">
               <div>
@@ -182,17 +195,6 @@
               </el-checkbox-group>
             </template>
             <!--单项填空模板-->
-            <!--            <template v-if="item.type === 'completion'">-->
-            <!--              <div>-->
-            <!--                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>-->
-            <!--                <span>{{(index+1)}}. </span>-->
-            <!--                <span style="margin-top: 20px"> {{item.title}} </span>-->
-            <!--              </div>-->
-            <!--              <el-input v-model="item.answer" class="single-completion-input" :autosize="true"-->
-            <!--                        type="textarea" :clearable="true" resize="none">-->
-            <!--              </el-input>-->
-            <!--            </template>-->
-            <!--多项填空模板-->
             <template v-if="item.type === 'completion'">
               <div>
                 <span v-if="info.is_show_question_num">{{(index+1)}}. </span>

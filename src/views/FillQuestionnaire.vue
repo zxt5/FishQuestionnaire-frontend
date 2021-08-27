@@ -1,19 +1,21 @@
 <template>
   <div>
-    <div class="reminder"  v-if="info.status==='closed'">
-      <h4>摸小鱼温馨提示：当前问卷处于关闭状态，无法提交哦~</h4>
-    </div>
+<!--    <div class="reminder"  v-if="info.status==='closed'">-->
+<!--      <h4>摸小鱼温馨提示：当前问卷处于关闭状态，无法提交哦~</h4>-->
+<!--    </div>-->
     <div class="questionnaire">
       <!--标题-->
       <h1 class="title">{{info.title}}</h1>
       <div class="content">&nbsp;{{info.content}}</div>
-<!--      <div class="line"></div>-->
+
       <el-divider/>
+
       <div class="question_block" v-for="(item, index) in info.question_list" :key="index">
         <div slot="header">
           <div class="questionTitle">
             <!--显示必填标识-->
-            {{(index+1)+'. '+item.title}}
+            <span v-if="info.is_show_question_num">{{(index+1)+'. '}}</span>
+            {{item.title}}
             <span style="color: #F56C6C;">
             <span v-if="item.is_must_answer">*</span>
           </span>
@@ -28,50 +30,47 @@
         </div>
         <!--单选题展示-->
         <v-app class="choice" v-if="item.type==='single-choice'">
-          <v-container
-              class="px-0"
-              fluid
-          >
-            <v-radio-group v-model="item.answer">
-              <v-radio
-                  v-for="optionItem in item.option_list"
-                  :key="optionItem.id"
-                  :label="optionItem.title"
-              ></v-radio>
-            </v-radio-group>
+          <v-container class="px-0" fluid >
+<!--            遍历选项-->
+            <div style="float: left;">
+              <v-radio-group v-model="item.answer" >
+                <div v-for="optionItem in item.option_list">
+                  <div style="float: left;min-width: 460px;max-width: 560px">
+                    <v-radio
+                        style="float: left"
+                        :key="optionItem.id"
+                        :label="optionItem.title "
+                    ></v-radio>
+                  </div>
+                  <div v-if="item.is_show_result" style="float: right;padding-left: 30px;">
+                    <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
+                  </div>
+                </div>
+              </v-radio-group>
+            </div>
           </v-container>
         </v-app>
 
         <!--多选题展示-->
-<!--        <el-checkbox-group v-if="item.type==='multiple-choice'" v-model="answer_list[index]" onload>-->
-<!--          <div class="multiple_choice"  v-for="optionItem in item.option_list">-->
-<!--            <el-checkbox :label="optionItem.ordering" style="margin: 5px;">{{ optionItem.title }}{{optionItem.content}}</el-checkbox>-->
-<!--          </div>-->
-<!--        </el-checkbox-group>-->
         <v-app class="choice" v-if="item.type==='multiple-choice'">
           <v-container fluid>
-            <v-checkbox
-                v-for="optionItem in item.option_list"
-                :key="optionItem.id"
-                :label="optionItem.title"
-                v-model="optionItem.is_answer_choice"
-                hide-details
-            ></v-checkbox>
+            <div style="float: left" v-for="optionItem in item.option_list">
+              <div style="float: left;min-width: 460px;max-width: 560px">
+                <v-checkbox
+                    :key="optionItem.id"
+                    :label="optionItem.title"
+                    v-model="optionItem.is_answer_choice"
+                    hide-details
+                ></v-checkbox>
+              </div>
+              <div v-if="item.is_show_result" style="float: right;padding-left: 30px;">
+                <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
+              </div>
+            </div>
           </v-container>
         </v-app>
 
         <!--填空题展示-->
-<!--        <el-input style="padding-left: 12px; padding-top: 5px; width: 98%"-->
-<!--                  placeholder="请在此输入答案~"-->
-<!--                  v-if="item.type==='completion'"-->
-<!--                  type="textarea"-->
-<!--                  maxlength="150"-->
-<!--                  show-word-limit-->
-<!--                  :autosize="{minRows: 2}"-->
-<!--                  :rows="item.row"-->
-<!--                  v-model="answer_list[index]"-->
-<!--                  resize="none">-->
-<!--        </el-input>-->
         <v-app class="choice" v-if="item.type==='completion'">
           <v-text-field
               v-model="item.answer"
@@ -92,12 +91,10 @@
           </v-card-text>
         </v-app>
       </div>
-      <!--内容结束-->
 
-      <el-button type="primary" @click="click">提交</el-button>
+      <!--提交按钮-->
+      <el-button type="primary" @click="click(info.id)">提交</el-button>
 
-<!--      <div class="line"></div>-->
-<!--      <div class="text2"> 摸鱼问卷 提供技术支持 </div>-->
 
     </div>
   </div>
@@ -139,25 +136,7 @@ export default {
         })
   },
   methods: {
-    // init() {
-    //   console.log("zhixing");
-    //   let i = 0;
-    //   for( let a in this.info.question_list) {
-    //     if(a.type === 'single-choice') {
-    //       let t = 'aaa';
-    //       this.answer_list[i++] = t;
-    //     }
-    //     else if(a.type === 'multiple-choice') {
-    //       let t = [];
-    //       this.answer_list[i++] = t;
-    //     }
-    //     else {
-    //       let t = 'bbb';
-    //       this.answer_list[i++] = t;
-    //     }
-    //   }
-    // },
-    click(){
+    click(id){
       let tmp;
       const that = this;
       if(this.info.status==='closed'){
@@ -181,13 +160,11 @@ export default {
             for(let i of item.option_list){
               if(i.is_answer_choice === true){
                 let data = {
-                  // questionnaire: that.info.id,
                   question: item.id,
                   option: i.id,
                 };
                 that.submit_list.push(data);
                 tmp = true;
-                // console.log(i.title);
               }
             }
             if(tmp === false && item.is_must_answer) {
@@ -200,7 +177,6 @@ export default {
             for(let i of item.option_list){
               if(item.option_list.indexOf(i) === item.answer){
                 let data = {
-                  // questionnaire: that.info.id,
                   question: item.id,
                   option: i.id,
                 };
@@ -212,7 +188,6 @@ export default {
               that.flag = false;
               console.log('单选 | 评分')
             }
-            // console.log(item.answer);
           }
           else if(item.type === 'completion'){
             if(item.answer === '' && item.is_must_answer) {
@@ -241,11 +216,9 @@ export default {
                 answer_list: that.submit_list,
               })
               .then(function (response){
-                // that.$notify.success({
-                //   title: '问卷提交成功',
-                //   message: '芜湖'
-                // })
-                that.$router.push({path: '/thank/'});
+                let s1 = Base64.encode('moyu' + id + 'wenjuan');
+                let url = window.location.origin+ "/thank/" + s1;
+                window.open(url);
               })
               .catch(function (error){
                 that.$notify.error({
