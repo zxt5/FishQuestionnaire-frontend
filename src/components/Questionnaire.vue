@@ -154,6 +154,7 @@ export default {
         //   message: '请先回收问卷'
         // })
         const that = this;
+
         this.$confirm('请先选择清空答卷或者复制问卷', '此问卷已存在答卷', {
           confirmButtonText: '清空答卷',
           cancelButtonText: '取消',

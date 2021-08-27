@@ -39,74 +39,73 @@
                 </el-menu-item>
               </el-submenu>
             </el-menu>
-            <el-menu class="aside-mid">
-              <div class="aside-top">
-                <span> 问卷设置 </span>
-              </div>
-              <!--            时间控制-->
-              <div class="time_control" style="margin-top: 20px">
-                <span style="padding-left: 15px">时间控制</span>
-                <el-switch
-                    style="float: right; padding-right: 20px"
-                    @change="delete_time_control"
-                    v-model="control_time"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949">
-                </el-switch>
-                <div v-if="control_time">
-                  <!--                开始时间-->
-                  <div>
-                    <div style="padding-left: 8px">
-                      <el-checkbox v-model="info.is_start_time">开始时间</el-checkbox>
-                    </div>
-                    <div style="padding-left: 20px">
-                      <el-date-picker
-                          v-if="info.is_start_time"
-                          v-model="info.start_time"
-                          type="datetime"
-                          placeholder="选择开始时间">
-                      </el-date-picker>
-                    </div>
-                  </div>
-                  <!--                结束时间-->
-                  <div>
-                    <div style="padding-left: 8px">
-                      <el-checkbox v-model="info.is_end_time">结束时间</el-checkbox>
-                    </div>
-                    <div style="padding-left: 20px">
-                      <el-date-picker
-                          v-if="info.is_end_time"
-                          v-model="info.end_time"
-                          type="datetime"
-                          placeholder="选择结束时间">
-                      </el-date-picker>
-                    </div>
-                  </div>
-                  <!--                保存按钮-->
-                  <div style="padding-left: 190px;margin-top: 15px;">
-                    <el-button
-                        size="mini"
-                        type="primary"
-                        @click="save_time_control"
-                    >
-                      保存更改
-                    </el-button>
-                  </div>
-                </div>
-              </div>
-              <!--            是否显示题号-->
-              <div style="margin-top: 15px">
-                <span style="padding-left: 15px; margin-top: 30px">是否显示题号</span>
-                <el-switch
-                    style="float: right; padding-right: 20px"
-                    @change="is_show_num"
-                    v-model="info.is_show_question_num"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949">
-                </el-switch>
-              </div>
-
-            </el-menu>
+<!--            <el-menu class="aside-mid">-->
+<!--              <div class="aside-top">-->
+<!--                <span> 问卷设置 </span>-->
+<!--              </div>-->
+<!--              &lt;!&ndash;            时间控制&ndash;&gt;-->
+<!--              <div class="time_control" style="margin-top: 20px">-->
+<!--                <span style="padding-left: 15px">时间控制</span>-->
+<!--                <el-switch-->
+<!--                    style="float: right; padding-right: 20px"-->
+<!--                    @change="delete_time_control"-->
+<!--                    v-model="control_time"-->
+<!--                    active-color="#13ce66"-->
+<!--                    inactive-color="#ff4949">-->
+<!--                </el-switch>-->
+<!--                <div v-if="control_time">-->
+<!--                  &lt;!&ndash;                开始时间&ndash;&gt;-->
+<!--                  <div>-->
+<!--                    <div style="padding-left: 8px">-->
+<!--                      <el-checkbox v-model="info.is_start_time">开始时间</el-checkbox>-->
+<!--                    </div>-->
+<!--                    <div style="padding-left: 20px">-->
+<!--                      <el-date-picker-->
+<!--                          v-if="info.is_start_time"-->
+<!--                          v-model="info.start_time"-->
+<!--                          type="datetime"-->
+<!--                          placeholder="选择开始时间">-->
+<!--                      </el-date-picker>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                  &lt;!&ndash;                结束时间&ndash;&gt;-->
+<!--                  <div>-->
+<!--                    <div style="padding-left: 8px">-->
+<!--                      <el-checkbox v-model="info.is_end_time">结束时间</el-checkbox>-->
+<!--                    </div>-->
+<!--                    <div style="padding-left: 20px">-->
+<!--                      <el-date-picker-->
+<!--                          v-if="info.is_end_time"-->
+<!--                          v-model="info.end_time"-->
+<!--                          type="datetime"-->
+<!--                          placeholder="选择结束时间">-->
+<!--                      </el-date-picker>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                  &lt;!&ndash;                保存按钮&ndash;&gt;-->
+<!--                  <div style="padding-left: 190px;margin-top: 15px;">-->
+<!--                    <el-button-->
+<!--                        size="mini"-->
+<!--                        type="primary"-->
+<!--                        @click="save_time_control"-->
+<!--                    >-->
+<!--                      保存更改-->
+<!--                    </el-button>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              &lt;!&ndash;            是否显示题号&ndash;&gt;-->
+<!--              <div style="margin-top: 15px">-->
+<!--                <span style="padding-left: 15px; margin-top: 30px">是否显示题号</span>-->
+<!--                <el-switch-->
+<!--                    style="float: right; padding-right: 20px"-->
+<!--                    @change="is_show_num"-->
+<!--                    v-model="info.is_show_question_num"-->
+<!--                    active-color="#13ce66"-->
+<!--                    inactive-color="#ff4949">-->
+<!--                </el-switch>-->
+<!--              </div>-->
+<!--            </el-menu>-->
           </el-aside>
         </a-affix>
         <!--问卷区域-->
@@ -757,7 +756,7 @@ export default {
   justify-content: center;
 }
 .el-aside {
-  position: fixed;
+  //position: fixed;
   background-color: transparent;
   color: #333;
   padding-top:0 !important;
@@ -772,10 +771,7 @@ export default {
   //background-color: #E9EEF3;
   //color: #333;
   //border-radius: 10px;
-  margin-left: 25%;
-  margin-bottom: 40px;
-  width: 60% ;
-  position: absolute;
+  margin-left: 30pt;
   //margin-top: 0;
   /*padding-top: 50px;*/
 }

@@ -74,31 +74,63 @@
             </el-collapse-item>
           </el-collapse>
         </div>
+
+
         <!--交叉分析-->
-        <div v-if="activeName==='second'">
-          <el-form label-width="80px"
-                   :model="questionForm"
-                   :rules="questionFormRules">
-            <el-form-item
-                v-for="(option, index) in questionForm.option_list"
-                :label="'选项 ' + (index + 1) "
-                :key="index"
-                :prop="'option_list.' + index + '.title'"
-                :rules="{
-                    required: true,  message: '内容不能为空', trigger: 'blur'
-                }"
-            >
-              <el-input v-model="option.title" class="choiceinput">
-              </el-input >
-              <el-button @click.prevent="removeChoice(option)" type="danger">删除</el-button>
-            </el-form-item>
-          </el-form>
-          <div class="dialog-footer">
-            <el-button icon="el-icon-edit" @click="addChoice" type="primary">新增选项</el-button>
-            <div>
-              <el-button icon="el-icon-check" @click="finishQuestion()" type="success">完成</el-button>
-              <el-button icon="el-icon-close" @click="cancelQuestion" type="danger"> 取消</el-button>
+        <div v-if="activeName==='second'" style="display: flex">
+<!--          <el-form label-width="80px"-->
+<!--                   :model="questionForm"-->
+<!--                   :rules="questionFormRules">-->
+<!--            <el-form-item-->
+<!--                v-for="(option, index) in questionForm.option_list"-->
+<!--                :label="'选项 ' + (index + 1) "-->
+<!--                :key="index"-->
+<!--                :prop="'option_list.' + index + '.title'"-->
+<!--                :rules="{-->
+<!--                    required: true,  message: '内容不能为空', trigger: 'blur'-->
+<!--                }"-->
+<!--            >-->
+<!--              <el-input v-model="option.title" class="choiceinput">-->
+<!--              </el-input >-->
+<!--              <el-button @click.prevent="removeChoice(option)" type="danger">删除</el-button>-->
+<!--            </el-form-item>-->
+<!--          </el-form>-->
+<!--          <div class="dialog-footer">-->
+<!--            <el-button icon="el-icon-edit" @click="addChoice" type="primary">新增选项</el-button>-->
+<!--            <div>-->
+<!--              <el-button icon="el-icon-check" @click="finishQuestion()" type="success">完成</el-button>-->
+<!--              <el-button icon="el-icon-close" @click="cancelQuestion" type="danger"> 取消</el-button>-->
+<!--            </div>-->
+<!--          </div>-->
+          <div class="block">
+            <span class="demonstration">定义行 [一般为需要分析的题目，如爱好，意愿等，限10题。]</span>
+            <div v-for="(i, index) in cross1" :key="index" style="float: left;margin-left: 18.6%;">
+              <el-select  style="margin-bottom: 20px;" v-model="i.value" filterable placeholder="请选择">
+                <el-option
+                    v-for="item in info.question_list"
+                    :key="item.id"
+                    :label="item.ordering + '. ' + item.title"
+                    :value="item.id">
+                </el-option>
+              </el-select>
+              <i @click="remove1(index)" class="el-icon-circle-close" style="margin-left: 10px; color: grey; cursor: pointer" v-if="cross1.length > 1"></i>
             </div>
+            <el-button class="button" plain @click="add1">新增题目</el-button>
+          </div>
+          <div class="block">
+            <span class="demonstration">定义行 [一般为样本属性，如性别，年龄等，限10题。]</span>
+            <div v-for="(i, index) in cross2" :key="index" style="float: left;margin-left: 18.6%;">
+              <el-select  style="margin-bottom: 20px" v-model="i.value" filterable placeholder="请选择">
+                <el-option
+                    v-for="item in info.question_list"
+                    :key="item.id"
+                    :label="item.ordering + '. ' + item.title"
+                    :value="item.id">
+                </el-option>
+              </el-select>
+              <i @click="remove2(index)" class="el-icon-circle-close" style="margin-left: 10px; color: grey; cursor: pointer" v-if="cross1.length > 1"></i>
+            </div>
+            <el-button class="button" plain @click="add2">新增题目</el-button>
           </div>
         </div>
       </el-main>
@@ -121,6 +153,17 @@ export default {
 
   data(){
     return {
+      cross1: [
+        {
+          value: '',
+        },
+      ],
+      cross2:[
+        {
+          value: '',
+        },
+      ],
+
       questionForm: {
         title: '',
         content: '',
@@ -169,74 +212,6 @@ export default {
       ],
       tmp: [],
       nums:[],
-      answers: [
-        {
-          activeChart: '0',
-          activeNames: ['2',], // 折叠栏全部展开
-          content: '第一个题目',
-          type: "single-choice",
-          result:[{
-            content: "A",
-            number: 2,
-            percent: "10%"
-          },
-            {
-              content: "B",
-              number: 10,
-              percent: "50%"
-            },
-            {
-              content: "C",
-              number: 8,
-              percent: "40%"
-            }
-          ]
-        },
-        {
-          activeChart: '0',
-          activeNames: ['2',],
-          content: '第二个题目',
-          type: "single-choice",
-          result:[{
-            content: "A",
-            number: 2,
-            percent: "10%"
-          },
-            {
-              content: "B",
-              number: 10,
-              percent: "50%"
-            },
-            {
-              content: "C",
-              number: 8,
-              percent: "40%"
-            }
-          ]
-        },
-        {
-          activeChart: '0',
-          activeNames: ['2',], // 折叠栏全部展开
-          content: '第三个题目',
-          type: "single-choice",
-          result:[{
-            content: "A",
-            number: 2,
-            percent: "10%"
-          },
-            {
-              content: "B",
-              number: 10,
-              percent: "50%"
-            },
-            {
-              content: "C",
-              number: 8,
-              percent: "40%"
-            }
-          ]
-        },
-      ]
     }
   },
 
@@ -327,19 +302,21 @@ export default {
   },
 
   methods: {
-    addChoice() {
-      this.questionForm.option_list.push({
-        title: '',
-        content: '',
-        ordering: this.questionForm.option_list.length + 1,
-        // key: Date.now()
+    add1() {
+      this.cross1.push({
+        value: '',
       })
     },
-    removeChoice(item) {
-      var index = this.questionForm.option_list.indexOf(item)
-      if (index !== -1) {
-        this.questionForm.option_list.splice(index, 1)
-      }
+    add2() {
+      this.cross2.push({
+        value: '',
+      })
+    },
+    remove1(index) {
+      this.cross1.splice(index, 1);
+    },
+    remove2(index) {
+      this.cross2.splice(index, 1);
     },
     handleClick(tab, event) {
       console.log(tab, event);
@@ -513,5 +490,32 @@ export default {
   left: 50%;
   top: 50%;
   transform: translate(-50%, 10%);
+}
+
+.block{
+  //padding: 30px 0;
+  text-align: center;
+  border-right: 1px solid #eff2f6;
+  width: 50%;
+  box-sizing: border-box;
+}
+.demonstration{
+  display: block;
+  color: #8492a6;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+.button{
+  width: 400px !important;
+  display: block;
+  margin: 0 auto;
+  //padding-left: 15px;
+}
+
+</style>
+
+<style>
+.el-input--suffix .el-input__inner {
+  padding-right: 230px !important;
 }
 </style>
