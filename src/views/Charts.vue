@@ -105,7 +105,7 @@
           <div class="block">
             <span class="demonstration">定义行 [一般为需要分析的题目，如爱好，意愿等，限10题。]</span>
             <div v-for="(i, index) in cross1" :key="index" style="float: left;margin-left: 18.6%;">
-              <el-select  style="margin-bottom: 20px;" v-model="i.value" filterable placeholder="请选择">
+              <el-select  style="margin-bottom: 20px; width: 400px" v-model="i.value" filterable placeholder="请选择">
                 <el-option
                     v-for="item in info.question_list"
                     :key="item.id"
@@ -120,7 +120,7 @@
           <div class="block">
             <span class="demonstration">定义行 [一般为样本属性，如性别，年龄等，限10题。]</span>
             <div v-for="(i, index) in cross2" :key="index" style="float: left;margin-left: 18.6%;">
-              <el-select  style="margin-bottom: 20px" v-model="i.value" filterable placeholder="请选择">
+              <el-select  style="margin-bottom: 20px; width: 400px" v-model="i.value" filterable placeholder="请选择">
                 <el-option
                     v-for="item in info.question_list"
                     :key="item.id"
@@ -511,8 +511,8 @@ export default {
   margin: 0 auto;
   //padding-left: 15px;
 }
-.el-input--suffix .el-input__inner {
-  padding-right: 230px !important;
-}
+//.el-input--suffix .el-input__inner {
+//  padding-right: 230px !important;
+//}
 </style>
 
