@@ -51,12 +51,10 @@
             <el-collapse @change="editTitle">
               <el-collapse-item >
             <title-content-dialog ref="title-content-dialog" :prop_title="info.title" :prop_content="info.content"></title-content-dialog>
-          
-
               </el-collapse-item>
             </el-collapse>
-            
           </div>
+
           <el-divider/>
 
           <draggable :list="info.question_list" animation="500"  force-fallback="true"

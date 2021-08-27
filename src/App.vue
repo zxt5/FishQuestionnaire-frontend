@@ -7,7 +7,7 @@
     <transition>
       <router-view v-if="isRouterAlive"/>
     </transition>
-    <!--    <el-backtop></el-backtop>-->
+        <el-backtop></el-backtop>
   </div>
 </template>
 
@@ -45,7 +45,7 @@ body{
   margin:0;
   padding:0;
   min-width:1600px;
-  width:100vw !important;
+  /*width:100vw !important;*/
   /*overflow-x: hidden !important;*/
   /*display: flex;*/
 }

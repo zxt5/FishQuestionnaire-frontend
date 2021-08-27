@@ -14,9 +14,6 @@
       </h1>
 <!--      <el-menu-item index="/">首页</el-menu-item>-->
       <el-menu-item index="/index">我的问卷</el-menu-item>
-      <el-menu-item>🐟</el-menu-item>
-      <el-menu-item>🐟</el-menu-item>
-      <el-menu-item>🐟</el-menu-item>
 <!--      <el-menu-item index="/help">帮助与支持</el-menu-item>-->
 <!--      <el-menu-item index="/check/1" @click="$router.push({path:'/check/1'})" disabled>预览问卷</el-menu-item>-->
 <!--      <el-menu-item index="/edit/30" @click="$router.push({path:'/edit/30'})" disabled>创建问卷</el-menu-item>-->
@@ -38,7 +35,14 @@
           </el-dropdown-menu>
         </el-dropdown>
       </div>
-
+      <!--      搜索框-->
+      <div class="search">
+        <div>
+          <el-input v-model="search" placeholder="请输入问卷名进行搜索~" maxLength="100" @keyup.native.enter="toSearch">
+            <el-button slot="append" icon="el-icon-search" @click="toSearch"></el-button>
+          </el-input>
+        </div>
+      </div>
 <!--      <div class="search">-->
 <!--        <div>-->
 <!--          <el-input v-model="search" placeholder="搜索图书" maxLength="100" @keyup.native.enter="toSearch">-->
@@ -53,6 +57,7 @@
 <script>
 import axios from "axios";
 import authorization from "../utils/authorization";
+import {Base64} from "js-base64";
 export default {
   name: "Header",
   data() {
@@ -111,7 +116,8 @@ export default {
         })
       }
       else{
-        this.$router.push({path: '/search/' + this.search})
+        let s1 = Base64.encode('wen' + this.search + 'juan');
+        this.$router.push({path: '/search/' + s1})
       }
     },
     myPre() {
@@ -176,7 +182,7 @@ export default {
 h1{
   float: left;
   height: 75px;
-  margin: 0;
+  margin-right: 30px;
   width: 150px;
   cursor: pointer;
   margin-left: 10%;
@@ -196,7 +202,7 @@ h1 a:hover{
 
 .logo{
   /*background-image: url("../assets/logo2.png");*/
-  background-size: 130px;
+  background-size: 160px;
   background-position: center;
   background-repeat: no-repeat;
   transition: 0.1s linear opacity;
@@ -225,7 +231,7 @@ h1 a:hover{
 .search{
   float: right;
   width: 300px;
-  margin: 10px 20px !important;
+  margin: 18px 20px 0 !important;
   height: 40px;
 }
 

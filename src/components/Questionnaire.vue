@@ -1,17 +1,8 @@
 <template>
   <div class="questionnaire" direction="vertical">
     <div>
-
-      <!--      搜索框-->
-      <div class="search">
-        <div>
-          <el-input v-model="search" placeholder="请输入问卷名进行搜索~" maxLength="100" @keyup.native.enter="toSearch">
-            <el-button slot="append" icon="el-icon-search" @click="toSearch"></el-button>
-          </el-input>
-        </div>
-      </div>
-      <el-dropdown @command="sort" style="float: right; margin-right: 15%; margin-top: 7px">
-          <span class="el-dropdown-link" style="color: darkblue; float: left; font-size: 17px">
+      <el-dropdown @command="sort" style="float: right; margin-right: 7px; margin-top: 7px">
+          <span class="el-dropdown-link" style="color: grey; float: left; font-size: 17px">
             选择排序方式<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
         <el-dropdown-menu slot="dropdown">
@@ -148,18 +139,7 @@ export default {
             })
           })
     },
-    toSearch(){
-      if(this.search === ''){
-        this.$notify.warning({
-          title: '别搞',
-          message: '搜索不能为空哦'
-        })
-      }
-      else{
-        let s1 = Base64.encode('wen' + this.search + 'juan');
-        this.$router.push({path: '/search/' + s1})
-      }
-    },
+
     formatted_time: function (iso_date_string) {
       const date = new Date(iso_date_string);
       return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
@@ -267,24 +247,32 @@ export default {
     },
     Start(item) {
         const that = this;
-        axios
-            .put('api/questionnaire/' + item.id + '/status/', {
-              status: "shared"
-            })
-            .then(function (response){
-              that.$notify.success({
-                title: '问卷成功发布!',
-                message: '您可以进行分享'
+        if(item.question_num === 0){
+          this.$notify.warning({
+            title: '无法发布',
+            message: '问卷为空，请先编辑'
+          })
+        }
+        else{
+          axios
+              .put('api/questionnaire/' + item.id + '/status/', {
+                status: "shared"
               })
-              item.status = 'shared';
-              that.showSharePage(item);
-            })
-            .catch(function (error){
-              that.$notify.error({
-                title: '出错啦',
-                message: '发布问卷失败'
+              .then(function (response){
+                that.$notify.success({
+                  title: '问卷成功发布!',
+                  message: '您可以进行分享'
+                })
+                item.status = 'shared';
+                that.showSharePage(item);
               })
-            })
+              .catch(function (error){
+                that.$notify.error({
+                  title: '出错啦',
+                  message: '发布问卷失败'
+                })
+              })
+        }
     },
     Close(id) {
       const that = this;

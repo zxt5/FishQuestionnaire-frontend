@@ -24,9 +24,10 @@
           </v-row>
         </v-carousel-item>
       </v-carousel>
-      <h1 class="title"> 问卷？摸鱼！🐟 两不误</h1>
+      <h1 class="title"> 🦈🐬🐳🐋🐟🐠🐡 </h1>
       <p style="max-width: 568px;">
-        这里是介绍（懒得写了
+        <strong>摸鱼问卷平台</strong> 拥有简洁轻量的界面，问卷发布快捷方便，无需人工处理问卷数据，大大节省调研成本。
+        目前向所有用户免费开放，志在做一款用户喜爱的在线问卷调查服务平台✊
       </p>
       <v-container style="margin-bottom: 40px">
         <v-row justify="center">
@@ -83,7 +84,7 @@
       </v-container>
       <v-divider style="width: 50%; margin: 0 auto"></v-divider>
       <p style="max-width: 568px; margin-top: 40px">
-        项目团队精心设计和打造多种不同类型的问卷类型以适应不同场合需求。 创建发布收集一条龙 — 预览相应的问卷模板，以便更好地做出选择。
+        项目团队精心设计和打造多种不同类型的问卷以适应不同场合需求。 做到创建发布收集一条龙 — 点击预览👀相应的问卷模板，以便更好地做出选择。
       </p>
       <v-row justify="center" style="margin-bottom: 40px">
         <v-btn :min-width="btnWidth" @click="expand = !expand">
@@ -114,7 +115,7 @@
                   </v-card-subtitle>
                   <v-card-actions>
                     <v-btn
-                        color="orange lighten-2"
+                        color="#3F87DA"
                         text
                     >
                       preview
@@ -146,13 +147,12 @@
           </v-row>
         </v-container>
       </v-expand-transition>
-
       <v-footer padless>
         <v-col
             class="text-center"
             cols="12"
         >
-          {{ new Date().getFullYear() }} — <strong>软件工程实践(1) 19组 摸鱼问卷</strong>
+          {{ new Date().getFullYear() }} — <strong>Group No.19</strong> FISHING QUESTIONNAIRE
         </v-col>
       </v-footer>
     </v-app>
