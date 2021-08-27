@@ -420,27 +420,44 @@ export default {
       }
       // if(this.is_end_time && Date.parse(this.end_time )< now) console.log("结束时间早于当前时间");
       else {
-        axios
-            .patch('/api/questionnaire/' + that.info.id + '/', {
-              is_start_time: this.info.is_start_time,
-              start_time: this.info.start_time,
-              is_end_time: this.info.is_end_time,
-              end_time: this.info.end_time,
-            }, {
-              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-            })
-            .then(function (response){
-              that.$notify.success({
-                title: '编辑成功',
-                message: '设置时间控制成功！'
+        var fl = 1;
+        if(this.info.is_start_time && this.info.is_end_time) {
+            // console.log(this.info.start_time);
+            // console.log(this.info.end_time);
+            if(Date.parse(this.info.start_time) > Date.parse(this.info.end_time)) {
+              fl = 0;
+            }
+        }
+        if(fl === 1) {
+          axios
+              .patch('/api/questionnaire/' + that.info.id + '/', {
+                is_start_time: this.info.is_start_time,
+                start_time: this.info.start_time,
+                is_end_time: this.info.is_end_time,
+                end_time: this.info.end_time,
+              }, {
+                headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
-            })
-            .catch(function (error){
-              that.$notify.error({
-                title: '出错啦',
-                message: '设置时间失败'
+              .then(function (response){
+                that.$notify.success({
+                  title: '编辑成功',
+                  message: '设置时间控制成功！'
+                })
               })
-            })
+              .catch(function (error){
+                that.$notify.error({
+                  title: '出错啦',
+                  message: '设置时间失败'
+                })
+              })
+        }
+        else {
+          this.$notify.warning({
+            title: '设置失败',
+            message: '结束时间不能早于开始时间，请检查并修改！',
+          })
+        }
+
       }
     },
     is_show_num() {

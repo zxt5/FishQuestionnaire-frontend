@@ -4,11 +4,6 @@
       <!--标题-->
 
       <h1 class="title">感谢填写！</h1>
-      <el-result icon="success" title="成功提示" subTitle="请根据提示进行操作">
-<!--        <template slot="extra">-->
-<!--          <el-button type="primary" size="medium">返回</el-button>-->
-<!--        </template>-->
-      </el-result>
       <div class="content">&nbsp;问卷到此结束，感谢您的参与！</div>
       <div class="line"></div>
       <!--内容结束-->
