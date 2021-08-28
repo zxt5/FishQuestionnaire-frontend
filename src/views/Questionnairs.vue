@@ -40,24 +40,24 @@
               </el-submenu>
             </el-menu>
 
-            <el-menu class="aside-mid">
+            <el-menu class="aside-mid" style="padding: 20px 25px">
               <div class="aside-top">
                 <span> 问卷设置 </span>
               </div>
               <!--            时间控制-->
               <div class="time_control" style="margin-top: 20px">
-                <span style="padding-left: 15px">时间控制</span>
+                <span>时间控制</span>
                 <el-switch
-                    style="float: right; padding-right: 20px"
+                    style="float: right"
                     @change="delete_time_control"
                     v-model="control_time"
                     active-color="#13ce66"
                     inactive-color="#ff4949">
                 </el-switch>
-                <div v-if="control_time">
+                <div v-if="control_time" style="padding-left: 15px">
                   <!--                开始时间-->
                   <div>
-                    <div style="padding-left: 8px">
+                    <div>
                       <el-checkbox v-model="info.is_start_time">开始时间</el-checkbox>
                     </div>
                     <div style="padding-left: 20px">
@@ -71,7 +71,7 @@
                   </div>
                   <!--                结束时间-->
                   <div>
-                    <div style="padding-left: 8px">
+                    <div>
                       <el-checkbox v-model="info.is_end_time">结束时间</el-checkbox>
                     </div>
                     <div style="padding-left: 20px">
@@ -84,7 +84,7 @@
                     </div>
                   </div>
                   <!--                保存按钮-->
-                  <div style="padding-left: 190px;margin-top: 15px;">
+                  <div style="float: right; margin-top: 15px;">
                     <el-button
                         size="mini"
                         type="primary"
@@ -97,14 +97,46 @@
               </div>
               <!--            是否显示题号-->
               <div style="margin-top: 15px">
-                <span style="padding-left: 15px; margin-top: 30px">是否显示题号</span>
+                <span style=" margin-top: 30px">是否显示题号</span>
                 <el-switch
-                    style="float: right; padding-right: 20px"
+                    style="float: right"
                     @change="is_show_num"
                     v-model="info.is_show_question_num"
                     active-color="#13ce66"
                     inactive-color="#ff4949">
                 </el-switch>
+                <!--              问卷设置密码-->
+                <div style="margin-top: 15px">
+                  <span style="margin-top: 30px">是否加密问卷</span>
+                  <el-switch
+                      style="float: right"
+                      active-color="#13ce66"
+                      inactive-color="#ff4949"
+                      v-model="info.is_locked"
+                      @change="set_islocked"
+                  >
+                  </el-switch>
+                  <div v-if="info.is_locked" style="margin-top: 15px;padding-left: 15px">
+                    <span style="color: #555555;font-size: 15px">设置密码:</span>
+                    <el-input
+                        placeholder="请输入密码"
+                        v-model="info.password"
+                        show-password
+                        v-on:keyup.enter.native="set_password"
+                        style="min-width: 180px;max-width: 180px;margin-left: 10px"
+                    >
+                    </el-input>
+                    <div style="margin-top: 15px; float: right">
+                      <el-button
+                          size="mini"
+                          type="primary"
+                          @click="set_password"
+                      >
+                        保存更改
+                      </el-button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </el-menu>
           </el-aside>
@@ -402,6 +434,59 @@ export default {
     }
   },
   methods:{
+    set_password() {
+      const that = this;
+      if(this.info.password === '') {
+        that.$notify.error({
+          title: '密码不能为空！',
+          message: '请输入密码！'
+        })
+      }
+      else {
+        axios
+            .patch('/api/questionnaire/' + that.info.id + '/', {
+              is_locked: true,
+              password: this.info.password,
+            }, {
+              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+            })
+            .then(function (response){
+              that.$notify.success({
+                title: '设置成功',
+                message: '设置密码成功！'
+              })
+            })
+            .catch(function (error){
+              that.$notify.error({
+                title: '出错啦',
+                message: '设置密码失败！'
+              })
+            })
+      }
+    },
+    set_islocked() {
+      const that = this;
+      if(this.info.is_locked === false) {
+        axios
+            .patch('/api/questionnaire/' + that.info.id + '/', {
+              is_locked: false
+            }, {
+              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+            })
+            .then(function (response){
+              that.$notify.success({
+                title: '编辑成功',
+                message: '问卷已解锁！'
+              })
+            })
+            .catch(function (error){
+              that.$notify.error({
+                title: '出错啦',
+                message: '解锁问卷失败'
+              })
+            })
+      }
+    },
     resetPositioning() {
       this.positioning = false
       this.location = null
@@ -942,7 +1027,7 @@ export default {
 .aside-mid{
   opacity: 0.95;
   background-color: #FFFFFF;
-  padding-top: 10px;
+  padding-top: 20px;
   margin-top: 10px !important;
   border-radius: 10px;
   padding-bottom: 10px;

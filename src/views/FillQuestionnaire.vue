@@ -115,32 +115,30 @@
       <el-button v-if="timeStamp===1" type="primary" @click="click(info.id)">提交</el-button>
 <!--      <div class="line"></div>-->
 <!--      <div class="text2"> 摸鱼问卷 提供技术支持 </div>-->
-
     </div>
-
+<!--    <el-dialog title="分享问卷" :visible.sync="info.is_locked" :close-on-click-modal="false" class="share_window" @opened="makeQrcode" append-to-body>-->
     <el-dialog
         title="问卷已加密！"
-        center
-        top="200px"
         :visible.sync="info.is_locked"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close= "false"
         width="30%"
+        center
+        append-to-body
+        style="margin: 0 auto; display: block"
     >
-      <div>
-        <div style="float: left">
-          <span style="font-size: 17px">请输入密码：</span>
-        </div>
-        <div style="float: left; margin-left: 10px">
-          <el-input placeholder="请输入密码" v-model="password" show-password v-on:keyup.enter.native="check_password"></el-input>
-        </div>
+      <!--        <div style="float: left">-->
+      <!--          <span style="font-size: 17px">请输入密码：</span>-->
+      <!--        </div>-->
+      <div style="width: 50%; margin: 0 auto">
+        <el-input placeholder="请输入密码" v-model="password" show-password v-on:keyup.enter.native="check_password"></el-input>
       </div>
-      <div style="margin-top: 100px;">
-        <el-button style="" type="primary" @click="check_password">确 定</el-button>
+      <div style="margin: 40px auto 0;">
+        <el-button style="margin-bottom: 0 !important;" type="primary" @click="check_password">确   定</el-button>
       </div>
     </el-dialog>
-
+<!--    </el-dialog>-->
   </div>
 
 </template>
@@ -411,6 +409,21 @@ export default {
               that.submit_list.push(data);
             }
           }
+          else if(item.type === 'position'){
+            if(that.location === null && item.is_must_answer) {
+              that.flag = false;
+              console.log('定位')
+            }
+            else {
+              let data = {
+                // questionnaire: that.info.id,
+                question: item.id,
+                option: item.option_list[0].id,
+                content: that.location['城市'],
+              };
+              that.submit_list.push(data);
+            }
+          }
         }
         console.log(that.submit_list);
         if(that.flag === true) {
@@ -458,9 +471,7 @@ export default {
   margin-right: 30px;
   color: #3F87DA;
 }
-.el-dialog__wrapper >>> .el-dialog {
-  border-radius: 10px !important;
-}
+
 
 .content {
   text-align: center;

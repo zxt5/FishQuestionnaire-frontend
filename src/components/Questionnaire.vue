@@ -521,9 +521,9 @@ li{
 }
 .el-dialog{
   border-radius: 15px !important;
-  left: 50% !important;
-  top: 50% ;
-  position: absoulte;
-  transform: translate(-90%, -90%);
+  /*left: 50% !important;*/
+  /*top: 50% ;*/
+  /*position: absoulte;*/
+  /*transform: translate(-90%, -90%);*/
 }
 </style>
