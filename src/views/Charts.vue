@@ -127,11 +127,11 @@
                   <div>
                     <span style="margin: 0 6px 0;color: darkgray" v-if="table_list[index].question_x.type==='single-choice'"> [单选题] </span>
                     <span style="margin: 0 6px 0;color: darkgray" v-if="table_list[index].question_x.type==='multiple-choice'"> [多选题] </span>
-                    <span style="margin: 0 6px 0;">{{ table_list[index].question_x.title}}</span>
+                    <span style="margin: 0 6px 0;">{{ table_list[index].question_x.ordering + '. ' + table_list[index].question_x.title}}</span>
                     <v-icon>mdi-arrow-left-right-bold</v-icon>
                     <span style="margin: 0 6px 0;color: darkgray" v-if="table_list[index].question_y.type==='single-choice'"> [单选题] </span>
                     <span style="margin: 0 6px 0;color: darkgray" v-if="table_list[index].question_y.type==='multiple-choice'"> [多选题] </span>
-                    <span>{{table_list[index].question_y.title}}</span>
+                    <span style="margin: 0 6px 0;">{{ table_list[index].question_y.ordering + '. ' + table_list[index].question_y.title}}</span>
                   </div>
                 </template>
                       <div :id="'1-1-' + index" :ref="'1-1-' + index" class="image-div"></div>
@@ -485,7 +485,7 @@ export default {
           tmpName_x.push(subItem.title);
           let tmp = [];
           for (let ii of subItem.option_y_list) {
-            tmp.push(ii.num);
+            tmp.push(ii.percent);
           }
           // console.log(tmp);
           tmpMat.push({
@@ -494,7 +494,7 @@ export default {
             stack: 'total',
             label: {
               show: false,
-              position: 'top'
+              position: 'top',
             },
             emphasis: {
               focus: 'series'
@@ -519,30 +519,37 @@ export default {
       }
       this.myChart[index] = this.$echarts.init(document.getElementById(eid));
       option = {
-          tooltip: {
-            trigger: 'axis',
-            axisPointer: {            // Use axis to trigger tooltip
-              type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
-            }
+        title:{
+          text:"单位：%",
+          textStyle:{
+            fontSize:15,
+          }
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {            // Use axis to trigger tooltip
+            type: 'shadow',        // 'shadow' as default; can also be 'line' or 'shadow'
           },
-          legend: {
-            // data: ['Direct', 'Mail Ad', 'Affiliate Ad', 'Video Ad', 'Search Engine']
-            data: this.crossName_x[index],
-          },
-          grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-          },
-          xAxis: {
-            type: 'value'
-          },
-          yAxis: {
-            type: 'category',
-            data: this.crossName_y[index],
-          },
-          series: this.crossMat[index],
+          // formatter : '{b0}<br/>{a0}: {c0}%<br />{a1}: {c1}%<br />{a2}: {c2}%<br />{a3}: {c3}%<br />{a4}: {c4}%'
+        },
+        legend: {
+          // data: ['Direct', 'Mail Ad', 'Affiliate Ad', 'Video Ad', 'Search Engine']
+          data: this.crossName_x[index],
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'value'
+        },
+        yAxis: {
+          type: 'category',
+          data: this.crossName_y[index],
+        },
+        series: this.crossMat[index],
       };
       this.myChart[index].setOption(option)
     },
