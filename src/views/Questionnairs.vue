@@ -221,10 +221,10 @@
                 {{item.content}}
               </div>
                 <br>
-                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
-                <span style="margin-right:20px">  当前定位: </span>
-                <el-button :icon="positioning ? 'el-icon-loading':none" @click="getLocation">
-                  <span v-if="location">{{ location["省份"]+location["城市"] }}</span>
+<!--                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>-->
+<!--                <span style="margin-right:20px">  当前定位: </span>-->
+                <el-button style="margin-left: 17px; width: 25%" :icon="positioning ? 'el-icon-loading': none " @click="getLocation">
+                  <span v-if="location">{{ location["省份"] + ' ' + location["城市"] }}</span>
                   <div v-show="!location && !positioning" >点击获取位置</div>
                   <span v-show="positioning">
                           &nbsp;
@@ -274,7 +274,7 @@
                     <!--    评分对话框-->
                     <scoring-add-card :ref="'scoring'+index" v-if="item.type === 'scoring'"></scoring-add-card>
 
-                    <position-add-card :ref="'position'+index" v-if="item.type == 'position'"></position-add-card>
+                    <position-add-card :ref="'position'+index" v-if="item.type === 'position'"></position-add-card>
 
                   </div>
                 </el-collapse-transition>
@@ -286,10 +286,10 @@
                        @mouseenter.native="mouseEnter"
                        @mouseleave.native="mouseLeave"
             class="edit-button"
-            :icon=" item.isShow == true ? 'el-icon-arrow-up':'el-icon-arrow-down'"
+            :icon=" item.isShow === true ? 'el-icon-arrow-up':'el-icon-arrow-down'"
             >
-              <div v-show="item.isShow == true">完成编辑</div>
-              <div v-show="item.isShow == false">进入编辑</div>
+              <div v-show="item.isShow === true">完成编辑</div>
+              <div v-show="item.isShow === false">进入编辑</div>
             </el-button>
             
             </div>
@@ -348,7 +348,6 @@ export default {
         TitleContentDialog
   },
   data(){
-
     return {
       isEdit: false,
       BMap: null,

@@ -28,6 +28,7 @@
             <span style="color: lightgrey" v-if="item.type==='multiple-choice'">[多选题]</span>
             <span style="color: lightgrey" v-if="item.type==='completion'">[填空题]</span>
             <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]（默认评分0）</span>
+            <span style="color: lightgrey" v-if="item.type==='position'">[填空题]</span>
           </div>
         </div>
         <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
@@ -95,6 +96,20 @@
             ></v-slider>
           </v-card-text>
         </v-app>
+
+        <v-app class="choice" v-if="item.type==='position'">
+<!--          <div style="display: inline-block">  当前定位: </div>-->
+          <v-btn
+              class="ma-2"
+              outlined
+              color="indigo"
+              @click="getLocation"
+          >
+            <span v-if="location && !positioning">{{ location["省份"] + ' ' + location["城市"] }}</span>
+            <span v-show="!location && !positioning" >点击获取位置</span>
+            <span v-show="positioning"><i class="el-icon-loading"></i>&nbsp;等待获取中 {{ countDown }} 秒</span>
+          </v-btn>
+        </v-app>
       </div>
 
       <el-button v-if="timeStamp===1" type="primary" @click="click(info.id)">提交</el-button>
@@ -134,6 +149,7 @@
 import authorization from "../utils/authorization";
 import axios from "axios";
 import {Base64} from "js-base64";
+import {loadBMap} from "../assets/js/loadBMap";
 
 export default {
   name: "FillQuestionnaire",
@@ -152,9 +168,20 @@ export default {
       endTime: '',
       // dialogVisible: true,
       password: '',
+      BMap: null,
+      geolocation: null, // Geolocation对象实例
+      positioning: false, // 定位中
+      positioningInterval: null, // 定位倒计时计时器
+      countDown: 30, // 倒计时，单位秒
+      location: null, // 位置信息
     }
   },
   mounted() {
+    const _this = this
+    window.initBaiduMapScript = () => {
+      _this.BMap = window.BMap
+    }
+    loadBMap('initBaiduMapScript')
     const that = this;
     let s1 = that.$route.params.text;
     s1 = Base64.decode(s1);
@@ -196,6 +223,108 @@ export default {
         })
   },
   methods: {
+    resetPositioning() {
+      this.positioning = false
+      this.location = null
+      this.countDown = 30
+      clearInterval(this.positioningInterval)
+    },
+    getLocation() {
+      const _this = this
+      _this.geolocation = new _this.BMap.Geolocation()
+      if (_this.geolocation) {
+        // 开启SDK辅助定位，仅当使用环境为移动web混合开发，且开启了定位sdk辅助定位功能后生效
+        _this.geolocation.enableSDKLocation()
+        // 开始定位
+        this.positioning = true
+        // 倒计时
+        this.positioningInterval = setInterval(() => {
+          if (this.countDown === 0) {
+            this.countDown = 30
+            clearInterval(this.positioningInterval)
+          } else {
+            this.countDown--
+          }
+        }, 1000)
+        // 位置选项
+        const positionOptions = {
+          enableHighAccuracy: true, // 要求浏览器获取最佳结果
+          timeout: 30, //    超时时间
+          maximumAge: 0 // 允许返回指定时间内的缓存结果。如果此值为0，则浏览器将立即获取新定位结果
+        }
+        // 获取用户位置信息
+        _this.geolocation.getCurrentPosition(position => {
+          _this.resetPositioning()
+          // 获取定位结果状态码
+          const statusCode = _this.geolocation.getStatus()
+          let msg = '由于未知错误而无法检索设备的位置' // 提示消息
+          let msgType = 'error' // 消息类型
+          // 判断结果状态码，为0代表获取成功，读取省市、经纬度
+          switch (statusCode) {
+            case 0:
+              msgType = 'success'
+              msg = '获取地理位置定位请求成功'
+              if (position) {
+                // 数据变量定义
+                let lat = 0.0 // 经度
+                let lng = 0.0 // 纬度
+                let province = '未知' // 经度
+                let city = '未知' // 纬度
+
+                // 坐标
+                if (position.point) {
+                  lat = position.point.lat
+                  lng = position.point.lng
+                }
+                // 位置
+                if (position.address) {
+                  province = position.address.province
+                  city = position.address.city
+                }
+                _this.location = {
+                  省份: province,
+                  城市: city,
+                  经度: lat,
+                  纬度: lng
+                }
+              } else {
+                msg = '由于未知错误而无法检索设备的位置'
+              }
+              break
+            case 2:
+              msg = '由于未知错误而无法检索设备的位置'
+              break
+            case 4:
+            case 5:
+              msg = '位置服务请求非法'
+              break
+            case 6:
+              msg = '应用程序没有使用位置服务的权限'
+              break
+            case 7:
+              msg = '网络不可用或者无法连接到获取位置信息的卫星'
+              break
+            case 8:
+              msg = '无法在指定的最大超时间隔内检索位置信息'
+              break
+            default:
+              msg = '由于未知错误而无法检索设备的位置'
+              break
+          }
+          _this.$$notify[msgType]({
+            key: NotificationKey,
+            message: '提示',
+            description: msg
+          })
+        }, positionOptions)
+      } else {
+        _this.$$notify.error({
+          key: NotificationKey,
+          message: '提示',
+          description: '您的浏览器不支持地理位置服务'
+        })
+      }
+    },
     toIndex(){
       this.$router.push({path: '/'});
     },
@@ -419,6 +548,14 @@ h4{
   margin-right: 50px;
   margin-top: 10px;
   border-radius: 10px;
+}
+
+.ma-2 {
+  margin-top: 20px !important;
+  margin-left: 0 !important;
+  width: 30%;
+  display: flex
+  /*height: 50px !important;*/
 }
 </style>
 
