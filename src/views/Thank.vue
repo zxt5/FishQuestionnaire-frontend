@@ -27,8 +27,6 @@
           </div>
 
         </div>
-
-      <h1 class="title">感谢填写！</h1>
       </div>
 
       <h1 class="title">感谢填写!</h1>
