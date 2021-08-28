@@ -40,18 +40,6 @@
               </el-submenu>
             </el-menu>
 
-
-
-            <el-menu class="aside-mid">
-              <div class="aside-top">
-                <span> 特殊题型 </span>
-              </div>
-              <el-submenu>
-
-              </el-submenu>
-            </el-menu>
-
-
             <el-menu class="aside-mid">
               <div class="aside-top">
                 <span> 问卷设置 </span>
@@ -346,11 +334,6 @@ import 'element-ui/lib/theme-chalk/base.css';
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 import Vue from 'vue'
 
-import collapse from "../assets/js/collapse.js";
-import ScoringAddDialog from '../components/ScoringAddDialog.vue'
-import SingleCompletionAddDialog from '../components/SingleCompletionAddDialog.vue'
-import SingleChoiceAddDialog from '../components/SingleChoiceAddDialog.vue'
-import MultipleChoiceAddDialog from '../components/MultipleChoiceAddDialog.vue'
 import {Base64} from "js-base64";
 Vue.component(CollapseTransition.name, CollapseTransition)
 
@@ -954,7 +937,7 @@ export default {
  opacity: 0.95;
  margin-top: 0;
  padding-top: 10pt;
- border-radius: 3%;
+ //border-radius: 3%;
 }
 
 .bottom-button{
