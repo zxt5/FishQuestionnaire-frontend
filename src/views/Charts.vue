@@ -115,9 +115,9 @@
           <!--        <el-divider/>-->
         </div>
         <el-divider style="margin-top: 3%"/>
-        <div v-if="activeName==='second'" style="margin-top: 5%">
+        <div v-if="activeName==='second'" style="margin-top: 3%;margin-bottom: 3%">
           <div style="text-align: center">
-            <el-button  type="primary" @click="crossGen()">生成</el-button>
+            <el-button  type="primary" @click="crossGen()">开始分析</el-button>
           </div>
 
           <el-collapse v-if="haveGend">
@@ -141,12 +141,6 @@
 
 
         </div>
-
-
-
-
-
-
       </el-main>
     </el-container>
     <!--波浪-->
@@ -498,7 +492,7 @@ export default {
             type: 'bar',
             stack: 'total',
             label: {
-              show: true,
+              show: false,
               position: 'top'
             },
             emphasis: {
@@ -724,6 +718,7 @@ export default {
   left: 50%;
   top: 50%;
   transform: translate(-50%, 10%);
+  padding-bottom: 15px;
 }
 
 .block{
