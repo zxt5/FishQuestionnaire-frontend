@@ -21,11 +21,19 @@
                   v-model="questionForm.content" :autosize="true"
                   type="textarea" :clearable="true" resize="none"> </el-input>
       </el-form-item>
-      <el-form-item label="是否必选" prop="is_must_answer">
-        <el-switch v-model="questionForm.is_must_answer"
-                   active-color="#409eff"
-                   inactive-color="#dcdfe6"></el-switch>
+      <el-form-item label="设置">
+       <el-checkbox label="是否必填"
+          v-model="questionForm.is_must_answer"></el-checkbox>
+        <el-checkbox label="是否考试题" v-model="questionForm.is_scoring"></el-checkbox>
       </el-form-item>
+      
+      <el-form-item label="正确答案" v-show="questionForm.is_scoring">
+        <el-input v-model="questionForm.option_list[0].content"></el-input>
+      </el-form-item>
+      <el-form-item label="题目分数" v-show="questionForm.is_scoring">
+        <el-input-number v-model="questionForm.question_score" :step="1"></el-input-number>
+      </el-form-item>
+
     </el-form>
     <div class="dialog-footer">
       <span> </span>
@@ -122,16 +130,20 @@ export default {
           title: '表单有错误'});
         }
         const that = this;
+        this.questionForm.option_list[0].title = '正确答案'
         if(!this.flag){
           axios
               .post('/api/question/', {
+                option_list: that.questionForm.option_list,
                 title: that.questionForm.title,
                 content: that.questionForm.content,
                 type: that.questionForm.type,
                 ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
-                is_show_result: that.questionForm.is_show_result
+                is_show_result: that.questionForm.is_show_result,
+                is_scoring: that.questionForm.is_scoring,
+                question_score: that.questionForm.question_score
               })
               .then(function (response){
                 // that.reload();
@@ -158,12 +170,16 @@ export default {
         else{
           axios
               .patch('/api/question/' + that.flag + '/', {
+                option_list: that.questionForm.option_list,
                 title: that.questionForm.title,
                 content: that.questionForm.content,
                 type: that.questionForm.type,
                 ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
+                is_show_result: that.questionForm.is_show_result,
+                is_scoring: that.questionForm.is_scoring,
+                question_score: that.questionForm.question_score
               })
               .then(function (response){
                 // that.reload();

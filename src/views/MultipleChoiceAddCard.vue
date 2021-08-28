@@ -26,7 +26,6 @@
                    active-color="#409eff"
                    inactive-color="#dcdfe6"></el-switch>
       </el-form-item>
-
       <el-form-item
           v-for="(option, index) in questionForm.option_list"
           :label="'选项 ' + (index + 1) "
@@ -34,8 +33,8 @@
           :prop="'option_list.' + index + '.title'"
           :rules="{
                     required: true,  message: '内容不能为空', trigger: 'blur'
-                }"
-      >
+                }">
+
         <el-input v-model="option.title" class="choiceinput">
         </el-input >
         <el-button @click.prevent="removeChoice(option)" type="danger">删除</el-button>

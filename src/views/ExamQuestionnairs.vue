@@ -40,24 +40,24 @@
               </el-submenu>
             </el-menu>
 
-            <el-menu class="aside-mid" style="padding: 20px 25px; overflow: auto; max-height: 400px">
+            <el-menu class="aside-mid">
               <div class="aside-top">
                 <span> 问卷设置 </span>
               </div>
               <!--            时间控制-->
               <div class="time_control" style="margin-top: 20px">
-                <span>设定答卷起止时间</span>
+                <span style="padding-left: 15px">时间控制</span>
                 <el-switch
-                    style="float: right"
+                    style="float: right; padding-right: 20px"
                     @change="delete_time_control"
                     v-model="control_time"
                     active-color="#409eff"
                    inactive-color="#dcdfe6">
                 </el-switch>
-                <div v-if="control_time" style="padding-left: 15px">
+                <div v-if="control_time">
                   <!--                开始时间-->
                   <div>
-                    <div>
+                    <div style="padding-left: 8px">
                       <el-checkbox v-model="info.is_start_time">开始时间</el-checkbox>
                     </div>
                     <div style="padding-left: 20px">
@@ -71,7 +71,7 @@
                   </div>
                   <!--                结束时间-->
                   <div>
-                    <div>
+                    <div style="padding-left: 8px">
                       <el-checkbox v-model="info.is_end_time">结束时间</el-checkbox>
                     </div>
                     <div style="padding-left: 20px">
@@ -84,7 +84,7 @@
                     </div>
                   </div>
                   <!--                保存按钮-->
-                  <div style="margin-top: 15px;">
+                  <div style="padding-left: 190px;margin-top: 15px;">
                     <el-button
                         size="mini"
                         type="primary"
@@ -97,71 +97,13 @@
               </div>
               <!--            是否显示题号-->
               <div style="margin-top: 15px">
-                <span style=" margin-top: 30px">问卷显示问题编号</span>
+                <span style="padding-left: 15px; margin-top: 30px">是否显示题号</span>
                 <el-switch
-                    style="float: right"
+                    style="float: right; padding-right: 20px"
                     @change="is_show_num"
                     v-model="info.is_show_question_num"
                     active-color="#409eff"
                    inactive-color="#dcdfe6">
-                </el-switch>
-              </div>
-              <!--              问卷设置密码-->
-              <div style="margin-top: 15px">
-                <span style="margin-top: 30px">设定答卷密码</span>
-                <el-switch
-                    style="float: right"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949"
-                    v-model="info.is_locked"
-                    @change="set_islocked"
-                >
-                </el-switch>
-                <div v-if="info.is_locked" style="margin-top: 15px; padding-left: 15px">
-                  <span style="font-size: 15px">设置密码:</span>
-                  <el-input
-                      placeholder="请输入密码"
-                      v-model="info.password"
-                      show-password
-                      v-on:keyup.enter.native="set_password"
-                      style="min-width: 180px;max-width: 180px;margin-left: 10px"
-                  >
-                  </el-input>
-                  <div style="margin-top: 15px">
-                    <el-button
-                        size="mini"
-                        type="primary"
-                        @click="set_password"
-                    >
-                      保存更改
-                    </el-button>
-                  </div>
-                </div>
-              </div>
-              <div style="margin-top: 15px">
-                <span style=" margin-top: 30px">答题需要登陆验证</span>
-
-                <el-switch
-                    style="float: right;"
-                    @change="is_login_required"
-                    v-model="info.is_required_login"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949"
-                    :disabled="info.is_only_answer_once"
-                >
-                </el-switch>
-                <div v-if="info.is_only_answer_once" style="margin-top: 15px; padding-left: 15px">
-                  <span style="color: #a1a1a1; font-size: 15px">设置限答后，必须打开登录验证</span>
-                </div>
-              </div>
-              <div style="margin-top: 15px">
-                <span style=" margin-top: 30px">每个用户仅答一次</span>
-                <el-switch
-                    style="float: right"
-                    @change="is_answer_once"
-                    v-model="info.is_only_answer_once"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949">
                 </el-switch>
               </div>
             </el-menu>
@@ -180,7 +122,7 @@
               <el-collapse v-model="info.isShow" class="question-container" @change="editTitle(info)">
                 <el-collapse-item >
                     <template slot="title">
-                        <span style="margin-left: 85%">  编辑标题和简介 </span>
+                        <span >  编辑标题和简介 </span>
                     </template>
                     <title-content-dialog ref="title-content-dialog"></title-content-dialog>
                 </el-collapse-item>
@@ -218,10 +160,10 @@
               <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
                 {{item.content}}
               </div>
-
+              
               <el-radio-group v-model="item.answer">
-                <el-radio
-                v-for="(subItem, subIndex)
+                <el-radio 
+                v-for="(subItem, subIndex) 
                 in item.option_list" :key="subItem.id ? subItem.id: subItem.key" :label="subIndex"
                 @click.native="debugShow(subItem)"
                 :disabled = "item.is_scoring"
@@ -243,7 +185,7 @@
               </div>
               <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
                 {{item.content}}
-
+ 
               </div>
 
               <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex">
@@ -271,8 +213,8 @@
               </div>
               <el-input class="single-completion-input" :autosize="true"
                         type="textarea" :clearable="true" resize="none" v-model="item.answer" :disabled="item.is_scoring"></el-input>
-
-              <div
+              
+              <div 
               v-if="item.is_scoring"
                style="color: #F56C6C; margin-top:20px">正确答案: {{item.option_list[0].content}}</div>
             </template>
@@ -286,10 +228,10 @@
                 {{item.content}}
               </div>
                 <br>
-<!--                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>-->
-<!--                <span style="margin-right:20px">  当前定位: </span>-->
-                <el-button style="margin-left: 17px; width: 25%" :icon="positioning ? 'el-icon-loading': none " @click="getLocation">
-                  <span v-if="location">{{ location["省份"] + ' ' + location["城市"] }}</span>
+                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+                <span style="margin-right:20px">  当前定位: </span>
+                <el-button :icon="positioning ? 'el-icon-loading':none" @click="getLocation">
+                  <span v-if="location">{{ location["省份"]+location["城市"] }}</span>
                   <div v-show="!location && !positioning" >点击获取位置</div>
                   <span v-show="positioning">
                           &nbsp;
@@ -319,7 +261,7 @@
             </template>
 
             <div v-show="item.is_scoring" style="margin-top: 20px; color: #F56C6C">本题分值: {{item.question_score}}</div>
-
+          
             </div>
             <!--编辑界面-->
             <el-container          
@@ -339,7 +281,7 @@
                     <!--    评分对话框-->
                     <scoring-add-card :ref="'scoring'+index" v-if="item.type === 'scoring'"></scoring-add-card>
 
-                    <position-add-card :ref="'position'+index" v-if="item.type === 'position'"></position-add-card>
+                    <position-add-card :ref="'position'+index" v-if="item.type == 'position'"></position-add-card>
 
                   </div>
                 </el-collapse-transition>
@@ -351,10 +293,10 @@
                        @mouseenter.native="mouseEnter"
                        @mouseleave.native="mouseLeave"
             class="edit-button"
-            :icon=" item.isShow === true ? 'el-icon-arrow-up':'el-icon-arrow-down'"
+            :icon=" item.isShow == true ? 'el-icon-arrow-up':'el-icon-arrow-down'"
             >
-              <div v-show="item.isShow === true">完成编辑</div>
-              <div v-show="item.isShow === false">进入编辑</div>
+              <div v-show="item.isShow == true">完成编辑</div>
+              <div v-show="item.isShow == false">进入编辑</div>
             </el-button>
             
             </div>
@@ -413,6 +355,7 @@ export default {
         TitleContentDialog
   },
   data(){
+
     return {
       isEdit: false, // 当前是否处于编辑状态
       editItem: '',  // 编辑的元素
@@ -467,59 +410,7 @@ export default {
     }
   },
   methods:{
-    set_password() {
-      const that = this;
-      if(this.info.password === '') {
-        that.$notify.error({
-          title: '密码不能为空！',
-          message: '请输入密码！'
-        })
-      }
-      else {
-        axios
-            .patch('/api/questionnaire/' + that.info.id + '/', {
-              is_locked: true,
-              password: this.info.password,
-            }, {
-              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-            })
-            .then(function (response){
-              that.$notify.success({
-                title: '设置成功',
-                message: '设置密码成功！'
-              })
-            })
-            .catch(function (error){
-              that.$notify.error({
-                title: '出错啦',
-                message: '设置密码失败！'
-              })
-            })
-      }
-    },
-    set_islocked() {
-      const that = this;
-      if(this.info.is_locked === false) {
-        axios
-            .patch('/api/questionnaire/' + that.info.id + '/', {
-              is_locked: false
-            }, {
-              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-            })
-            .then(function (response){
-              that.$notify.success({
-                title: '编辑成功',
-                message: '问卷已解锁！'
-              })
-            })
-            .catch(function (error){
-              that.$notify.error({
-                title: '出错啦',
-                message: '解锁问卷失败'
-              })
-            })
-      }
-    },
+    // 重置地图
     resetPositioning() {
       this.positioning = false
       this.location = null
@@ -729,52 +620,6 @@ export default {
             })
           })
     },
-    is_login_required(){
-      const that = this;
-      axios
-          .patch('/api/questionnaire/' + that.info.id + '/', {
-            is_required_login: this.info.is_required_login,
-          }, {
-            headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-          })
-          .then(function (response){
-            that.$notify.success({
-              title: '好耶',
-              message: '设置成功'
-            })
-          })
-          .catch(function (error){
-            that.$notify.error({
-              title: '出错啦',
-              message: '设置失败'
-            })
-          })
-    },
-    is_answer_once(){
-      if(this.info.is_only_answer_once && !this.info.is_required_login){
-        this.info.is_required_login = true;
-      }
-      const that = this;
-      axios
-          .patch('/api/questionnaire/' + that.info.id + '/', {
-            is_only_answer_once: this.info.is_only_answer_once,
-            is_required_login: this.info.is_required_login,
-          }, {
-            headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-          })
-          .then(function (response){
-            that.$notify.success({
-              title: '好耶',
-              message: '设置成功'
-            })
-          })
-          .catch(function (error){
-            that.$notify.error({
-              title: '出错啦',
-              message: '设置失败'
-            })
-          })
-    },
     check(){
       let s1 = Base64.encode('moyu' + this.$route.params.id + 'wenjuan');
       let url = window.location.origin+ "/check/" + s1; //预览链接
@@ -843,7 +688,7 @@ export default {
       var questionType = item.type
       // 切换编辑界面显示
       var temp = this.$refs[questionType+index][0]
-
+    
       if (this.editItem && this.editItem != temp){
         this.$notify.error("请完成之前题目编辑")
         this.$nextTick(_=>{
@@ -1170,7 +1015,7 @@ export default {
 .aside-mid{
   opacity: 0.95;
   background-color: #FFFFFF;
-  padding-top: 20px;
+  padding-top: 10px;
   margin-top: 10px !important;
   border-radius: 10px;
   padding-bottom: 10px;
@@ -1340,7 +1185,10 @@ export default {
 
 </style>
 <style>
-
+.el-collapse-item__header{
+  display: block !important;
+  text-align: end;
+}
 .el-submenu__title{
   font-size: 18px !important;
 }
