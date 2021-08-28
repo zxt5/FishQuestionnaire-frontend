@@ -12,7 +12,7 @@
               <h3>{{ (index+1) + '. ' + item.title}}</h3>
             </div>
             <!--          循环选项-->
-            <div v-for="optionItem in item.option_list" style="margin-top: 4px;">
+            <div v-for="optionItem in item.option_list" style="margin-top: 4px;" :key="optionItem.id">
 
               <div style="float: left;padding-left: 55px; min-width: 550px;max-width: 630px;color: darkblue">
                 <span>{{optionItem.title}}</span>

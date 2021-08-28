@@ -8,6 +8,7 @@
       <h1 class="title">{{info.title}}</h1>
       <div class="content" v-if="timeStamp===2">&nbsp;很抱歉，此问卷将于 {{startTime}} 开放！</div>
       <div class="content" v-if="timeStamp===3">&nbsp;很抱歉，此问卷已于 {{endTime}} 结束！</div>
+      <div class="content" v-if="timeStamp===4">&nbsp;恭喜，您已成功提交此问卷！</div>
       <div class="line" v-if="timeStamp!==1"></div>
       <el-button v-if="timeStamp!==1" type="primary" @click="toIndex">确定</el-button>
 
@@ -125,8 +126,6 @@
         :show-close= "false"
         width="30%"
         center
-        append-to-body
-        style="margin: 0 auto; display: block"
     >
       <!--        <div style="float: left">-->
       <!--          <span style="font-size: 17px">请输入密码：</span>-->
@@ -184,41 +183,78 @@ export default {
     let s1 = that.$route.params.text;
     s1 = Base64.decode(s1);
     s1 = s1.substring(4,s1.length - 7);
-    axios
-        .get('/api/questionnaire/' + parseInt(s1) + '/')
-        .then(function (response) {
-          that.info = response.data;
-          console.log(that.info);
-          if(that.info.is_start_time) {
-            var time = that.info.start_time;
-            var date = new Date(time).toJSON();
-            // console.log(date);
-            var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
-            // console.log(str);
-            that.startTime = str;
-            if(Date.parse(that.info.start_time) > Date.now()) {
-              that.timeStamp = 2;
-            }
-          }
-          if(that.info.is_end_time) {
-            var time = that.info.end_time;
-            var date = new Date(time).toJSON();
-            // console.log(date);
-            var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
-            // console.log(str);
-            that.endTime = str;
-            if(Date.parse(that.info.end_time) < Date.now()) {
-              that.timeStamp = 3;
-            }
-          }
-          console.log(that.timeStamp);
-        })
-        .catch(function (error){
-          that.$notify.error({
-            title: '好像发生了什么错误',
-            message: error.message
-          })
-        })
+    authorization()
+      .then(function (res){
+        axios
+            .get('/api/questionnaire/' + parseInt(s1) + '/')
+            .then(function (response) {
+              that.info = response.data;
+              if(that.info.is_required_login && !res[0]){
+                // localStorage.setItem('flag.myblog', 'true');
+                // localStorage.setItem('url.myblog', that.$route.params.text);
+                that.$store.commit('flag_true');
+                that.$store.commit('toUrl', that.$route.params.text);
+                that.$notify.warning({
+                  title: '请先登录',
+                  message: '发布者设置了登陆验证'
+                })
+                that.$router.push({path: '/login'});
+              }
+              // console.log(that.info);
+              if(that.info.is_start_time) {
+                var time = that.info.start_time;
+                var date = new Date(time).toJSON();
+                // console.log(date);
+                var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
+                // console.log(str);
+                that.startTime = str;
+                if(Date.parse(that.info.start_time) > Date.now()) {
+                  that.timeStamp = 2;
+                }
+              }
+              if(that.info.is_end_time) {
+                var time = that.info.end_time;
+                var date = new Date(time).toJSON();
+                // console.log(date);
+                var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
+                // console.log(str);
+                that.endTime = str;
+                if(Date.parse(that.info.end_time) < Date.now()) {
+                  that.timeStamp = 3;
+                }
+              }
+              if(that.info.is_only_answer_once){
+                const _that = that;
+                axios
+                    .put('/api/answer/check_answer/', {
+                      id: _that.info.id
+                    }, {
+                      headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+                    })
+                    .then(function (resp){
+                      console.log(resp.data)
+                      if(resp.data.has_answer === true){
+                        _that.timeStamp = 4;
+                      }
+                    })
+                    .catch(function (error){
+                      _that.$notify.error({
+                        title: '出错啦',
+                        message: '限制失败'
+                      })
+                    })
+              }
+              console.log(that.info.is_only_answer_once)
+              console.log(that.timeStamp);
+            })
+            .catch(function (error){
+              that.$notify.error({
+                title: '好像发生了什么错误',
+                message: error.message
+              })
+            })
+      })
+
   },
   methods: {
     resetPositioning() {
@@ -434,6 +470,8 @@ export default {
                 // cname: returnCitySN.cname,
                 questionnaire: that.info.id,
                 answer_list: that.submit_list,
+              }, {
+                headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
               .then(function (response){
                 let s1 = Base64.encode('moyu' + id + 'wenjuan');
