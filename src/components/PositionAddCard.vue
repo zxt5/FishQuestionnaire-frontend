@@ -122,9 +122,11 @@ export default {
           title: '表单有错误'});
         }
         const that = this;
+        this.questionForm.option_list[0].title = '正确答案'
         if(!this.flag){
           axios
               .post('/api/question/', {
+                option_list: that.questionForm.option_list,
                 title: that.questionForm.title,
                 content: that.questionForm.content,
                 type: that.questionForm.type,
@@ -155,6 +157,7 @@ export default {
         else{
           axios
               .patch('/api/question/' + that.flag + '/', {
+                option_list: that.questionForm.option_list,
                 title: that.questionForm.title,
                 content: that.questionForm.content,
                 type: that.questionForm.type,

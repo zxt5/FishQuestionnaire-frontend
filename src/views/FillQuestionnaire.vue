@@ -29,7 +29,7 @@
             <span style="color: lightgrey" v-if="item.type==='multiple-choice'">[多选题]</span>
             <span style="color: lightgrey" v-if="item.type==='completion'">[填空题]</span>
             <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]（默认评分0）</span>
-            <span style="color: lightgrey" v-if="item.type==='position'">[填空题]</span>
+            <span style="color: lightgrey" v-if="item.type==='position'">[定位题]</span>
           </div>
         </div>
         <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
@@ -113,7 +113,7 @@
         </v-app>
       </div>
 
-      <el-button v-if="timeStamp===1" type="primary" @click="click(info.id)">提交</el-button>
+      <el-button v-if="timeStamp===1" type="primary" @click="click(info.id)">提 交</el-button>
 <!--      <div class="line"></div>-->
 <!--      <div class="text2"> 摸鱼问卷 提供技术支持 </div>-->
     </div>
