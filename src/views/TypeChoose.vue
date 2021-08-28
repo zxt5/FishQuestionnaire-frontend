@@ -43,6 +43,7 @@
                       <v-btn
                           color="#3F87DA"
                           text
+                          @click="Create(item)"
                       >
                         create
                       </v-btn>
@@ -89,7 +90,8 @@ export default {
         {
           src: 'https://www.wjx.cn/images/newimg/pic-2/survey@2x.png',
           title: '普通问卷',
-          subtitle: '预览模板',
+          subtitle: '点击 CREATE 创建',
+          type: 'normal',
           show: false,
           content: '这是普通问卷的模板'
         },
@@ -97,6 +99,7 @@ export default {
           src: 'https://www.wjx.cn/images/newimg/pic-2/vote@2x.png',
           title: '投票问卷',
           subtitle: '预览模板',
+          type: 'vote',
           show: false,
           content: '这是投票问卷的模板'
         },
@@ -104,6 +107,7 @@ export default {
           src: 'https://www.wjx.cn/images/newimg/pic-2/form@2x.png',
           title: '报名问卷',
           subtitle: '预览模板',
+          type: 'signup',
           show: false,
           content: '这是报名问卷的模板'
         },
@@ -111,6 +115,7 @@ export default {
           src: 'https://www.wjx.cn/images/newimg/pic-2/exam@2x.png',
           title: '考试问卷',
           subtitle: '预览模板',
+          type: 'exam',
           show: false,
           content: '这是考试问卷的模板'
         },
@@ -118,6 +123,7 @@ export default {
           src: 'https://www.wjx.cn/images/newimg/pic-2/360-evaluate@2x.png',
           title: '健康打卡',
           subtitle: '预览模板',
+          type: 'epidemic-check-in',
           show: false,
           content: '这是健康打卡的模板'
         },
@@ -128,7 +134,40 @@ export default {
     back() {
       this.$router.push({path: '/index'});
     },
-
+    Create(item){
+      const that = this;
+      authorization()
+          .then(function (response) {
+            if(response[0]){
+              axios
+                  .post('api/questionnaire/',{
+                    title : item.title + '标题',
+                    content : item.title + '描述',
+                    type: item.type,
+                  }, {
+                    headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+                  })
+                  .then(function (response){
+                    // console.log(response.data);
+                    // that.dialog=false;
+                    that.$router.push({path: '/edit/' + response.data.id});
+                  }).catch(function (error){
+                // that.dialog=false;
+                that.$notify.error({
+                  title: '出错啦',
+                  message: '创建问卷失败',
+                })
+              })
+            }
+            else {
+              // that.dialog=false;
+              that.$notify.error({
+                title: '创建问卷失败',
+                message: '请先登录！'
+              })
+            }
+          })
+    }
   },
   mounted() {
 
