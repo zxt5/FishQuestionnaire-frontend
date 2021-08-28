@@ -136,7 +136,7 @@
           @end="onEnd"
           >
           <transition-group>              
-          <div class="card"  v-for="(item, index) in info.question_list" :key="item.id">
+          <div class="card"  v-for="(item, index) in info.question_list" :key="item.id ? item.id: item.key">
             <div style="padding: 20px">
             <div class="op">
               <ul>
@@ -154,7 +154,7 @@
                 <span style="color: lightgrey">[单选题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
               </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
                 {{item.content}}
               </div>
               <el-radio-group v-model="item.answer">
@@ -172,10 +172,10 @@
                 <span style="color: lightgrey">[多选题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
               </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
                 {{item.content}}
               </div>
-              <el-checkbox-group v-model="answer[item.ordering - 1]">
+              <el-checkbox-group v-model="item.answer">
                 <el-checkbox  v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex" >
                   {{subItem.title}}
                 </el-checkbox>
@@ -192,7 +192,7 @@
             <!--                        type="textarea" :clearable="true" resize="none">-->
             <!--              </el-input>-->
             <!--            </template>-->
-            <!--多项填空模板-->
+            <!--填空模板-->
             <template v-if="item.type === 'completion'">
               <div>
                 <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
@@ -200,31 +200,48 @@
                 <span style="color: lightgrey">[填空题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
               </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
                 {{item.content}}
               </div>
-              <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex" class="multiple-completion-input">
 <!--                <p style="margin-left:10px">{{subItem.title}}</p>-->
-                <el-input class="single-completion-input" :autosize="true"
-                          type="textarea" :clearable="true" resize="none" v-model="answer[item.ordering - 1][subIndex]"></el-input>
+              <el-input class="single-completion-input" :autosize="true"
+                        type="textarea" :clearable="true" resize="none" v-model="item.answer"></el-input>
+  
+            </template>
+            <!--定位模板-->
+            <template v-if="item.type == 'position'">
+              <div>
+                <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
+                <span style="margin-top: 20px"> {{item.title}} </span>
+                <span style="color: lightgrey">[定位题]</span>
+                <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
+                {{item.content}}
+              </div>
+                <br>
+                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+                <span style="margin-right:20px">  当前定位: </span>
+                <el-button :icon="positioning ? 'el-icon-loading':none" @click="getLocation">
+                  <span v-if="location">{{ location["省份"]+location["城市"] }}</span>
+                  <div v-show="!location && !positioning" >点击获取位置</div>
+                  <span v-show="positioning">
+                          &nbsp;
+                          等待获取中
+                          <span class="red">{{ countDown }}</span> 秒
+                      </span>
+                  </el-button>
               </div>
             </template>
-            <!--评分模板-->
-            <template v-if="item.type === 'scoring'">
+          <!--评分题-->
+          <template v-if="item.type === 'scoring'">
               <div>
                 <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
                 <span style="margin-top: 20px"> {{item.title}} </span>
                 <span style="color: lightgrey">[评分题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
               </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
                 {{item.content}}
               </div>
-<!--              <el-radio-group v-model="item.answer">-->
-<!--                <el-radio v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex">-->
-<!--                  {{subItem.title}}-->
-<!--                </el-radio>-->
-<!--              </el-radio-group>-->
               <el-slider class="scoring-input"
                   v-model="item.answer"
                   :step="1"
@@ -232,6 +249,7 @@
               >
               </el-slider>
             </template>
+
                 <!--单选题目框-->
             </div>
             
@@ -255,6 +273,8 @@
                     <!--    评分对话框-->
                     <scoring-add-card :ref="'scoring'+index" v-if="item.type === 'scoring'"></scoring-add-card>
 
+                    <position-add-card :ref="'position'+index" v-if="item.type == 'position'"></position-add-card>
+  
                   </div>
                 </el-collapse-transition>
             </div>
@@ -283,12 +303,14 @@
       </el-container>
     </el-container>
 
+
     <!--波浪-->
     <!--    <wave></wave>-->
-    <scoring-add-dialog ref="scoring"></scoring-add-dialog>
+    <!-- <scoring-add-dialog ref="scoring"></scoring-add-dialog>
     <single-completion-add-dialog ref="completion"></single-completion-add-dialog>
     <single-choice-add-dialog ref="single-choice"></single-choice-add-dialog>
     <multiple-choice-add-dialog ref="multiple-choice"> </multiple-choice-add-dialog>
+    <position-add-dialog ref="position"></position-add-dialog> -->
     <el-backtop></el-backtop>
   </div>
 </template>
@@ -302,26 +324,34 @@ import MultipleCompletionAddCard from '../components/MultipleCompletionAddCard.v
 import authorization from "@/utils/authorization";
 import ScoringAddCard from "../components/ScoringAddCard";
 import axios from "axios";
-import TitleContentDialog from '../components/TitleContentDialog.vue'
 import draggable from 'vuedraggable'
 // fade/zoom 等
 import 'element-ui/lib/theme-chalk/base.css';
 // collapse 展开折叠
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 import Vue from 'vue'
-import collapse from "../assets/js/collapse.js";
-import ScoringAddDialog from '../components/ScoringAddDialog.vue'
-import SingleCompletionAddDialog from '../components/SingleCompletionAddDialog.vue'
-import SingleChoiceAddDialog from '../components/SingleChoiceAddDialog.vue'
-import MultipleChoiceAddDialog from '../components/MultipleChoiceAddDialog.vue'
+
 Vue.component(CollapseTransition.name, CollapseTransition)
 
+import { loadBMap } from '../assets/js/loadBMap'
+import PositionAddCard from '../components/PositionAddCard.vue'
 
 export default {
-  components: {collapse, SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard, TitleContentDialog,draggable,  ScoringAddDialog, SingleCompletionAddDialog, SingleChoiceAddDialog, MultipleChoiceAddDialog},
+  components: {
+        PositionAddCard, SingleChoiceAddCard, 
+        Wave, MultipleChoiceAddCard, SingleCompletionAddCard, 
+        MultipleCompletionAddCard, 
+        ScoringAddCard,draggable,  
+  },
   data(){
+
     return {
-      // 菜单栏
+      BMap: null,
+      geolocation: null, // Geolocation对象实例
+      positioning: false, // 定位中
+      positioningInterval: null, // 定位倒计时计时器
+      countDown: 30, // 倒计时，单位秒
+      location: null, // 位置信息
       disabled: false,
       editPlace: {},
       menuList:[
@@ -368,6 +398,108 @@ export default {
     }
   },
   methods:{
+    resetPositioning() {
+      this.positioning = false
+      this.location = null
+      this.countDown = 30
+      clearInterval(this.positioningInterval)
+    },
+    getLocation() {
+        const _this = this
+        _this.geolocation = new _this.BMap.Geolocation()
+        if (_this.geolocation) {
+          // 开启SDK辅助定位，仅当使用环境为移动web混合开发，且开启了定位sdk辅助定位功能后生效
+          _this.geolocation.enableSDKLocation()
+          // 开始定位
+          this.positioning = true
+          // 倒计时
+          this.positioningInterval = setInterval(() => {
+            if (this.countDown === 0) {
+              this.countDown = 30
+              clearInterval(this.positioningInterval)
+            } else {
+              this.countDown--
+            }
+          }, 1000)
+          // 位置选项
+          const positionOptions = {
+            enableHighAccuracy: true, // 要求浏览器获取最佳结果
+            timeout: 30, //    超时时间
+            maximumAge: 0 // 允许返回指定时间内的缓存结果。如果此值为0，则浏览器将立即获取新定位结果
+          }
+          // 获取用户位置信息
+          _this.geolocation.getCurrentPosition(position => {
+            _this.resetPositioning()
+            // 获取定位结果状态码
+            const statusCode = _this.geolocation.getStatus()
+            let msg = '由于未知错误而无法检索设备的位置' // 提示消息
+            let msgType = 'error' // 消息类型
+            // 判断结果状态码，为0代表获取成功，读取省市、经纬度
+            switch (statusCode) {
+              case 0:
+                msgType = 'success'
+                msg = '获取地理位置定位请求成功'
+                if (position) {
+                  // 数据变量定义
+                  let lat = 0.0 // 经度
+                  let lng = 0.0 // 纬度
+                  let province = '未知' // 经度
+                  let city = '未知' // 纬度
+
+                  // 坐标
+                  if (position.point) {
+                    lat = position.point.lat
+                    lng = position.point.lng
+                  }
+                  // 位置
+                  if (position.address) {
+                    province = position.address.province
+                    city = position.address.city
+                  }
+                  _this.location = {
+                    省份: province,
+                    城市: city,
+                    经度: lat,
+                    纬度: lng
+                  }
+                } else {
+                  msg = '由于未知错误而无法检索设备的位置'
+                }
+                break
+              case 2:
+                msg = '由于未知错误而无法检索设备的位置'
+                break
+              case 4:
+              case 5:
+                msg = '位置服务请求非法'
+                break
+              case 6:
+                msg = '应用程序没有使用位置服务的权限'
+                break
+              case 7:
+                msg = '网络不可用或者无法连接到获取位置信息的卫星'
+                break
+              case 8:
+                msg = '无法在指定的最大超时间隔内检索位置信息'
+                break
+              default:
+                msg = '由于未知错误而无法检索设备的位置'
+                break
+            }
+            _this.$$notify[msgType]({
+              key: NotificationKey,
+              message: '提示',
+              description: msg
+            })
+          }, positionOptions)
+        } else {
+          _this.$$notify.error({
+            key: NotificationKey,
+            message: '提示',
+            description: '您的浏览器不支持地理位置服务'
+          })
+        }
+      },
     delete_time_control() {
       const that = this;
       if(this.control_time === false) {
@@ -486,17 +618,42 @@ export default {
       }
     },
     addQuestion(questionType){
-      this.$refs[questionType].addQuestion(questionType)
+      console.log("addQuestion", this.$refs, questionType)
+      // this.$refs[questionType].addQuestion(questionType)
+        this.info.question_list.push({
+            key: Date.now(),
+            option_list: [
+              {
+                title: '',
+                content:'',
+                ordering: 1,
+              },
+            ],
+            title: '',
+            content: '',
+            type: questionType,
+            questionnaire: this.$route.params.id,
+            is_must_answer: false,
+            is_show_result: false,
+            isShow: false
+        })
+        var index = this.info.question_list.length-1
+        this.$nextTick(_=>{
+          this.editQuestion(this.info.question_list[index], index)
+        })
     },
     editQuestion(item, index){
       var questionType = item.type
       // 切换编辑界面显示
-      console.log("editquestion", this.$refs, questionType+index)
+      console.log("editquestion", this.$refs[questionType+index][0])
       var temp = this.$refs[questionType+index][0]
-      var last= temp.addDialogVisible
-      console.log(last)
       temp.editQuestion(this.info.question_list[index])
-      if (last == !temp.addDialogVisible) item.isShow = !item.isShow
+
+      console.log("afteredit",this.info.question_list[index])
+      // 编辑成功才切换状态
+      if (temp.editSuccess){
+        item.isShow = !item.isShow
+      }
     },
     cardUp(index, item){
       if (index === 0){
@@ -589,6 +746,7 @@ export default {
     onStart() {
     this.drag = true;
     console.log("start")
+    console.log(this.info.question_list)
     },
 //拖拽结束事件
     onEnd(e) {
@@ -632,6 +790,11 @@ export default {
     // 添加成功的事件
   },
   mounted() {
+    const _this = this
+    window.initBaiduMapScript = () => {
+      _this.BMap = window.BMap
+    }
+    loadBMap('initBaiduMapScript')
     const that = this;
     authorization().then(function (response) {
       if(response[0]){
@@ -652,11 +815,24 @@ export default {
                   // message: '爬',
                 });
               }
+              that.menuList.push({
+                  name: "其他功能",
+                  type: "function",
+                  children:[
+                    {
+                      name: "定位",
+                      type: "position"
+                    },
+                  ]
+                })
+              if (that.info.type == "epidemic-check-in"){
+ 
+              }
               for (let item of that.info.question_list){
                 item["isShow"] = false
               }
               for (let item of that.info.question_list) {
-                that.answer.push([]);
+                item.answer = []
               }
             })
             .catch(function (error) {
@@ -877,7 +1053,7 @@ export default {
 }
 
 .single-completion-input, .multiple-completion-input{
-  margin-top: 20pt !important;
+  margin-top: 12px !important;
   width: 80% !important;
 }
 

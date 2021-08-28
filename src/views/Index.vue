@@ -151,7 +151,7 @@ export default {
 
   },
   mounted(){
-    console.log(returnCitySN);
+    console.log("city",returnCitySN);
     const that = this;
     authorization()
       .then(function (response){

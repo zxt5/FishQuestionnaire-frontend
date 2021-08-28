@@ -8,6 +8,12 @@ import vuetify from './plugins/vuetify'
 import Clipboard from "v-clipboard";
 import axios from 'axios';
 import htmlToPdf from "./components/htmlToPdf";
+import BaiduMap from 'vue-baidu-map'
+
+
+Vue.use(BaiduMap, {
+  ak: 'cTsGIgzbOe4eeNykwqYy6m0lVHvWTtnF'
+});
 const echarts = require('echarts');
 let Base64 = require('js-base64').Base64;
 Vue.config.productionTip = false

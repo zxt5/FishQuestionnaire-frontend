@@ -48,15 +48,7 @@ export default {
   name: "scoring-addcard",
   data(){
     return{
-      addDialogVisible : false,
-      // title: '',
-      // content: '',
-      // type: '',
-      // ordering: 0,
-      // questionnaire: 0,
-      // is_must_answer: false,
-      // option_list: [],
-      // answer: '',
+      editSuccess: true,
       flag : 0,//判断创建还是修改问题
       questionForm: {
         title: '',
@@ -98,15 +90,17 @@ export default {
     addQuestion(questionType){
       this.resetForm(questionType)
       this.flag = 0
-      this.addDialogVisible = true
     },
     editQuestion(question){
-      if (this.addDialogVisible) {
-        this.finishQuestion()
+      if (question.isShow) {
+        this.editSuccess = true
+        this.finishQuestion(question)
         return 
       }
-      this.addDialogVisible = true
+      // 置空选项
+      question.option_list = []
       this.questionForm = question
+      console.log("answer", question.answer)
       this.flag = question.id
     },
     addChoice(title) {
@@ -124,15 +118,15 @@ export default {
       }
     },
 
-    finishQuestion(){
-      console.log(this.questionForm.answer);
+    finishQuestion(question){
       this.$refs.questionFormRef.validate(valid => {
-        if (!valid) return this.$notify.error({
-          title: '表单有错误'
-        });
-        this.addDialogVisible = false;
+        if (!valid){
+          this.editSuccess = false
+          return this.$notify.error({
+          title: '表单有错误'});
+        }
         const that = this;
-        if(this.flag === 0){
+        if(!this.flag){
           for(var i = 0; i <= that.questionForm.answer; ++i){
             that.addChoice(i);
           }
@@ -145,18 +139,27 @@ export default {
                 ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
+                is_show_result: that.questionForm.is_show_result
               })
               .then(function (response){
-                // that.reload();
+                // that.reload();'
+                that.editSuccess = true
                 that.$notify.success({
                   title: '保存成功'
                 })
+                var data = response.data
+                for (var key in data){
+              　　if(data.hasOwnProperty(key)){
+                    question[key] = data[key]
+                  }
+                }
               })
               .catch(function (error){
                 that.$notify.error({
                   title: '出错啦',
                   message: '编辑失败'
                 })
+                that.questionForm.isShow = true
               })
         }
         else{
@@ -172,9 +175,11 @@ export default {
                 ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
+                is_show_result: that.questionForm.is_show_result
               })
               .then(function (response){
                 // that.reload();
+                that.editSuccess = true
                 that.$notify.success({
                   title: '保存成功'
                 })
@@ -184,6 +189,7 @@ export default {
                   title: '出错啦',
                   message: '编辑失败'
                 })
+                that.questionForm.isShow = true
               })
         }
         // console.log(this.$parent.info.questions_list.length);
@@ -200,7 +206,6 @@ export default {
 
     cancelQuestion(){
       this.$refs.questionFormRef.resetFields()
-      this.addDialogVisible = false
     }
 
   }
