@@ -71,15 +71,20 @@
 
 <!--        评分题展示-->
         <v-app class="choice" style="margin-top: 20px" v-if="item.type==='scoring'">
-          <v-card-text>
-            <v-slider
+          <div style="display: inline-block">
+            <v-rating
+                style="float: left !important;"
+                color="primary"
+                empty-icon="mdi-star-outline"
+                full-icon="mdi-star"
+                half-icon="mdi-star-half-full"
+                hover
+                :length="item.option_list.length - 1"
+                size="30"
                 v-model="item.answer"
-                step="1"
-                thumb-label
-                ticks="always"
-                :max="item.option_list.length - 1"
-            ></v-slider>
-          </v-card-text>
+            ></v-rating>
+            <div style="margin: 6px 20px; float: left !important; font-size: 22px">{{ item.answer }}</div>
+          </div>
         </v-app>
 <!--        定位题展示-->
         <v-app class="choice" v-if="item.type==='position'">

@@ -310,12 +310,12 @@
               <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
                 {{item.content}}
               </div>
-              <el-slider class="scoring-input"
+              <el-rate class="scoring-input"
                   v-model="item.answer"
-                  :step="1"
                   :max="item.option_list.length - 1"
+                  show-score
               >
-              </el-slider>
+              </el-rate>
             </template>
 
             <div v-show="item.is_scoring" style="margin-top: 20px; color: #F56C6C">本题分值: {{item.question_score}}</div>
@@ -1326,9 +1326,8 @@ export default {
   transform: translate(-50%,0);
 }
 
-
 .single-completion-input, .multiple-completion-input{
-  margin-top: 12px !important;
+  margin: 20px 10px !important;
   width: 80% !important;
 }
 
@@ -1338,6 +1337,9 @@ export default {
     opacity: 0.5;
 }
 
+.el-rate{
+  margin: 20px 10px;
+}
 </style>
 <style>
 
@@ -1347,11 +1349,17 @@ export default {
 .el-menu-item{
   font-size: 16px !important;
 }
-
-.el-slider__runway{
-  width: 80% !important;
-  margin: 60px 10px !important;
+.el-rate__icon {
+  font-size: 30px !important;
+  margin-right: 15px !important;
 }
+.el-rate__text {
+  font-size: 20px !important;
+}
+/*.el-slider__runway{*/
+/*  width: 80% !important;*/
+/*  margin: 60px 10px !important;*/
+/*}*/
 .el-textarea .el-input__count{
   background-color: transparent !important;
 }
