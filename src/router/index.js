@@ -14,6 +14,7 @@ import NotFound from "../views/NotFound";
 import Thank from "../views/Thank";
 import Welcome from "../views/Welcome";
 import TypeChoose from "../views/TypeChoose";
+import ExamQuestionnairs from "../views/ExamQuestionnairs.vue"
 
 Vue.use(VueRouter)
 

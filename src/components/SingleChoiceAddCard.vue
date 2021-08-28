@@ -21,14 +21,26 @@
                   v-model="questionForm.content" :autosize="true"
                   type="textarea" :clearable="true" resize="none"> </el-input>
       </el-form-item>
-      <el-form-item >
+      <el-form-item label="设置">
 
         <el-checkbox label="是否必填"
           v-model="questionForm.is_must_answer"></el-checkbox>
           
         <el-checkbox label="是否显示结果" v-model="questionForm.is_show_result"></el-checkbox>
+
+        <el-checkbox label="是否考试题" v-model="questionForm.is_scoring"></el-checkbox>
       </el-form-item>
 
+      <div style="display: flex;
+            margin-bottom: 20px;"> 
+        <span style="margin-left:3%">选项</span> 
+        <span style="margin-left:20%">选项内容</span>
+        <span style="margin-left:35%"><span v-show="questionForm.is_scoring"> 正确答案</span></span>
+        <span style="margin-left:12%">按钮</span>
+        </div>
+<el-divider></el-divider>
+
+      <el-radio-group style="width:100%" @click.native="debugShow" v-model="questionForm.answer">
       <el-form-item
           v-for="(option, index) in questionForm.option_list"
           :label="'选项 ' + (index + 1) "
@@ -40,14 +52,19 @@
       >
         <el-input v-model="option.title" class="choiceinput">
         </el-input >
-        <el-button @click.prevent="removeChoice(option)" type="danger">删除</el-button>
+        <el-radio  v-show="questionForm.is_scoring" :label="index"><span></span></el-radio>
+        <el-button @click.prevent="removeChoice(option)" type="danger" style="margin-left: 60px">删除</el-button>
       </el-form-item>
+      </el-radio-group>
+      <el-form-item label="题目分数"  prop="question_score"  v-show="questionForm.is_scoring">
+        <el-input-number v-model="questionForm.question_score" :step="1"></el-input-number>
+      </el-form-item>
+
     </el-form>
     <div class="dialog-footer">
       <el-button icon="el-icon-edit" @click="addChoice" type="primary">新增选项</el-button>
       <div>
         <span>
-          
         </span>
       </div>
     </div>
@@ -74,7 +91,9 @@ export default {
         is_must_answer: false,
         option_list: [
         ],
-        answer: ''
+        answer: '',
+        is_show_result: false,
+        is_scoring: false
       },
       questionFormRules:{
         title:[
@@ -83,7 +102,7 @@ export default {
             message: '你的题目呢',
             trigger: 'blur'
           }
-        ]
+        ],
       }
     }
   },
@@ -140,6 +159,14 @@ export default {
           title: '请至少添加一个选项噢~'})
         }
         const that = this;
+        if (that.questionForm.is_scoring){
+          for (var option in that.questionForm.option_list){
+              that.questionForm.option_list[option].is_answer_choice = false
+          }
+          var index = that.questionForm.answer
+          that.questionForm.option_list[index].is_answer_choice = true
+        }
+
         if(!this.flag){
           axios
               .post('/api/question/', {
@@ -147,10 +174,11 @@ export default {
                 title: that.questionForm.title,
                 content: that.questionForm.content,
                 type: that.questionForm.type,
-                ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
-                is_show_result: that.questionForm.is_show_result
+                is_show_result: that.questionForm.is_show_result,
+                is_scoring: that.questionForm.is_scoring,
+                question_score: that.questionForm.question_score
               }, {
                 headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
@@ -165,6 +193,12 @@ export default {
                     question[key] = data[key]
                   }
                 }
+                for (let i = 0; i < question.option_list.length; i++){
+                    if (question.option_list[i].is_answer_choice){
+                        question.answer = i
+                    }
+                }
+
               })
               .catch(function (error){
                 that.$notify.error({
@@ -185,7 +219,9 @@ export default {
                 ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
-                is_show_result: that.questionForm.is_show_result
+                is_show_result: that.questionForm.is_show_result,
+                is_scoring: that.questionForm.is_scoring,
+                question_score: that.questionForm.question_score
               }, {
                 headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
@@ -205,10 +241,9 @@ export default {
         }
       })
     },
-    cancelQuestion(){
-      this.$refs.questionFormRef.resetFields()
+    debugShow(){
+      console.log("debug", this.questionForm)
     }
-
   }
 }
 </script>
@@ -222,9 +257,10 @@ export default {
   color: #fff;
 }
 .choiceinput{
-  width: 70%;
+  width: 60%;
   margin-right: 10%;
 }
+
 </style>
 <style>
 .dialog-footer{

@@ -22,15 +22,27 @@
                   v-model="questionForm.content" :autosize="true"
                   type="textarea" :clearable="true" resize="none"> </el-input>
       </el-form-item>
-      <el-form-item >
+      <el-form-item label="设置">
 
         <el-checkbox label="是否必填"
           v-model="questionForm.is_must_answer"></el-checkbox>
           
         <el-checkbox label="是否显示结果" v-model="questionForm.is_show_result"></el-checkbox>
+        <el-checkbox label="是否考试题" v-model="questionForm.is_scoring"></el-checkbox>
       </el-form-item>
 
+      <div style="display: flex;
+            margin-bottom: 20px;"> 
+        <span style="margin-left:3%">选项</span> 
+        <span style="margin-left:20%">选项内容</span>
+        <span style="margin-left:35%"><span v-show="questionForm.is_scoring"> 正确答案</span></span>
+        <span style="margin-left:12%">按钮</span>
+        </div>
+      <el-divider></el-divider>
 
+      <!-- <el-checkbox-group 
+      @click.native="debugShow(questionForm.answer)"
+       v-model="questionForm.answer" style="width:100%"> -->
       <el-form-item
           v-for="(option, index) in questionForm.option_list"
           :label="'选项 ' + (index + 1) "
@@ -38,12 +50,23 @@
           :prop="'option_list.' + index + '.title'"
           :rules="{
                     required: true,  message: '内容不能为空', trigger: 'blur'
-                }"
-      >
+                }">
         <el-input v-model="option.title" class="choiceinput">
         </el-input >
-        <el-button @click.prevent="removeChoice(option)" type="danger">删除</el-button>
+
+        <el-checkbox 
+        v-model="option.is_answer_choice"
+        v-show="questionForm.is_scoring" :label="index">
+          <span></span>
+        </el-checkbox>
+
+        <el-button @click.prevent="removeChoice(option)" type="danger" style="margin-left: 80px">删除</el-button>
       </el-form-item>
+      <!-- </el-checkbox-group> -->
+      <el-form-item label="题目分数" v-show="questionForm.is_scoring">
+        <el-input-number v-model="questionForm.question_score" :step="1"></el-input-number>
+      </el-form-item>
+
     </el-form>
     <div class="dialog-footer">
       <el-button icon="el-icon-edit" @click="addChoice" type="primary">新增选项</el-button>
@@ -151,7 +174,9 @@ export default {
                 ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
-                is_show_result: that.questionForm.is_show_result
+                is_show_result: that.questionForm.is_show_result,
+                is_scoring: that.questionForm.is_scoring,
+                question_score: that.questionForm.question_score
               })
               .then(function (response){
                 // that.reload();
@@ -184,7 +209,9 @@ export default {
                 ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
-                is_show_result: that.questionForm.is_show_result
+                is_show_result: that.questionForm.is_show_result,
+                is_scoring: that.questionForm.is_scoring,
+                question_score: that.questionForm.question_score
               })
               .then(function (response){
                 // that.reload();
@@ -203,12 +230,9 @@ export default {
         }
       })
     },
-
-    cancelQuestion(){
-      this.$refs.questionFormRef.resetFields()
-      this.addDialogVisible = false
+    debugShow(item){
+      console.log("item", item)
     }
-
   }
 }
 </script>
@@ -217,7 +241,7 @@ export default {
   color: #fff;
 }
 .choiceinput{
-  width: 70%;
+  width: 60%;
   margin-right: 10%;
 }
 .dialog-footer{
