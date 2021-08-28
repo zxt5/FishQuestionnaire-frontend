@@ -459,6 +459,7 @@ export default {
     handleClick(tab, event) {
       // console.log(tab, event);
       // console.log(this.activeName)
+      if(this.activeName === 'first') this.haveGend = false;
     },
     downloadExcel() {
       let a = document.createElement('a')
