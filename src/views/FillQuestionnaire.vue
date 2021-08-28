@@ -3,6 +3,8 @@
 <!--    <div class="reminder"  v-if="info.status==='closed'">-->
 <!--      <h4>摸小鱼温馨提示：当前问卷处于关闭状态，无法提交哦~</h4>-->
 <!--    </div>-->
+
+
     <div class="questionnaire">
       <!--标题-->
       <h1 class="title">{{info.title}}</h1>
@@ -97,6 +99,29 @@
 
 
     </div>
+
+    <el-dialog
+        title="问卷已加密！"
+        center
+        :visible.sync="info.is_locked"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close= "false"
+        width="30%"
+    >
+      <div>
+        <div style="float: left">
+          <span style="font-size: 17px">请输入密码：</span>
+        </div>
+        <div style="float: left; margin-left: 10px">
+          <el-input placeholder="请输入密码" v-model="password" show-password v-on:keyup.enter.native="check_password"></el-input>
+        </div>
+      </div>
+      <div style="margin-top: 100px;">
+        <el-button style="" type="primary" @click="check_password">确 定</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 
 </template>
@@ -118,6 +143,8 @@ export default {
       info: '',
       submit_list: [],
       flag: true,
+      // dialogVisible: true,
+      password: '',
     }
   },
   mounted() {
@@ -136,6 +163,21 @@ export default {
         })
   },
   methods: {
+    check_password() {
+      if(this.password === this.info.password) {
+        this.$notify.success({
+          title: '通过验证！',
+          message: '开始填写问卷吧~'
+        })
+        this.info.is_locked = false;
+      }
+      else {
+        this.$notify.error({
+          title: '密码错误!',
+          message: '请重新输入~'
+        })
+      }
+    },
     click(id){
       let tmp;
       const that = this;
@@ -242,6 +284,10 @@ export default {
 
 
 <style scoped>
+
+.el-dialog__wrapper >>> .el-dialog {
+  border-radius: 10px !important;
+}
 
 .content {
   /*text-align: center;*/
