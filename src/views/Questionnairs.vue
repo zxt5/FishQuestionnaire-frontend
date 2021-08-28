@@ -154,7 +154,7 @@
               <el-collapse v-model="info.isShow" class="question-container" @change="editTitle(info)">
                 <el-collapse-item >
                     <template slot="title">
-                        <span >  编辑标题和简介 </span>
+                        <span style="margin-left: 85%">  编辑标题和简介 </span>
                     </template>
                     <title-content-dialog ref="title-content-dialog"></title-content-dialog>
                 </el-collapse-item>
@@ -1196,10 +1196,7 @@ export default {
 
 </style>
 <style>
-.el-collapse-item__header{
-  display: block !important;
-  text-align: end;
-}
+
 .el-submenu__title{
   font-size: 18px !important;
 }

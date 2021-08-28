@@ -8,7 +8,7 @@
     <el-container class="main" id="pdfDom">
       <!--图像区域-->
       <el-main style="height: fit-content" class="questionnaire">
-        <el-tabs v-model="activeName" @tab-click="handleClick" style="margin-bottom: 20px;font-size: large">
+        <el-tabs v-model="activeName" @tab-click="handleClick" style="margin-bottom: 20px;font-size: large;margin-left: 2%">
           <el-tab-pane label="统计分析" name="first"></el-tab-pane>
           <el-tab-pane label="交叉分析" name="second"></el-tab-pane>
         </el-tabs>
@@ -112,19 +112,39 @@
             <el-button class="button" plain @click="add2" v-if="cross2.length < 10">新增题目</el-button>
           </div>
 
+          <!--        <el-divider/>-->
         </div>
+        <el-divider style="margin-top: 3%"/>
+        <div v-if="activeName==='second'" style="margin-top: 5%">
+          <div style="text-align: center">
+            <el-button  type="primary" @click="crossGen()">生成</el-button>
+          </div>
 
-
-
-<!--        <el-divider/>-->
-        <el-button  type="primary" @click="crossGen()">生成</el-button>
-        <el-divider/>
-        <div v-for="(i, index) in table_list">
-<!--          <div v-for="(j, jndex) in info.question_list">-->
-            <div :id="'1-1-' + index" :ref="'1-1-' + index" class="image-div">
+          <el-collapse v-if="haveGend">
+            <div v-for="(i, index) in table_list">
+              <el-collapse-item >
+                <template slot="title">
+                  <div>
+                    <span style="margin: 0 6px 0;color: darkgray" v-if="table_list[index].question_x.type==='single-choice'"> [单选题] </span>
+                    <span style="margin: 0 6px 0;color: darkgray" v-if="table_list[index].question_x.type==='multiple-choice'"> [多选题] </span>
+                    <span style="margin: 0 6px 0;">{{ table_list[index].question_x.title}}</span>
+                    <v-icon>mdi-arrow-left-right-bold</v-icon>
+                    <span style="margin: 0 6px 0;color: darkgray" v-if="table_list[index].question_y.type==='single-choice'"> [单选题] </span>
+                    <span style="margin: 0 6px 0;color: darkgray" v-if="table_list[index].question_y.type==='multiple-choice'"> [多选题] </span>
+                    <span>{{table_list[index].question_y.title}}</span>
+                  </div>
+                </template>
+                      <div :id="'1-1-' + index" :ref="'1-1-' + index" class="image-div"></div>
+              </el-collapse-item>
             </div>
-<!--          </div>-->
+          </el-collapse>
+
+
         </div>
+
+
+
+
 
 
       </el-main>
@@ -145,6 +165,7 @@ export default {
 
   data(){
     return {
+      haveGend:false,
       placeHoledStyle: {
         normal: {
           barBorderColor: 'rgba(0,0,0,0)',
@@ -240,64 +261,64 @@ export default {
       ],
       name:["111","222"],
       table_list : [
-        {
-          question_x : {
-            title: "问题1",
-            type : "single-choice",
-            ordering : 1
-          },
-          question_y : {
-            title: "问题2",
-            type : "multiple-choice",
-            ordering : 2,
-          },
-          option_x_list : [
-            {
-              id : 231,
-              title : "23号问题的选项1",
-              num : 10, //小计
-              cnt : 2,
-              option_y_list : [
-                {
-                  id: 241,
-                  title: "24号问题的选项1",
-                  num : 10,
-                  percent: 100.0,
-                  percent_string: "100.00%"
-                },
-                {
-                  id : 242,
-                  title: "24号问题的选项2",
-                  num : 0,
-                  percent: 0.0,
-                  percent_string: "0.00%"
-                }
-              ]
-            },
-            {
-              id : 232,
-              title : "23号问题的选项2",
-              num : 3, //小计
-              cnt : 2,
-              option_y_list : [
-                {
-                  id : 241,
-                  title: "24号问题的选项1",
-                  num : 2,
-                  percent: 0.0,
-                  percent_string: "0.00%"
-                },
-                {
-                  id : 242,
-                  title: "24号问题的选项2",
-                  num : 1,
-                  percent: 0.0,
-                  percent_string: "0.00%"
-                }
-              ]
-            }
-          ]
-        }
+        // {
+        //   question_x : {
+        //     title: "问题1",
+        //     type : "single-choice",
+        //     ordering : 1
+        //   },
+        //   question_y : {
+        //     title: "问题2",
+        //     type : "multiple-choice",
+        //     ordering : 2,
+        //   },
+        //   option_x_list : [
+        //     {
+        //       id : 231,
+        //       title : "23号问题的选项1",
+        //       num : 10, //小计
+        //       cnt : 2,
+        //       option_y_list : [
+        //         {
+        //           id: 241,
+        //           title: "24号问题的选项1",
+        //           num : 10,
+        //           percent: 100.0,
+        //           percent_string: "100.00%"
+        //         },
+        //         {
+        //           id : 242,
+        //           title: "24号问题的选项2",
+        //           num : 0,
+        //           percent: 0.0,
+        //           percent_string: "0.00%"
+        //         }
+        //       ]
+        //     },
+        //     {
+        //       id : 232,
+        //       title : "23号问题的选项2",
+        //       num : 3, //小计
+        //       cnt : 2,
+        //       option_y_list : [
+        //         {
+        //           id : 241,
+        //           title: "24号问题的选项1",
+        //           num : 2,
+        //           percent: 0.0,
+        //           percent_string: "0.00%"
+        //         },
+        //         {
+        //           id : 242,
+        //           title: "24号问题的选项2",
+        //           num : 1,
+        //           percent: 0.0,
+        //           percent_string: "0.00%"
+        //         }
+        //       ]
+        //     }
+        //   ]
+        // }
       ],
   }
   },
@@ -402,6 +423,8 @@ export default {
       for (let item of this.cross2) {
         if(item.value !== '') question_y_list.push(item.value);
       }
+      if(question_x_list.length === 0 || question_y_list.length === 0) return;
+      this.haveGend = true;
       const that = this;
       axios.put('/api/questionnaire/' + this.info.id + '/cross-analysis/', {
         question_x_list : question_x_list,
@@ -410,7 +433,7 @@ export default {
         headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
       }
       ).then(function (response) {
-        console.log(response.data);
+        console.log(response.data.table_list);
         that.table_list = response.data.table_list;
       })
       setTimeout(()=>{
@@ -440,8 +463,8 @@ export default {
       this.cross2.splice(index, 1);
     },
     handleClick(tab, event) {
-      console.log(tab, event);
-      console.log(this.activeName)
+      // console.log(tab, event);
+      // console.log(this.activeName)
     },
     downloadExcel() {
       let a = document.createElement('a')
@@ -469,7 +492,7 @@ export default {
           for (let ii of subItem.option_y_list) {
             tmp.push(ii.num);
           }
-          console.log(tmp);
+          // console.log(tmp);
           tmpMat.push({
             name: subItem.title,
             type: 'bar',
@@ -490,8 +513,8 @@ export default {
         }
         this.crossName_x.push(tmpName_x);
         this.crossName_y.push(tmpName_y);
-        console.log(tmpName_x)
-        console.log(tmpName_y)
+        // console.log(tmpName_x)
+        // console.log(tmpName_y)
       }
     },
     genrateCross(index, eid) {
