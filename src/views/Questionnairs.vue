@@ -46,7 +46,7 @@
               </div>
               <!--            时间控制-->
               <div class="time_control" style="margin-top: 20px">
-                <span style="padding-left: 15px">时间控制</span>
+                <span style="padding-left: 16px">时间控制</span>
                 <el-switch
                     style="float: right; padding-right: 20px"
                     @change="delete_time_control"
@@ -84,7 +84,7 @@
                     </div>
                   </div>
                   <!--                保存按钮-->
-                  <div style="padding-left: 190px;margin-top: 15px;">
+                  <div style="padding-left: 200px;margin-top: 15px;">
                     <el-button
                         size="mini"
                         type="primary"
@@ -106,6 +106,40 @@
                     inactive-color="#ff4949">
                 </el-switch>
               </div>
+<!--              问卷设置密码-->
+              <div style="margin-top: 15px">
+                <span style="padding-left: 15px; margin-top: 30px">是否加密问卷</span>
+                <el-switch
+                    style="float: right; padding-right: 20px"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949"
+                    v-model="info.is_locked"
+                    @change="set_islocked"
+                >
+                </el-switch>
+                <div v-if="info.is_locked" style="margin-top: 15px;padding-left: 15px">
+                  <span style="color: #555555;font-size: 15px">设置密码:</span>
+                  <el-input
+                      placeholder="请输入密码"
+                      v-model="info.password"
+                      show-password
+                      v-on:keyup.enter.native="set_password"
+                      style="min-width: 180px;max-width: 180px;margin-left: 10px"
+                  >
+                  </el-input>
+                  <div style="padding-left: 185px;margin-top: 15px;">
+                    <el-button
+                        size="mini"
+                        type="primary"
+                        @click="set_password"
+                    >
+                      保存更改
+                    </el-button>
+                  </div>
+                </div>
+
+              </div>
+
             </el-menu>
           </el-aside>
         </a-affix>
@@ -185,17 +219,6 @@
               </el-checkbox-group>
             </template>
             <!--单项填空模板-->
-            <!--            <template v-if="item.type === 'completion'">-->
-            <!--              <div>-->
-            <!--                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>-->
-            <!--                <span>{{(index+1)}}. </span>-->
-            <!--                <span style="margin-top: 20px"> {{item.title}} </span>-->
-            <!--              </div>-->
-            <!--              <el-input v-model="item.answer" class="single-completion-input" :autosize="true"-->
-            <!--                        type="textarea" :clearable="true" resize="none">-->
-            <!--              </el-input>-->
-            <!--            </template>-->
-            <!--填空模板-->
             <template v-if="item.type === 'completion'">
               <div>
                 <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
@@ -307,13 +330,6 @@
     </el-container>
 
 
-    <!--波浪-->
-    <!--    <wave></wave>-->
-    <!-- <scoring-add-dialog ref="scoring"></scoring-add-dialog>
-    <single-completion-add-dialog ref="completion"></single-completion-add-dialog>
-    <single-choice-add-dialog ref="single-choice"></single-choice-add-dialog>
-    <multiple-choice-add-dialog ref="multiple-choice"> </multiple-choice-add-dialog>
-    <position-add-dialog ref="position"></position-add-dialog> -->
     <el-backtop></el-backtop>
   </div>
 </template>
@@ -402,6 +418,59 @@ export default {
     }
   },
   methods:{
+    set_password() {
+      const that = this;
+      if(this.info.password === '') {
+        that.$notify.error({
+          title: '密码不能为空！',
+          message: '请输入密码！'
+        })
+      }
+      else {
+        axios
+            .patch('/api/questionnaire/' + that.info.id + '/', {
+              is_locked: true,
+              password: this.info.password,
+            }, {
+              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+            })
+            .then(function (response){
+              that.$notify.success({
+                title: '设置成功',
+                message: '设置密码成功！'
+              })
+            })
+            .catch(function (error){
+              that.$notify.error({
+                title: '出错啦',
+                message: '设置密码失败！'
+              })
+            })
+      }
+    },
+    set_islocked() {
+      const that = this;
+      if(this.info.is_locked === false) {
+        axios
+            .patch('/api/questionnaire/' + that.info.id + '/', {
+              is_locked: false
+            }, {
+              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+            })
+            .then(function (response){
+              that.$notify.success({
+                title: '编辑成功',
+                message: '问卷已解锁！'
+              })
+            })
+            .catch(function (error){
+              that.$notify.error({
+                title: '出错啦',
+                message: '解锁问卷失败'
+              })
+            })
+      }
+    },
     resetPositioning() {
       this.positioning = false
       this.location = null
@@ -555,8 +624,6 @@ export default {
       else {
         var fl = 1;
         if(this.info.is_start_time && this.info.is_end_time) {
-            // console.log(this.info.start_time);
-            // console.log(this.info.end_time);
             if(Date.parse(this.info.start_time) > Date.parse(this.info.end_time)) {
               fl = 0;
             }
