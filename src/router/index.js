@@ -114,7 +114,7 @@ const routes = [
     }
   },
   {
-    path: '/thank',
+    path: '/thank/:text',
     name: 'Thank',
     component: Thank,
     meta:{

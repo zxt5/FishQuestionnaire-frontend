@@ -48,11 +48,6 @@
         </v-app>
 
         <!--多选题展示-->
-        <!--        <el-checkbox-group v-if="item.type==='multiple-choice'" v-model="answer_list[index]" onload>-->
-        <!--          <div class="multiple_choice"  v-for="optionItem in item.option_list">-->
-        <!--            <el-checkbox :label="optionItem.ordering" style="margin: 5px;">{{ optionItem.title }}{{optionItem.content}}</el-checkbox>-->
-        <!--          </div>-->
-        <!--        </el-checkbox-group>-->
         <v-app class="choice" v-if="item.type==='multiple-choice'">
           <v-container fluid>
             <v-checkbox
@@ -66,17 +61,6 @@
         </v-app>
 
         <!--填空题展示-->
-        <!--        <el-input style="padding-left: 12px; padding-top: 5px; width: 98%"-->
-        <!--                  placeholder="请在此输入答案~"-->
-        <!--                  v-if="item.type==='completion'"-->
-        <!--                  type="textarea"-->
-        <!--                  maxlength="150"-->
-        <!--                  show-word-limit-->
-        <!--                  :autosize="{minRows: 2}"-->
-        <!--                  :rows="item.row"-->
-        <!--                  v-model="answer_list[index]"-->
-        <!--                  resize="none">-->
-        <!--        </el-input>-->
         <v-app class="choice" v-if="item.type==='completion'">
           <v-text-field
               v-model="item.answer"
@@ -143,7 +127,6 @@ export default {
             that.$router.push({path: '/index'});
             that.$notify.error({
               title: '您无权预览此问卷',
-              // message: '爬',
             });
           }
         })
@@ -156,7 +139,6 @@ export default {
   },
   methods: {
     click(){
-      // if(this.info.status==='closed') alert('此问卷暂未发布，无法填写！');
       this.$notify.warning({
         title: '当前为预览',
         message: '无法提交'
