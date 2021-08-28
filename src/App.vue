@@ -63,4 +63,8 @@ html{
   right: 0;
   z-index: -5;
 }
+
+.password_dialog {
+  border-radius: 10px;
+}
 </style>

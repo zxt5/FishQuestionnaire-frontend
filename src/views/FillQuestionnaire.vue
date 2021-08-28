@@ -3,7 +3,7 @@
     <div class="reminder"  v-if="info.status==='closed'">
       <h4>摸小鱼温馨提示：当前问卷处于关闭状态，无法提交哦~</h4>
     </div>
-    <div class="questionnaire">
+    <div class="questionnaire" v-if="info.is_locked === false">
       <!--标题-->
       <h1 class="title">{{info.title}}</h1>
       <div class="content" v-if="timeStamp===2">&nbsp;很抱歉，此问卷将于 {{startTime}} 开放！</div>
@@ -19,7 +19,8 @@
         <div slot="header">
           <div class="questionTitle">
             <!--显示必填标识-->
-            {{(index+1)+'. '+item.title}}
+            <span v-if="info.is_show_question_num">{{(index+1)+'. '}}</span>
+            {{item.title}}
             <span style="color: #F56C6C;">
             <span v-if="item.is_must_answer">*</span>
           </span>
@@ -34,32 +35,47 @@
         </div>
         <!--单选题展示-->
         <v-app class="choice" v-if="item.type==='single-choice'">
-          <v-container
-              class="px-0"
-              fluid
-          >
-            <v-radio-group v-model="item.answer">
-              <v-radio
-                  v-for="optionItem in item.option_list"
-                  :key="optionItem.id"
-                  :label="optionItem.title"
-              ></v-radio>
-            </v-radio-group>
+          <v-container class="px-0" fluid >
+<!--            遍历选项-->
+            <div style="float: left;">
+              <v-radio-group v-model="item.answer" >
+                <div v-for="optionItem in item.option_list">
+                  <div style="float: left;min-width: 460px;max-width: 560px">
+                    <v-radio
+                        style="float: left"
+                        :key="optionItem.id"
+                        :label="optionItem.title "
+                    ></v-radio>
+                  </div>
+                  <div v-if="item.is_show_result" style="float: right;padding-left: 30px;">
+                    <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
+                  </div>
+                </div>
+              </v-radio-group>
+            </div>
           </v-container>
         </v-app>
 
+        <!--多选题展示-->
         <v-app class="choice" v-if="item.type==='multiple-choice'">
           <v-container fluid>
-            <v-checkbox
-                v-for="optionItem in item.option_list"
-                :key="optionItem.id"
-                :label="optionItem.title"
-                v-model="optionItem.is_answer_choice"
-                hide-details
-            ></v-checkbox>
+            <div style="float: left" v-for="optionItem in item.option_list">
+              <div style="float: left;min-width: 460px;max-width: 560px">
+                <v-checkbox
+                    :key="optionItem.id"
+                    :label="optionItem.title"
+                    v-model="optionItem.is_answer_choice"
+                    hide-details
+                ></v-checkbox>
+              </div>
+              <div v-if="item.is_show_result" style="float: right;padding-left: 30px;">
+                <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
+              </div>
+            </div>
           </v-container>
         </v-app>
 
+        <!--填空题展示-->
         <v-app class="choice" v-if="item.type==='completion'">
           <v-text-field
               v-model="item.answer"
@@ -80,13 +96,36 @@
           </v-card-text>
         </v-app>
       </div>
-      <!--内容结束-->
 
-      <el-button v-if="timeStamp===1" type="primary" @click="click">提交</el-button>
+      <el-button v-if="timeStamp===1" type="primary" @click="click(info.id)">提交</el-button>
 <!--      <div class="line"></div>-->
 <!--      <div class="text2"> 摸鱼问卷 提供技术支持 </div>-->
 
     </div>
+
+    <el-dialog
+        title="问卷已加密！"
+        center
+        top="200px"
+        :visible.sync="info.is_locked"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close= "false"
+        width="30%"
+    >
+      <div>
+        <div style="float: left">
+          <span style="font-size: 17px">请输入密码：</span>
+        </div>
+        <div style="float: left; margin-left: 10px">
+          <el-input placeholder="请输入密码" v-model="password" show-password v-on:keyup.enter.native="check_password"></el-input>
+        </div>
+      </div>
+      <div style="margin-top: 100px;">
+        <el-button style="" type="primary" @click="check_password">确 定</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 
 </template>
@@ -111,6 +150,8 @@ export default {
       timeStamp: 1,
       startTime: '',
       endTime: '',
+      // dialogVisible: true,
+      password: '',
     }
   },
   mounted() {
@@ -158,25 +199,22 @@ export default {
     toIndex(){
       this.$router.push({path: '/'});
     },
-    // init() {
-    //   console.log("zhixing");
-    //   let i = 0;
-    //   for( let a in this.info.question_list) {
-    //     if(a.type === 'single-choice') {
-    //       let t = 'aaa';
-    //       this.answer_list[i++] = t;
-    //     }
-    //     else if(a.type === 'multiple-choice') {
-    //       let t = [];
-    //       this.answer_list[i++] = t;
-    //     }
-    //     else {
-    //       let t = 'bbb';
-    //       this.answer_list[i++] = t;
-    //     }
-    //   }
-    // },
-    click(){
+    check_password() {
+      if(this.password === this.info.password) {
+        this.$notify.success({
+          title: '通过验证！',
+          message: '开始填写问卷吧~'
+        })
+        this.info.is_locked = false;
+      }
+      else {
+        this.$notify.error({
+          title: '密码错误!',
+          message: '请重新输入~'
+        })
+      }
+    },
+    click(id){
       let tmp;
       const that = this;
       if(this.info.status==='closed'){
@@ -200,13 +238,11 @@ export default {
             for(let i of item.option_list){
               if(i.is_answer_choice === true){
                 let data = {
-                  // questionnaire: that.info.id,
                   question: item.id,
                   option: i.id,
                 };
                 that.submit_list.push(data);
                 tmp = true;
-                // console.log(i.title);
               }
             }
             if(tmp === false && item.is_must_answer) {
@@ -219,7 +255,6 @@ export default {
             for(let i of item.option_list){
               if(item.option_list.indexOf(i) === item.answer){
                 let data = {
-                  // questionnaire: that.info.id,
                   question: item.id,
                   option: i.id,
                 };
@@ -231,7 +266,6 @@ export default {
               that.flag = false;
               console.log('单选 | 评分')
             }
-            // console.log(item.answer);
           }
           else if(item.type === 'completion'){
             if(item.answer === '' && item.is_must_answer) {
@@ -260,11 +294,9 @@ export default {
                 answer_list: that.submit_list,
               })
               .then(function (response){
-                // that.$notify.success({
-                //   title: '问卷提交成功',
-                //   message: '芜湖'
-                // })
-                that.$router.push({path: '/thank/'});
+                let s1 = Base64.encode('moyu' + id + 'wenjuan');
+                let url = window.location.origin+ "/thank/" + s1;
+                window.open(url);
               })
               .catch(function (error){
                 that.$notify.error({
@@ -297,6 +329,10 @@ export default {
   margin-right: 30px;
   color: #3F87DA;
 }
+.el-dialog__wrapper >>> .el-dialog {
+  border-radius: 10px !important;
+}
+
 .content {
   text-align: center;
   font-size: 15px;

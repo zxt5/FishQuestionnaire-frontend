@@ -39,6 +39,19 @@
                 </el-menu-item>
               </el-submenu>
             </el-menu>
+
+
+
+            <el-menu class="aside-mid">
+              <div class="aside-top">
+                <span> 特殊题型 </span>
+              </div>
+              <el-submenu>
+
+              </el-submenu>
+            </el-menu>
+
+
             <el-menu class="aside-mid">
               <div class="aside-top">
                 <span> 问卷设置 </span>
@@ -147,6 +160,7 @@
                 <li @click="cardUp(index, item)"><v-icon small>mdi-arrow-up-circle-outline</v-icon>  上移</li>
               </ul>
             </div>
+
             <!--单选框模板-->
             <template v-if="item.type === 'single-choice'">
               <div>
@@ -163,8 +177,8 @@
                   {{subItem.title}}
                 </el-radio>
               </el-radio-group>
-
             </template>
+
             <!--多选框模板-->
             <template v-if="item.type === 'multiple-choice'">
               <div>
@@ -183,17 +197,6 @@
               </el-checkbox-group>
             </template>
             <!--单项填空模板-->
-            <!--            <template v-if="item.type === 'completion'">-->
-            <!--              <div>-->
-            <!--                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>-->
-            <!--                <span>{{(index+1)}}. </span>-->
-            <!--                <span style="margin-top: 20px"> {{item.title}} </span>-->
-            <!--              </div>-->
-            <!--              <el-input v-model="item.answer" class="single-completion-input" :autosize="true"-->
-            <!--                        type="textarea" :clearable="true" resize="none">-->
-            <!--              </el-input>-->
-            <!--            </template>-->
-            <!--多项填空模板-->
             <template v-if="item.type === 'completion'">
               <div>
                 <span v-if="info.is_show_question_num">{{(index+1)}}. </span>

@@ -25,8 +25,6 @@
         <h1 @click="toCheck(item.id)">
           <el-tag class="label" v-if="item.status === 'closed'">未发布</el-tag>
           <el-tag class="label" type="success" v-if="item.status === 'shared'">已发布</el-tag>
-<!--          <el-tag class="label" type="danger" v-if="item.status === 'deleted'">已删除</el-tag>-->
-<!--          <el-tag v-for="tag in item.tags" key="tag" class="label">{{tag}}</el-tag>-->
           <span style="display: inline-block; width: 3px"></span>
           <a>{{item.title}}</a>
         </h1>
@@ -238,9 +236,6 @@ export default {
       let url = window.location.origin+ "/check/" + s1; //预览链接
       window.open(url);
     },
-    // toCenter(username){
-    //   this.$router.push({path: '/center/' + username});
-    // },
     handleCommand(command) {
       if(command === 'b'){
         this.showSharePage()

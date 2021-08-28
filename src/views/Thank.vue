@@ -1,9 +1,38 @@
 <template>
   <div>
     <div class="questionnaire">
-      <!--标题-->
+      <div v-if="info.type === 'vote'">
+        <h1 class="title"> 投票结果:</h1>
+<!--        <p v-if="flag">hhhhh</p>-->
+        <div v-for="(item, index) in info.question_list" :key="index" style="margin-top:30px;padding-left: 10px">
 
-      <h1 class="title">感谢填写！</h1>
+          <div v-if="(item.type==='single-choice' || item.type==='multiple-choice') && item.is_show_result">
+
+            <div style="padding-left: 30px;margin-bottom: 15px;">
+              <h3>{{ (index+1) + '. ' + item.title}}</h3>
+            </div>
+            <!--          循环选项-->
+            <div v-for="optionItem in item.option_list" style="margin-top: 4px;">
+
+              <div style="float: left;padding-left: 55px; min-width: 550px;max-width: 630px;color: darkblue">
+                <span>{{optionItem.title}}</span>
+              </div>
+
+              <div style="margin-left: 400px;">
+                <span style="color: red">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <h1 class="title">感谢填写!</h1>
+      <el-result icon="success" title="成功提示" subTitle="请根据提示进行操作">
+      </el-result>
+
       <div class="content">&nbsp;问卷到此结束，感谢您的参与！</div>
       <div class="line"></div>
       <!--内容结束-->
@@ -18,16 +47,34 @@
 <script>
 import authorization from "../utils/authorization";
 import axios from "axios";
+import {Base64} from "js-base64";
 
 export default {
   name: "Thank",
   components: {},
   data(){
     return {
+      info: '',
+      flag: true,
     }
   },
   mounted() {
-
+    const that = this;
+    let s1 = that.$route.params.text;
+    s1 = Base64.decode(s1);
+    s1 = s1.substring(4,s1.length - 7);
+    axios
+        .get('/api/questionnaire/' + parseInt(s1))
+        .then(function (response){
+          that.info = response.data;
+          that.htmlTitle = response.data.title;
+        })
+        .catch(function (error){
+          that.$notify.error({
+            title: '好像发生了什么错误',
+            message: error.message
+          })
+        })
   },
   methods: {
     click(){
