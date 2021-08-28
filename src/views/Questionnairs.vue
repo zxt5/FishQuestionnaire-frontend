@@ -115,7 +115,6 @@
           <div class="question-title" contenteditable="true" >
             <h2>{{info.title}}</h2>
           </div>
-
           <div class="intro" contenteditable="true" @input="info.content = $event.target.innerText" @blur="editTitle(info)"> {{info.content}}</div>
 
             <el-container          
@@ -632,29 +631,35 @@ export default {
       }
     },
     addQuestion(questionType){
-      console.log("addQuestion", this.$refs, questionType)
+      // console.log("addQuestion", this.$refs, questionType)
       // this.$refs[questionType].addQuestion(questionType)
-        this.info.question_list.push({
-            key: Date.now(),
-            option_list: [
-              {
-                title: '',
-                content:'',
-                ordering: 1,
-              },
-            ],
+      if (this.isEdit){
+        this.$notify.error({
+          title: "请完成当前题目的编辑!"
+        })
+        return;
+      }
+      this.info.question_list.push({
+        key: Date.now(),
+        option_list: [
+          {
             title: '',
-            content: '',
-            type: questionType,
-            questionnaire: this.$route.params.id,
-            is_must_answer: false,
-            is_show_result: false,
-            isShow: false
-        })
-        var index = this.info.question_list.length-1
-        this.$nextTick(_=>{
-          this.editQuestion(this.info.question_list[index], index)
-        })
+            content:'',
+            ordering: 1,
+          },
+        ],
+        title: '',
+        content: '',
+        type: questionType,
+        questionnaire: this.$route.params.id,
+        is_must_answer: false,
+        is_show_result: false,
+        isShow: false
+      })
+      var index = this.info.question_list.length-1
+      this.$nextTick(_=>{
+        this.editQuestion(this.info.question_list[index], index)
+      })
     },
     editQuestion(item, index){
       var questionType = item.type
@@ -667,6 +672,7 @@ export default {
       // 编辑成功才切换状态
       if (temp.editSuccess){
         item.isShow = !item.isShow
+        this.$forceUpdate()
       }
       if (item.isShow) this.isEdit = true
       else this.isEdit = false
@@ -809,11 +815,9 @@ export default {
           })
     },
     mouseEnter(){
-      this.mouseActivate = true
       this.disabled = true
     },
     mouseLeave(){
-      this.mouseActivate = true
       this.disabled = false
     },
     mouseChange(){
@@ -893,7 +897,7 @@ export default {
 .question-container{
   padding-left: 20px;
   padding-right: 20px;
-  background-color: #fafafa;
+  //background-color: #fafafa;
 }
 
 .edit-button{
@@ -916,6 +920,12 @@ export default {
   font-weight: bolder;
   padding: 10px 10px;
   margin:0 20px;
+}
+.question-title:hover{
+  background-color: #fdfbfb;
+}
+.intro:hover{
+  background-color: #fdfbfb;
 }
 .questionnaire {
   //padding: 20px;
@@ -1120,8 +1130,8 @@ export default {
 .el-textarea .el-input__count{
   background-color: transparent !important;
 }
-.el-collapse-item__content{
-  background-color: #FAFAFA;
-}
+/*.el-collapse-item__content{*/
+/*  background-color: #FAFAFA;*/
+/*}*/
 
 </style>
