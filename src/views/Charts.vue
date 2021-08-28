@@ -78,36 +78,14 @@
 
         <!--交叉分析-->
         <div v-if="activeName==='second'" style="display: flex">
-<!--          <el-form label-width="80px"-->
-<!--                   :model="questionForm"-->
-<!--                   :rules="questionFormRules">-->
-<!--            <el-form-item-->
-<!--                v-for="(option, index) in questionForm.option_list"-->
-<!--                :label="'选项 ' + (index + 1) "-->
-<!--                :key="index"-->
-<!--                :prop="'option_list.' + index + '.title'"-->
-<!--                :rules="{-->
-<!--                    required: true,  message: '内容不能为空', trigger: 'blur'-->
-<!--                }"-->
-<!--            >-->
-<!--              <el-input v-model="option.title" class="choiceinput">-->
-<!--              </el-input >-->
-<!--              <el-button @click.prevent="removeChoice(option)" type="danger">删除</el-button>-->
-<!--            </el-form-item>-->
-<!--          </el-form>-->
-<!--          <div class="dialog-footer">-->
-<!--            <el-button icon="el-icon-edit" @click="addChoice" type="primary">新增选项</el-button>-->
-<!--            <div>-->
-<!--              <el-button icon="el-icon-check" @click="finishQuestion()" type="success">完成</el-button>-->
-<!--              <el-button icon="el-icon-close" @click="cancelQuestion" type="danger"> 取消</el-button>-->
-<!--            </div>-->
-<!--          </div>-->
+
           <div class="block">
             <span class="demonstration">定义行 [一般为需要分析的题目，如爱好，意愿等，限10题。]</span>
             <div v-for="(i, index) in cross1" :key="index" style="float: left;margin-left: 18.6%;">
               <el-select  style="margin-bottom: 20px; width: 400px" v-model="i.value" filterable placeholder="请选择">
                 <el-option
                     v-for="item in info.question_list"
+                    v-if="item.type !== 'completion'"
                     :key="item.id"
                     :label="item.ordering + '. ' + item.title"
                     :value="item.id">
@@ -115,7 +93,7 @@
               </el-select>
               <i @click="remove1(index)" class="el-icon-circle-close" style="margin-left: 10px; color: grey; cursor: pointer" v-if="cross1.length > 1"></i>
             </div>
-            <el-button class="button" plain @click="add1">新增题目</el-button>
+            <el-button class="button" plain @click="add1" v-if="cross1.length < 10">新增题目</el-button>
           </div>
           <div class="block">
             <span class="demonstration">定义行 [一般为样本属性，如性别，年龄等，限10题。]</span>
@@ -123,19 +101,33 @@
               <el-select  style="margin-bottom: 20px; width: 400px" v-model="i.value" filterable placeholder="请选择">
                 <el-option
                     v-for="item in info.question_list"
+                    v-if="item.type !== 'completion'"
                     :key="item.id"
                     :label="item.ordering + '. ' + item.title"
                     :value="item.id">
                 </el-option>
               </el-select>
-              <i @click="remove2(index)" class="el-icon-circle-close" style="margin-left: 10px; color: grey; cursor: pointer" v-if="cross1.length > 1"></i>
+              <i @click="remove2(index)" class="el-icon-circle-close" style="margin-left: 10px; color: grey; cursor: pointer" v-if="cross2.length > 1"></i>
             </div>
-            <el-button class="button" plain @click="add2">新增题目</el-button>
+            <el-button class="button" plain @click="add2" v-if="cross2.length < 10">新增题目</el-button>
           </div>
+
         </div>
+
+
+
+<!--        <el-divider/>-->
+        <el-button  type="primary" @click="crossGen()">生成</el-button>
+        <el-divider/>
+        <div v-for="(i, index) in table_list">
+<!--          <div v-for="(j, jndex) in info.question_list">-->
+            <div :id="'1-1-' + index" :ref="'1-1-' + index" class="image-div">
+            </div>
+<!--          </div>-->
+        </div>
+
+
       </el-main>
-
-
     </el-container>
     <!--波浪-->
 <!--    <wave></wave>-->
@@ -153,6 +145,26 @@ export default {
 
   data(){
     return {
+      placeHoledStyle: {
+        normal: {
+          barBorderColor: 'rgba(0,0,0,0)',
+          color: 'rgba(0,0,0,0)'
+        },
+        emphasis: {
+          barBorderColor: 'rgba(0,0,0,0)',
+          color: 'rgba(0,0,0,0)'
+        }
+      },
+      dataStyle: {
+        normal: {
+          label : {
+            show: true,
+            position: 'insideLeft',
+            formatter: '{c}%'
+          }
+        }
+      },
+      crossShow: false,
       cross1: [
         {
           value: '',
@@ -212,7 +224,82 @@ export default {
       ],
       tmp: [],
       nums:[],
-    }
+      myChart: [],
+      crossName_x :[],
+      crossName_y :[],
+      crossMat:[],
+      pre_list :[
+        {
+          title: "111",
+          num: [85, 50],
+
+        },{
+          title: "2222",
+          num: [15, 50],
+        }
+      ],
+      name:["111","222"],
+      table_list : [
+        {
+          question_x : {
+            title: "问题1",
+            type : "single-choice",
+            ordering : 1
+          },
+          question_y : {
+            title: "问题2",
+            type : "multiple-choice",
+            ordering : 2,
+          },
+          option_x_list : [
+            {
+              id : 231,
+              title : "23号问题的选项1",
+              num : 10, //小计
+              cnt : 2,
+              option_y_list : [
+                {
+                  id: 241,
+                  title: "24号问题的选项1",
+                  num : 10,
+                  percent: 100.0,
+                  percent_string: "100.00%"
+                },
+                {
+                  id : 242,
+                  title: "24号问题的选项2",
+                  num : 0,
+                  percent: 0.0,
+                  percent_string: "0.00%"
+                }
+              ]
+            },
+            {
+              id : 232,
+              title : "23号问题的选项2",
+              num : 3, //小计
+              cnt : 2,
+              option_y_list : [
+                {
+                  id : 241,
+                  title: "24号问题的选项1",
+                  num : 2,
+                  percent: 0.0,
+                  percent_string: "0.00%"
+                },
+                {
+                  id : 242,
+                  title: "24号问题的选项2",
+                  num : 1,
+                  percent: 0.0,
+                  percent_string: "0.00%"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+  }
   },
 
   mounted: function (){
@@ -302,6 +389,40 @@ export default {
   },
 
   methods: {
+    crossGen() {
+      this.crossName_x.splice(0,this.crossName_x.length)
+      this.crossName_y.splice(0,this.crossName_y.length)
+      this.crossMat.splice(0,this.crossMat.length)
+      this.myChart.splice(0,this.myChart.length)
+      let question_x_list = [];
+      let question_y_list = [];
+      for (let item of this.cross1) {
+        if(item.value !== '') question_x_list.push(item.value);
+      }
+      for (let item of this.cross2) {
+        if(item.value !== '') question_y_list.push(item.value);
+      }
+      const that = this;
+      axios.put('/api/questionnaire/' + this.info.id + '/cross-analysis/', {
+        question_x_list : question_x_list,
+        question_y_list : question_y_list,
+        },{
+        headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+      }
+      ).then(function (response) {
+        console.log(response.data);
+        that.table_list = response.data.table_list;
+      })
+      setTimeout(()=>{
+        this.genData();
+        for (let i = 0; i < that.table_list.length; i ++) {
+          this.myChart.push('');
+          this.genrateCross(i, "1-1-" + i);
+        }
+      }, 500)
+
+
+    },
     add1() {
       this.cross1.push({
         value: '',
@@ -327,14 +448,6 @@ export default {
       a.href ="http://49.233.52.139:8000/api/questionnaire/"+this.info.id+"/export-xls/";
       a.click();
     },
-    init(){
-      console.log(this.tmp);
-      for (let i = 0; i < this.answers.length; i++){
-        for (let j = 0; j < 3; j++){
-          this.generateChart(i+'-'+j, j)
-        }
-      }
-      },
     handleChange(index) {
       for (let j = 0; j < 3; j++) {
         this.generateChart(index, index + '-' + j, j);
@@ -344,6 +457,76 @@ export default {
       for (let j = 0; j < 3; j++) {
         this.generateChart(index, index + '-' + j, j);
       }
+    },
+    genData(){
+      for (let item of this.table_list) {
+        let tmpName_x = [];
+        let tmpName_y = [];
+        let tmpMat = [];
+        for (let subItem of item.option_x_list) {
+          tmpName_x.push(subItem.title);
+          let tmp = [];
+          for (let ii of subItem.option_y_list) {
+            tmp.push(ii.num);
+          }
+          console.log(tmp);
+          tmpMat.push({
+            name: subItem.title,
+            type: 'bar',
+            stack: 'total',
+            label: {
+              show: true,
+              position: 'top'
+            },
+            emphasis: {
+              focus: 'series'
+            },
+            data: tmp,
+          });
+        }
+        this.crossMat.push(tmpMat);
+        for (let subItem of item.option_x_list[0].option_y_list) {
+          tmpName_y.push((subItem.title));
+        }
+        this.crossName_x.push(tmpName_x);
+        this.crossName_y.push(tmpName_y);
+        console.log(tmpName_x)
+        console.log(tmpName_y)
+      }
+    },
+    genrateCross(index, eid) {
+      console.log(eid)
+      if (this.myChart[index] != null && this.myChart[index] !== "" && this.myChart[index] !== undefined){
+        this.myChart[index].dispose();
+      }
+      this.myChart[index] = this.$echarts.init(document.getElementById(eid));
+      option = {
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {            // Use axis to trigger tooltip
+              type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
+            }
+          },
+          legend: {
+            // data: ['Direct', 'Mail Ad', 'Affiliate Ad', 'Video Ad', 'Search Engine']
+            data: this.crossName_x[index],
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          xAxis: {
+            type: 'value'
+          },
+          yAxis: {
+            type: 'category',
+            data: this.crossName_y[index],
+          },
+          series: this.crossMat[index],
+      };
+      this.myChart[index].setOption(option)
     },
     generateChart(index, eid, type){
       console.log(eid)
@@ -435,6 +618,34 @@ export default {
               data: this.nums[index].pair
             }
           ]
+        };
+      }
+      else if(type === 3) {
+        option = {
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {            // Use axis to trigger tooltip
+              type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
+            }
+          },
+          legend: {
+            // data: ['Direct', 'Mail Ad', 'Affiliate Ad', 'Video Ad', 'Search Engine']
+            data: this.crossName_x[index],
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          xAxis: {
+            type: 'value'
+          },
+          yAxis: {
+            type: 'category',
+            data: this.crossName_y[index],
+          },
+          series: this.crossMat[index],
         };
       }
       myChart.setOption(option)
