@@ -101,11 +101,17 @@ export default {
             storage.setItem('refresh.myblog', response.data.refresh);
             storage.setItem('expiredTime.myblog', expiredTime);
             storage.setItem('username.myblog', that.form.user);
-            storage.setItem('identity.myblog', response.data.identity);
+
+            if(that.$store.state.flag === true){
+              // localStorage.setItem('flag.myblog', false);
+              that.$store.commit('flag_false');
+              that.$router.push({path: '/fill/' + that.$store.state.url});
+            }else{
+              that.$router.push({path: '/index'});
+            }
+            location.reload();
             // 路由跳转
             // 登录成功后回到首页
-            that.$router.push({path: '/index'});
-            location.reload();
           })
           .catch(function (error){
             console.log(error.response);
