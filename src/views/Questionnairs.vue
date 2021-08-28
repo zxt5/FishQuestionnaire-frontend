@@ -4,7 +4,7 @@
     <el-container class="main">
       <el-container>
         <!--侧边栏区域-->
-        <a-affix style="width: 23%" offset-top="4">
+        <a-affix style="width: 23%" :offset-top="4">
           <el-aside style="height: fit-content;">
 
             <el-container class="class" >
@@ -51,8 +51,8 @@
                     style="float: right; padding-right: 20px"
                     @change="delete_time_control"
                     v-model="control_time"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949">
+                    active-color="#409eff"
+                   inactive-color="#dcdfe6">
                 </el-switch>
                 <div v-if="control_time">
                   <!--                开始时间-->
@@ -102,8 +102,8 @@
                     style="float: right; padding-right: 20px"
                     @change="is_show_num"
                     v-model="info.is_show_question_num"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949">
+                    active-color="#409eff"
+                   inactive-color="#dcdfe6">
                 </el-switch>
               </div>
             </el-menu>
@@ -351,13 +351,14 @@ export default {
 
     return {
       isEdit: false,
+      editItem: '',
       BMap: null,
       geolocation: null, // Geolocation对象实例
       positioning: false, // 定位中
       positioningInterval: null, // 定位倒计时计时器
       countDown: 30, // 倒计时，单位秒
       location: null, // 位置信息
-      disabled: true,
+      disabled: true,  // 控制是否能够拖动
       editPlace: {},
       menuList:[
         {
@@ -491,14 +492,14 @@ export default {
                 msg = '由于未知错误而无法检索设备的位置'
                 break
             }
-            _this.$$notify[msgType]({
+            _this.$notify[msgType]({
               key: NotificationKey,
               message: '提示',
               description: msg
             })
           }, positionOptions)
         } else {
-          _this.$$notify.error({
+          _this.$notify.error({
             key: NotificationKey,
             message: '提示',
             description: '您的浏览器不支持地理位置服务'
@@ -637,6 +638,9 @@ export default {
         this.$notify.error({
           title: "请完成当前题目的编辑!"
         })
+        this.$nextTick(_=>{
+            window.scrollTo({"behavior":"smooth","top": this.editItem.$el.offsetTop - 300});
+        })
         return;
       }
       this.info.question_list.push({
@@ -659,23 +663,51 @@ export default {
       var index = this.info.question_list.length-1
       this.$nextTick(_=>{
         this.editQuestion(this.info.question_list[index], index)
+        this.$nextTick(_=>{
+            var el = document.getElementById("app")
+            window.scrollTo({"behavior":"smooth","top": el.offsetHeight});
+        })
       })
     },
     editQuestion(item, index){
       var questionType = item.type
       // 切换编辑界面显示
-      console.log("editquestion", this.$refs[questionType+index][0])
       var temp = this.$refs[questionType+index][0]
+    
+      if (this.editItem && this.editItem != temp){
+        this.$notify.error("请完成之前题目编辑")
+        this.$nextTick(_=>{
+            window.scrollTo({"behavior":"smooth","top": this.editItem.$el.offsetTop - 300});
+        })
+        return
+      }
+
+      if (this.isEdit && !item.isShow){
+        this.$notify.error("请完成之前题目编辑")
+        this.$nextTick(_=>{
+            var el = document.getElementById("app")
+            window.scrollTo({"behavior":"smooth","top": el.offsetHeight});
+        })
+        return
+      }
       temp.editQuestion(this.info.question_list[index])
 
-      console.log("afteredit",this.info.question_list[index])
       // 编辑成功才切换状态
       if (temp.editSuccess){
         item.isShow = !item.isShow
         this.$forceUpdate()
       }
-      if (item.isShow) this.isEdit = true
-      else this.isEdit = false
+
+      if (item.isShow){
+        this.disabled = true
+        this.isEdit = true
+        this.editItem = temp
+      }
+      else{
+        this.disabled = false
+        this.isEdit = false
+        this.editItem = ''
+        }
     },
     cardUp(index, item){
       if (this.isEdit){
@@ -736,6 +768,8 @@ export default {
     cardDelete(index, item){
       if (!item.hasOwnProperty('id')){
         this.info.question_list.splice(index, 1)
+        this.isEdit = false
+        this.editItem = ''
         return
       }
       const that = this;
@@ -818,6 +852,7 @@ export default {
       this.disabled = true
     },
     mouseLeave(){
+      if (this.isEdit) return
       this.disabled = false
     },
     mouseChange(){
@@ -955,7 +990,7 @@ export default {
   //margin-top: 20pt;
   //height: 100%;
   width: 80%;
-  margin: 40px auto 40px;
+  margin: 40px auto 210px;
 }
 
 .card {
