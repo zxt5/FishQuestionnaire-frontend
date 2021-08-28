@@ -96,7 +96,7 @@
             <el-button class="button" plain @click="add1" v-if="cross1.length < 10">新增题目</el-button>
           </div>
           <div class="block">
-            <span class="demonstration">定义行 [一般为样本属性，如性别，年龄等，限10题。]</span>
+            <span class="demonstration">定义列 [一般为样本属性，如性别，年龄等，限10题。]</span>
             <div v-for="(i, index) in cross2" :key="index" style="float: left;margin-left: 18.6%;">
               <el-select  style="margin-bottom: 20px; width: 400px" v-model="i.value" filterable placeholder="请选择">
                 <el-option
