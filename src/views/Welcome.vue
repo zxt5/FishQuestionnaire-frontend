@@ -25,7 +25,7 @@
         </v-carousel-item>
       </v-carousel>
       <h1 class="title"> 🦈🐬🐳🐋🐟🐠🐡 </h1>
-      <p style="max-width: 568px;">
+      <p class="subContent" style="max-width: 568px;">
         <strong>摸鱼问卷平台</strong> 拥有简洁轻量的界面，问卷发布快捷方便，无需人工处理问卷数据，大大节省调研成本。
         目前向所有用户免费开放，志在做一款用户喜爱的在线问卷调查服务平台✊
       </p>
@@ -83,70 +83,83 @@
         </v-row>
       </v-container>
       <v-divider style="width: 50%; margin: 0 auto"></v-divider>
-      <p style="max-width: 568px; margin-top: 40px">
-        项目团队精心设计和打造多种不同类型的问卷以适应不同场合需求。 做到创建发布收集一条龙 — 点击预览👀相应的问卷模板，以便更好地做出选择。
+      <p class="subContent" style="max-width: 568px; margin-top: 40px">
+        项目团队精心设计和打造多种不同类型的问卷以适应不同场合需求。 做到创建发布收集一条龙 — 查看👀相应的类型介绍👇，以便更好地做出选择。
       </p>
-      <v-row justify="center" style="margin-bottom: 40px">
-        <v-btn :min-width="btnWidth" @click="expand = !expand">
-          问卷类型及模板预览
-        </v-btn>
-      </v-row>
-      <v-expand-transition>
-        <v-container style="margin-bottom: 40px" v-show="expand">
-          <v-row justify="center">
-            <template v-for="(item, index) in type">
-              <v-col cols="auto" :key="index">
-                <v-card
-                    class="mx-auto"
-                    min-width="200px"
-                >
-                  <v-img class="img"
-                         :src="item.src"
-                         max-height="120px"
-                         max-width="120px"
-                  ></v-img>
 
-                  <v-card-title>
-                    {{ item.title }}
-                  </v-card-title>
+      <div class="all_block">
+        <div class="block" style="width: 100% !important;">
+          <img src="https://www.wjx.cn/images/newimg/pic-2/survey@2x.png"
+               width="200px"
+               height="200px"
+               class="img"
+          />
+          <div style="margin-left: 10%; display: inline-block">
+          <p class="sub" style="font-size: 2rem; font-weight: 400">
+          调查问卷<br/>
+          </p>
+            <p class="sub">这里是普通问卷的介绍这里是普通问卷的介绍</p>
+          </div>
+        </div>
+      </div>
 
-                  <v-card-subtitle>
-                    {{ item.subtitle }}
-                  </v-card-subtitle>
-                  <v-card-actions>
-                    <v-btn
-                        color="#3F87DA"
-                        text
-                    >
-                      preview
-                    </v-btn>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        icon
-                        @click="item.show = !item.show"
-                    >
-                      <v-icon>{{ item.show ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
-                    </v-btn>
-                  </v-card-actions>
-                  <v-expand-transition>
-                    <div v-show="item.show">
-                      <v-divider></v-divider>
-                      <v-card-text>
-                        {{ item.content }}
-                      </v-card-text>
-                    </div>
-                  </v-expand-transition>
-                </v-card>
-              </v-col>
-              <!--            <v-responsive-->
-              <!--                v-if="index === 2"-->
-              <!--                :key="`width-${index}`"-->
-              <!--                width="100%"-->
-              <!--            ></v-responsive>-->
-            </template>
-          </v-row>
-        </v-container>
-      </v-expand-transition>
+      <div  class="all_block" style="background-color: #fdfbfb">
+        <div class="block"  style="border-right: 1px solid #eff2f6;">
+          <img src="https://www.wjx.cn/images/newimg/pic-2/vote@2x.png"
+               width="200px"
+               height="200px"
+               class="img"
+          />
+          <div style="margin-left: 20%; display: inline-block">
+          <p class="sub" style="font-size: 2rem; font-weight: 400">
+          投票问卷<br/>
+          </p>
+            <p class="sub">这里是投票问卷的介绍</p>
+          </div>
+        </div>
+        <div class="block">
+          <img src="https://www.wjx.cn/images/newimg/pic-2/form@2x.png"
+               width="200px"
+               height="200px"
+               class="img"
+          />
+          <div style="margin-left: 20%; display: inline-block">
+          <p class="sub" style="font-size: 2rem; font-weight: 400">
+          报名问卷<br/>
+          </p>
+            <p class="sub">这里是报名问卷的介绍</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="all_block">
+        <div class="block"  style="border-right: 1px solid #eff2f6;">
+          <img src="https://www.wjx.cn/images/newimg/pic-2/exam@2x.png"
+               width="200px"
+               height="200px"
+               class="img"
+          />
+          <div style="margin-left: 20%; display: inline-block">
+          <p class="sub" style="font-size: 2rem; font-weight: 400">
+          考试问卷<br/>
+          </p>
+            <p class="sub">这里是考试问卷的介绍</p>
+          </div>
+        </div>
+        <div class="block">
+          <img src="https://www.wjx.cn/images/newimg/pic-2/360-evaluate@2x.png"
+               width="200px"
+               height="200px"
+               class="img"
+          />
+          <div style="margin-left: 20%; display: inline-block">
+          <p class="sub" style="font-size: 2rem; font-weight: 400">
+          健康打卡<br/>
+          </p>
+            <p class="sub">这里是打卡问卷的介绍</p>
+          </div>
+        </div>
+      </div>
       <v-footer padless>
         <v-col
             class="text-center"
@@ -193,49 +206,38 @@ export default {
         //   img: 'https://wj.qq.com/image/index_slider_p0.png?v=@version'
         // },
       ],
-      type: [
-        {
-          src: 'https://www.wjx.cn/images/newimg/pic-2/survey@2x.png',
-          title: '普通问卷',
-          subtitle: '预览模板',
-          show: false,
-          content: '这是普通问卷的模板'
-        },
-        {
-          src: 'https://www.wjx.cn/images/newimg/pic-2/vote@2x.png',
-          title: '投票问卷',
-          subtitle: '预览模板',
-          show: false,
-          content: '这是投票问卷的模板'
-        },
-        {
-          src: 'https://www.wjx.cn/images/newimg/pic-2/form@2x.png',
-          title: '报名问卷',
-          subtitle: '预览模板',
-          show: false,
-          content: '这是报名问卷的模板'
-        },
-        {
-          src: 'https://www.wjx.cn/images/newimg/pic-2/exam@2x.png',
-          title: '考试问卷',
-          subtitle: '预览模板',
-          show: false,
-          content: '这是考试问卷的模板'
-        },
-        {
-          src: 'https://www.wjx.cn/images/newimg/pic-2/360-evaluate@2x.png',
-          title: '健康打卡',
-          subtitle: '预览模板',
-          show: false,
-          content: '这是健康打卡的模板'
-        },
-      ]
+
     }
   },
 }
 </script>
 
 <style scoped>
+.all_block{
+  padding: 40px 0;
+}
+.block{
+  display: inline-block;
+  /*vertical-align: center;*/
+  text-align: center;
+  width: 50%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+.sub{
+  font-family: Roboto,sans-serif;
+  line-height: 1.5;
+  /*text-align: center!important;*/
+  font-size: 1.25rem;
+  font-weight: 300;
+  /*margin-bottom: 40px;*/
+  /*margin-right: auto;*/
+  /*margin-left: auto;*/
+  max-width: 568px;
+}
+.img{
+  vertical-align: middle;
+}
 h2{
   color: #fff;
   padding-top: 50px;
@@ -262,7 +264,7 @@ h3{
   font-weight: 400;
   font-family: Roboto,sans-serif!important;
 }
-p{
+.subContent{
   font-family: Roboto,sans-serif;
   line-height: 1.5;
   text-align: center!important;
@@ -273,13 +275,8 @@ p{
   margin-left: auto;
   max-width: 568px;
 }
-.img{
-  margin:auto !important;
-  /*padding: 30px 0 !important;*/
-}
-.mx-auto{
-  padding-top: 20px;
-}
+
+
 /*.theme--light.v-application{*/
 /*  background: transparent !important;*/
 /*}*/

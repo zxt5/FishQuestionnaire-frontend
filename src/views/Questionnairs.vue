@@ -4,129 +4,119 @@
     <el-container class="main">
       <el-container>
         <!--侧边栏区域-->
-        <el-aside width="23%" style="height: fit-content;">
+        <a-affix style="width: 23%" offset-top="4">
+          <el-aside style="height: fit-content;">
 
-<!--          第一块-->
-          <el-container class="class" >
-            <div @click="check" style="margin-left: 0px">
-              <el-button class="button" circle>
-                <i class="el-icon-document-checked"></i>
-              </el-button>
-              <h4>预览问卷</h4>
-            </div>
-            <div @click="toChart" style="margin-left: 50px">
-              <el-button class="button" circle>
-                <i class="el-icon-data-line"></i>
-              </el-button>
-              <h4>结果统计</h4>
-            </div>
-          </el-container>
-
-<!--          第二块-->
-          <el-menu class="aside-mid">
-            <div class="aside-top">
-              <span> 题型选择 </span>
-            </div>
-            <!--一级菜单-->
-            <el-submenu v-for="item in menuList" :key="item.type" :index="item.type">
-              <template slot="title">
-                <span>{{item.name}}</span>
-              </template>
-              <!--二级菜单-->
-              <el-menu-item v-for="subItem in item.children" :key="subItem.type" :index="subItem.type" @click="addQuestion(subItem.type)">
+            <el-container class="class" >
+              <div @click="check" style="margin-left: 0px">
+                <el-button class="button" circle>
+                  <i class="el-icon-document-checked"></i>
+                </el-button>
+                <h4>预览问卷</h4>
+              </div>
+              <div @click="Finish" style="margin-left: 50px">
+                <el-button class="button" circle>
+                  <i class="el-icon-finished"></i>
+                </el-button>
+                <h4>完成编辑</h4>
+              </div>
+            </el-container>
+            <!--              active-text-color="#DA70D6"-->
+            <el-menu class="aside-mid">
+              <div class="aside-top">
+                <span> 题型选择 </span>
+              </div>
+              <!--一级菜单-->
+              <el-submenu v-for="item in menuList" :key="item.type" :index="item.type">
                 <template slot="title">
-                  <span>{{subItem.name}}</span>
+                  <span>{{item.name}}</span>
                 </template>
-              </el-menu-item>
-            </el-submenu>
-          </el-menu>
+                <!--二级菜单-->
+                <el-menu-item v-for="subItem in item.children" :key="subItem.type" :index="subItem.type" @click="addQuestion(subItem.type)">
+                  <template slot="title">
+                    <span>{{subItem.name}}</span>
+                  </template>
+                </el-menu-item>
+              </el-submenu>
+            </el-menu>
 
-          <el-menu class="aside-mid">
-            <div class="aside-top">
-              <span> 特殊题型 </span>
-            </div>
-            <el-submenu>
-
-            </el-submenu>
-          </el-menu>
-
-<!--          第三块-->
-          <el-menu class="aside-mid">
-            <div class="aside-top">
-              <span> 问卷设置 </span>
-            </div>
-            <!--            时间控制-->
-            <div class="time_control" style="margin-top: 20px">
-              <span style="padding-left: 15px">时间控制</span>
-              <el-switch
-                  style="float: right; padding-right: 20px"
-                  @change="delete_time_control"
-                  v-model="control_time"
-                  active-color="#13ce66"
-                  inactive-color="#ff4949">
-              </el-switch>
-              <div v-if="control_time">
-                <!--                开始时间-->
-                <div>
-                  <div style="padding-left: 8px">
-                    <el-checkbox v-model="info.is_start_time">开始时间</el-checkbox>
+            <el-menu class="aside-mid">
+              <div class="aside-top">
+                <span> 问卷设置 </span>
+              </div>
+              <!--            时间控制-->
+              <div class="time_control" style="margin-top: 20px">
+                <span style="padding-left: 15px">时间控制</span>
+                <el-switch
+                    style="float: right; padding-right: 20px"
+                    @change="delete_time_control"
+                    v-model="control_time"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949">
+                </el-switch>
+                <div v-if="control_time">
+                  <!--                开始时间-->
+                  <div>
+                    <div style="padding-left: 8px">
+                      <el-checkbox v-model="info.is_start_time">开始时间</el-checkbox>
+                    </div>
+                    <div style="padding-left: 20px">
+                      <el-date-picker
+                          v-if="info.is_start_time"
+                          v-model="info.start_time"
+                          type="datetime"
+                          placeholder="选择开始时间">
+                      </el-date-picker>
+                    </div>
                   </div>
-                  <div style="padding-left: 20px">
-                    <el-date-picker
-                        v-if="info.is_start_time"
-                        v-model="info.start_time"
-                        type="datetime"
-                        placeholder="选择开始时间">
-                    </el-date-picker>
+                  <!--                结束时间-->
+                  <div>
+                    <div style="padding-left: 8px">
+                      <el-checkbox v-model="info.is_end_time">结束时间</el-checkbox>
+                    </div>
+                    <div style="padding-left: 20px">
+                      <el-date-picker
+                          v-if="info.is_end_time"
+                          v-model="info.end_time"
+                          type="datetime"
+                          placeholder="选择结束时间">
+                      </el-date-picker>
+                    </div>
                   </div>
-                </div>
-                <!--                结束时间-->
-                <div>
-                  <div style="padding-left: 8px">
-                    <el-checkbox v-model="info.is_end_time">结束时间</el-checkbox>
+                  <!--                保存按钮-->
+                  <div style="padding-left: 190px;margin-top: 15px;">
+                    <el-button
+                        size="mini"
+                        type="primary"
+                        @click="save_time_control"
+                    >
+                      保存更改
+                    </el-button>
                   </div>
-                  <div style="padding-left: 20px">
-                    <el-date-picker
-                        v-if="info.is_end_time"
-                        v-model="info.end_time"
-                        type="datetime"
-                        placeholder="选择结束时间">
-                    </el-date-picker>
-                  </div>
-                </div>
-                <!--                保存按钮-->
-                <div style="padding-left: 190px;margin-top: 15px;">
-                  <el-button
-                      size="mini"
-                      type="primary"
-                      @click="save_time_control"
-                  >
-                    保存更改
-                  </el-button>
                 </div>
               </div>
-            </div>
-            <!--            是否显示题号-->
-            <div style="margin-top: 15px">
-              <span style="padding-left: 15px; margin-top: 30px">是否显示题号</span>
-              <el-switch
-                  style="float: right; padding-right: 20px"
-                  @change="is_show_num"
-                  v-model="info.is_show_question_num"
-                  active-color="#13ce66"
-                  inactive-color="#ff4949">
-              </el-switch>
-            </div>
-
-          </el-menu>
-        </el-aside>
+              <!--            是否显示题号-->
+              <div style="margin-top: 15px">
+                <span style="padding-left: 15px; margin-top: 30px">是否显示题号</span>
+                <el-switch
+                    style="float: right; padding-right: 20px"
+                    @change="is_show_num"
+                    v-model="info.is_show_question_num"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949">
+                </el-switch>
+              </div>
+            </el-menu>
+          </el-aside>
+        </a-affix>
         <!--问卷区域-->
         <el-main style="height: fit-content" class="questionnaire">
           <!--标题区域-->
-          <div class="question-title">
+          <div class="question-title" contenteditable="true" >
             <h2>{{info.title}}</h2>
           </div>
-          <div class="intro"> {{info.content}}</div>
+
+          <div class="intro" contenteditable="true" @input="info.content = $event.target.innerText" @blur="editTitle(info)"> {{info.content}}</div>
 
             <el-container          
             style="display:inline">
@@ -148,7 +138,7 @@
           @end="onEnd"
           >
           <transition-group>              
-          <div class="card"  v-for="(item, index) in info.question_list" :key="item.id">
+          <div class="card"  v-for="(item, index) in info.question_list" :key="item.id ? item.id: item.key">
             <div style="padding: 20px">
             <div class="op">
               <ul>
@@ -167,7 +157,7 @@
                 <span style="color: lightgrey">[单选题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
               </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
                 {{item.content}}
               </div>
               <el-radio-group v-model="item.answer">
@@ -185,16 +175,27 @@
                 <span style="color: lightgrey">[多选题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
               </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
                 {{item.content}}
               </div>
-              <el-checkbox-group v-model="answer[item.ordering - 1]">
+              <el-checkbox-group v-model="item.answer">
                 <el-checkbox  v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex" >
                   {{subItem.title}}
                 </el-checkbox>
               </el-checkbox-group>
             </template>
             <!--单项填空模板-->
+            <!--            <template v-if="item.type === 'completion'">-->
+            <!--              <div>-->
+            <!--                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>-->
+            <!--                <span>{{(index+1)}}. </span>-->
+            <!--                <span style="margin-top: 20px"> {{item.title}} </span>-->
+            <!--              </div>-->
+            <!--              <el-input v-model="item.answer" class="single-completion-input" :autosize="true"-->
+            <!--                        type="textarea" :clearable="true" resize="none">-->
+            <!--              </el-input>-->
+            <!--            </template>-->
+            <!--填空模板-->
             <template v-if="item.type === 'completion'">
               <div>
                 <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
@@ -202,31 +203,48 @@
                 <span style="color: lightgrey">[填空题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
               </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
                 {{item.content}}
               </div>
-              <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex" class="multiple-completion-input">
 <!--                <p style="margin-left:10px">{{subItem.title}}</p>-->
-                <el-input class="single-completion-input" :autosize="true"
-                          type="textarea" :clearable="true" resize="none" v-model="answer[item.ordering - 1][subIndex]"></el-input>
+              <el-input class="single-completion-input" :autosize="true"
+                        type="textarea" :clearable="true" resize="none" v-model="item.answer"></el-input>
+
+            </template>
+            <!--定位模板-->
+            <template v-if="item.type == 'position'">
+              <div>
+                <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
+                <span style="margin-top: 20px"> {{item.title}} </span>
+                <span style="color: lightgrey">[定位题]</span>
+                <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
+                {{item.content}}
+              </div>
+                <br>
+                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+                <span style="margin-right:20px">  当前定位: </span>
+                <el-button :icon="positioning ? 'el-icon-loading':none" @click="getLocation">
+                  <span v-if="location">{{ location["省份"]+location["城市"] }}</span>
+                  <div v-show="!location && !positioning" >点击获取位置</div>
+                  <span v-show="positioning">
+                          &nbsp;
+                          等待获取中
+                          <span class="red">{{ countDown }}</span> 秒
+                      </span>
+                  </el-button>
               </div>
             </template>
-            <!--评分模板-->
-            <template v-if="item.type === 'scoring'">
+          <!--评分题-->
+          <template v-if="item.type === 'scoring'">
               <div>
                 <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
                 <span style="margin-top: 20px"> {{item.title}} </span>
                 <span style="color: lightgrey">[评分题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
               </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
                 {{item.content}}
               </div>
-<!--              <el-radio-group v-model="item.answer">-->
-<!--                <el-radio v-for="(subItem, subIndex) in item.option_list" :key="subIndex" :label="subIndex">-->
-<!--                  {{subItem.title}}-->
-<!--                </el-radio>-->
-<!--              </el-radio-group>-->
               <el-slider class="scoring-input"
                   v-model="item.answer"
                   :step="1"
@@ -234,6 +252,7 @@
               >
               </el-slider>
             </template>
+
                 <!--单选题目框-->
             </div>
             
@@ -256,6 +275,8 @@
 
                     <!--    评分对话框-->
                     <scoring-add-card :ref="'scoring'+index" v-if="item.type === 'scoring'"></scoring-add-card>
+
+                    <position-add-card :ref="'position'+index" v-if="item.type == 'position'"></position-add-card>
 
                   </div>
                 </el-collapse-transition>
@@ -285,12 +306,14 @@
       </el-container>
     </el-container>
 
+
     <!--波浪-->
     <!--    <wave></wave>-->
-    <scoring-add-dialog ref="scoring"></scoring-add-dialog>
+    <!-- <scoring-add-dialog ref="scoring"></scoring-add-dialog>
     <single-completion-add-dialog ref="completion"></single-completion-add-dialog>
     <single-choice-add-dialog ref="single-choice"></single-choice-add-dialog>
     <multiple-choice-add-dialog ref="multiple-choice"> </multiple-choice-add-dialog>
+    <position-add-dialog ref="position"></position-add-dialog> -->
     <el-backtop></el-backtop>
   </div>
 </template>
@@ -304,26 +327,35 @@ import MultipleCompletionAddCard from '../components/MultipleCompletionAddCard.v
 import authorization from "@/utils/authorization";
 import ScoringAddCard from "../components/ScoringAddCard";
 import axios from "axios";
-import TitleContentDialog from '../components/TitleContentDialog.vue'
 import draggable from 'vuedraggable'
 // fade/zoom 等
 import 'element-ui/lib/theme-chalk/base.css';
 // collapse 展开折叠
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 import Vue from 'vue'
-import collapse from "../assets/js/collapse.js";
-import ScoringAddDialog from '../components/ScoringAddDialog.vue'
-import SingleCompletionAddDialog from '../components/SingleCompletionAddDialog.vue'
-import SingleChoiceAddDialog from '../components/SingleChoiceAddDialog.vue'
-import MultipleChoiceAddDialog from '../components/MultipleChoiceAddDialog.vue'
+
+import {Base64} from "js-base64";
 Vue.component(CollapseTransition.name, CollapseTransition)
 
+import { loadBMap } from '../assets/js/loadBMap'
+import PositionAddCard from '../components/PositionAddCard.vue'
 
 export default {
-  components: {collapse, SingleChoiceAddCard, Wave, MultipleChoiceAddCard, SingleCompletionAddCard, MultipleCompletionAddCard, ScoringAddCard, TitleContentDialog,draggable,  ScoringAddDialog, SingleCompletionAddDialog, SingleChoiceAddDialog, MultipleChoiceAddDialog},
+  components: {
+        PositionAddCard, SingleChoiceAddCard,
+        Wave, MultipleChoiceAddCard, SingleCompletionAddCard,
+        MultipleCompletionAddCard,
+        ScoringAddCard,draggable,
+  },
   data(){
+
     return {
-      // 菜单栏
+      BMap: null,
+      geolocation: null, // Geolocation对象实例
+      positioning: false, // 定位中
+      positioningInterval: null, // 定位倒计时计时器
+      countDown: 30, // 倒计时，单位秒
+      location: null, // 位置信息
       disabled: false,
       editPlace: {},
       menuList:[
@@ -370,6 +402,108 @@ export default {
     }
   },
   methods:{
+    resetPositioning() {
+      this.positioning = false
+      this.location = null
+      this.countDown = 30
+      clearInterval(this.positioningInterval)
+    },
+    getLocation() {
+        const _this = this
+        _this.geolocation = new _this.BMap.Geolocation()
+        if (_this.geolocation) {
+          // 开启SDK辅助定位，仅当使用环境为移动web混合开发，且开启了定位sdk辅助定位功能后生效
+          _this.geolocation.enableSDKLocation()
+          // 开始定位
+          this.positioning = true
+          // 倒计时
+          this.positioningInterval = setInterval(() => {
+            if (this.countDown === 0) {
+              this.countDown = 30
+              clearInterval(this.positioningInterval)
+            } else {
+              this.countDown--
+            }
+          }, 1000)
+          // 位置选项
+          const positionOptions = {
+            enableHighAccuracy: true, // 要求浏览器获取最佳结果
+            timeout: 30, //    超时时间
+            maximumAge: 0 // 允许返回指定时间内的缓存结果。如果此值为0，则浏览器将立即获取新定位结果
+          }
+          // 获取用户位置信息
+          _this.geolocation.getCurrentPosition(position => {
+            _this.resetPositioning()
+            // 获取定位结果状态码
+            const statusCode = _this.geolocation.getStatus()
+            let msg = '由于未知错误而无法检索设备的位置' // 提示消息
+            let msgType = 'error' // 消息类型
+            // 判断结果状态码，为0代表获取成功，读取省市、经纬度
+            switch (statusCode) {
+              case 0:
+                msgType = 'success'
+                msg = '获取地理位置定位请求成功'
+                if (position) {
+                  // 数据变量定义
+                  let lat = 0.0 // 经度
+                  let lng = 0.0 // 纬度
+                  let province = '未知' // 经度
+                  let city = '未知' // 纬度
+
+                  // 坐标
+                  if (position.point) {
+                    lat = position.point.lat
+                    lng = position.point.lng
+                  }
+                  // 位置
+                  if (position.address) {
+                    province = position.address.province
+                    city = position.address.city
+                  }
+                  _this.location = {
+                    省份: province,
+                    城市: city,
+                    经度: lat,
+                    纬度: lng
+                  }
+                } else {
+                  msg = '由于未知错误而无法检索设备的位置'
+                }
+                break
+              case 2:
+                msg = '由于未知错误而无法检索设备的位置'
+                break
+              case 4:
+              case 5:
+                msg = '位置服务请求非法'
+                break
+              case 6:
+                msg = '应用程序没有使用位置服务的权限'
+                break
+              case 7:
+                msg = '网络不可用或者无法连接到获取位置信息的卫星'
+                break
+              case 8:
+                msg = '无法在指定的最大超时间隔内检索位置信息'
+                break
+              default:
+                msg = '由于未知错误而无法检索设备的位置'
+                break
+            }
+            _this.$$notify[msgType]({
+              key: NotificationKey,
+              message: '提示',
+              description: msg
+            })
+          }, positionOptions)
+        } else {
+          _this.$$notify.error({
+            key: NotificationKey,
+            message: '提示',
+            description: '您的浏览器不支持地理位置服务'
+          })
+        }
+      },
     delete_time_control() {
       const that = this;
       if(this.control_time === false) {
@@ -419,27 +553,44 @@ export default {
       }
       // if(this.is_end_time && Date.parse(this.end_time )< now) console.log("结束时间早于当前时间");
       else {
-        axios
-            .patch('/api/questionnaire/' + that.info.id + '/', {
-              is_start_time: this.info.is_start_time,
-              start_time: this.info.start_time,
-              is_end_time: this.info.is_end_time,
-              end_time: this.info.end_time,
-            }, {
-              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-            })
-            .then(function (response){
-              that.$notify.success({
-                title: '编辑成功',
-                message: '设置时间控制成功！'
+        var fl = 1;
+        if(this.info.is_start_time && this.info.is_end_time) {
+            // console.log(this.info.start_time);
+            // console.log(this.info.end_time);
+            if(Date.parse(this.info.start_time) > Date.parse(this.info.end_time)) {
+              fl = 0;
+            }
+        }
+        if(fl === 1) {
+          axios
+              .patch('/api/questionnaire/' + that.info.id + '/', {
+                is_start_time: this.info.is_start_time,
+                start_time: this.info.start_time,
+                is_end_time: this.info.is_end_time,
+                end_time: this.info.end_time,
+              }, {
+                headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
-            })
-            .catch(function (error){
-              that.$notify.error({
-                title: '出错啦',
-                message: '设置时间失败'
+              .then(function (response){
+                that.$notify.success({
+                  title: '编辑成功',
+                  message: '设置时间控制成功！'
+                })
               })
-            })
+              .catch(function (error){
+                that.$notify.error({
+                  title: '出错啦',
+                  message: '设置时间失败'
+                })
+              })
+        }
+        else {
+          this.$notify.warning({
+            title: '设置失败',
+            message: '结束时间不能早于开始时间，请检查并修改！',
+          })
+        }
+
       }
     },
     is_show_num() {
@@ -460,18 +611,9 @@ export default {
           })
     },
     check(){
-      this.$router.push({path: '/check/' + this.$route.params.id});
-    },
-    toChart(){
-      if(this.info.answer_num === 0){
-        this.$notify.warning({
-          title: '此问卷暂无答卷',
-          message: '请先回收问卷'
-        })
-      }
-      else{
-        this.$router.push({path: '/charts/' + this.info.id});
-      }
+      let s1 = Base64.encode('moyu' + this.$route.params.id + 'wenjuan');
+      let url = window.location.origin+ "/check/" + s1; //预览链接
+      window.open(url);
     },
     Finish(){
       if(this.info.question_list.length === 0){
@@ -488,17 +630,42 @@ export default {
       }
     },
     addQuestion(questionType){
-      this.$refs[questionType].addQuestion(questionType)
+      console.log("addQuestion", this.$refs, questionType)
+      // this.$refs[questionType].addQuestion(questionType)
+        this.info.question_list.push({
+            key: Date.now(),
+            option_list: [
+              {
+                title: '',
+                content:'',
+                ordering: 1,
+              },
+            ],
+            title: '',
+            content: '',
+            type: questionType,
+            questionnaire: this.$route.params.id,
+            is_must_answer: false,
+            is_show_result: false,
+            isShow: false
+        })
+        var index = this.info.question_list.length-1
+        this.$nextTick(_=>{
+          this.editQuestion(this.info.question_list[index], index)
+        })
     },
     editQuestion(item, index){
       var questionType = item.type
       // 切换编辑界面显示
-      console.log("editquestion", this.$refs, questionType+index)
+      console.log("editquestion", this.$refs[questionType+index][0])
       var temp = this.$refs[questionType+index][0]
-      var last= temp.addDialogVisible
-      console.log(last)
       temp.editQuestion(this.info.question_list[index])
-      if (last == !temp.addDialogVisible) item.isShow = !item.isShow
+
+      console.log("afteredit",this.info.question_list[index])
+      // 编辑成功才切换状态
+      if (temp.editSuccess){
+        item.isShow = !item.isShow
+      }
     },
     cardUp(index, item){
       if (index === 0){
@@ -591,6 +758,7 @@ export default {
     onStart() {
     this.drag = true;
     console.log("start")
+    console.log(this.info.question_list)
     },
 //拖拽结束事件
     onEnd(e) {
@@ -634,6 +802,11 @@ export default {
     // 添加成功的事件
   },
   mounted() {
+    const _this = this
+    window.initBaiduMapScript = () => {
+      _this.BMap = window.BMap
+    }
+    loadBMap('initBaiduMapScript')
     const that = this;
     authorization().then(function (response) {
       if(response[0]){
@@ -654,11 +827,24 @@ export default {
                   // message: '爬',
                 });
               }
+              that.menuList.push({
+                  name: "其他功能",
+                  type: "function",
+                  children:[
+                    {
+                      name: "定位",
+                      type: "position"
+                    },
+                  ]
+                })
+              if (that.info.type == "epidemic-check-in"){
+
+              }
               for (let item of that.info.question_list){
                 item["isShow"] = false
               }
               for (let item of that.info.question_list) {
-                that.answer.push([]);
+                item.answer = []
               }
             })
             .catch(function (error) {
@@ -695,7 +881,6 @@ export default {
 }
 // 侧边栏标题布局
 .aside-top{
-  
   text-align: center;
   margin-bottom: 5pt;
   font-size: 20px !important;
@@ -705,7 +890,8 @@ export default {
   text-align: center;
   font-size: 30px;
   font-weight: bolder;
-  margin-bottom: 20px;
+  padding: 10px 10px;
+  margin:0 20px;
 }
 .questionnaire {
   //padding: 20px;
@@ -714,8 +900,8 @@ export default {
   opacity: 0.95;
 }
 .intro{
-  padding: 0 2em;
-  margin:10px 0;
+  padding: 10px 10px;
+  margin:10px 20px;
   font-size:15px;
   //color:#888;
   line-height: 1.5em;
@@ -751,9 +937,8 @@ export default {
  opacity: 0.95;
  margin-top: 0;
  padding-top: 10pt;
- border-radius: 3%;
+ //border-radius: 3%;
 }
-
 
 .bottom-button{
   height: 100%;
@@ -766,12 +951,14 @@ export default {
   justify-content: center;
 }
 .el-aside {
+  //position: fixed;
   background-color: transparent;
   color: #333;
   padding-top:0 !important;
   padding-bottom:30px;
+  width: auto !important;
   /*border-radius: 15px;*/
-  opacity: 0.9;
+  //opacity: 0.9;
   /*line-height: 200px;*/
 }
 // element ui 的主题区域布局
@@ -801,7 +988,7 @@ export default {
   justify-content: center;
 }
 
-.el-icon-document-checked, .el-icon-data-line{
+.el-icon-document-checked, .el-icon-finished{
   font-size: 30px;
 }
 
@@ -879,7 +1066,7 @@ export default {
 }
 
 .single-completion-input, .multiple-completion-input{
-  margin-top: 20pt !important;
+  margin-top: 12px !important;
   width: 80% !important;
 }
 

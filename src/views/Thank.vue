@@ -27,7 +27,6 @@
           </div>
 
         </div>
-
       </div>
 
       <h1 class="title">感谢填写!</h1>
@@ -79,13 +78,11 @@ export default {
   },
   methods: {
     click(){
-      this.$router.push({path: '/index'});
+      this.$router.push({path: '/'});
     },
   }
 }
 </script>
-
-
 
 <style scoped>
 

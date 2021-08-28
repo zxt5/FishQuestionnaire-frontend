@@ -1,18 +1,21 @@
 <template>
   <div>
-<!--    <div class="reminder"  v-if="info.status==='closed'">-->
-<!--      <h4>摸小鱼温馨提示：当前问卷处于关闭状态，无法提交哦~</h4>-->
-<!--    </div>-->
-
-
+    <div class="reminder"  v-if="info.status==='closed'">
+      <h4>摸小鱼温馨提示：当前问卷处于关闭状态，无法提交哦~</h4>
+    </div>
     <div class="questionnaire" v-if="info.is_locked === false">
       <!--标题-->
       <h1 class="title">{{info.title}}</h1>
-      <div class="content">&nbsp;{{info.content}}</div>
+      <div class="content" v-if="timeStamp===2">&nbsp;很抱歉，此问卷将于 {{startTime}} 开放！</div>
+      <div class="content" v-if="timeStamp===3">&nbsp;很抱歉，此问卷已于 {{endTime}} 结束！</div>
+      <div class="line" v-if="timeStamp!==1"></div>
+      <el-button v-if="timeStamp!==1" type="primary" @click="toIndex">确定</el-button>
 
-      <el-divider/>
 
-      <div class="question_block" v-for="(item, index) in info.question_list" :key="index">
+      <div v-if="timeStamp===1" class="content">&nbsp;{{info.content}}</div>
+<!--      <div class="line"></div>-->
+      <el-divider v-if="timeStamp===1"/>
+      <div v-if="timeStamp===1" class="question_block" v-for="(item, index) in info.question_list" :key="index">
         <div slot="header">
           <div class="questionTitle">
             <!--显示必填标识-->
@@ -94,9 +97,9 @@
         </v-app>
       </div>
 
-      <!--提交按钮-->
-      <el-button type="primary" @click="click(info.id)">提交</el-button>
-
+      <el-button v-if="timeStamp===1" type="primary" @click="click(info.id)">提交</el-button>
+<!--      <div class="line"></div>-->
+<!--      <div class="text2"> 摸鱼问卷 提供技术支持 </div>-->
 
     </div>
 
@@ -144,6 +147,9 @@ export default {
       info: '',
       submit_list: [],
       flag: true,
+      timeStamp: 1,
+      startTime: '',
+      endTime: '',
       // dialogVisible: true,
       password: '',
     }
@@ -155,7 +161,33 @@ export default {
     s1 = s1.substring(4,s1.length - 7);
     axios
         .get('/api/questionnaire/' + parseInt(s1) + '/')
-        .then(response => (this.info = response.data))
+        .then(function (response) {
+          that.info = response.data;
+          console.log(that.info);
+          if(that.info.is_start_time) {
+            var time = that.info.start_time;
+            var date = new Date(time).toJSON();
+            // console.log(date);
+            var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
+            // console.log(str);
+            that.startTime = str;
+            if(Date.parse(that.info.start_time) > Date.now()) {
+              that.timeStamp = 2;
+            }
+          }
+          if(that.info.is_end_time) {
+            var time = that.info.end_time;
+            var date = new Date(time).toJSON();
+            // console.log(date);
+            var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
+            // console.log(str);
+            that.endTime = str;
+            if(Date.parse(that.info.end_time) < Date.now()) {
+              that.timeStamp = 3;
+            }
+          }
+          console.log(that.timeStamp);
+        })
         .catch(function (error){
           that.$notify.error({
             title: '好像发生了什么错误',
@@ -164,6 +196,9 @@ export default {
         })
   },
   methods: {
+    toIndex(){
+      this.$router.push({path: '/'});
+    },
     check_password() {
       if(this.password === this.info.password) {
         this.$notify.success({
@@ -286,15 +321,23 @@ export default {
 
 <style scoped>
 
+.line{
+  /*width: 90%;*/
+  height: 1px;
+  border-top: solid 2px;
+  margin-left: 30px;
+  margin-right: 30px;
+  color: #3F87DA;
+}
 .el-dialog__wrapper >>> .el-dialog {
   border-radius: 10px !important;
 }
 
 .content {
-  /*text-align: center;*/
+  text-align: center;
   font-size: 15px;
   color: #555555;
-  margin: 10px 40px 6px;
+  margin: 20px auto 50px;
   /*text-indent:1em;*/
 }
 p {
@@ -325,15 +368,6 @@ p {
   box-shadow: 0 2px 12px 1px rgba(0, 0, 0, 0.1);
   padding: 20px;
   margin-bottom: 40px;
-}
-
-.line{
-  /*width: 90%;*/
-  height: 1px;
-  border-top: solid 2px;
-  margin-left: 30px;
-  margin-right: 30px;
-  color: #3F87DA;
 }
 
 .question_block {

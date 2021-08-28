@@ -13,6 +13,7 @@ import Search from "../views/Search";
 import NotFound from "../views/NotFound";
 import Thank from "../views/Thank";
 import Welcome from "../views/Welcome";
+import TypeChoose from "../views/TypeChoose";
 
 Vue.use(VueRouter)
 
@@ -71,6 +72,14 @@ const routes = [
         }
       },
     ]
+  },
+  {
+    path: '/create',
+    name: 'TypeChoose',
+    component: TypeChoose,
+    meta:{
+      title:'创建问卷'
+    }
   },
   {
     path: '/check/:text',

@@ -5,7 +5,7 @@
         <el-aside width="23%" style="height: fit-content;">
 
           <el-container class="class">
-            <div @click="add()" style="margin-left: 0px">
+            <div @click="$router.push({path: '/create'})" style="margin-left: 0px">
               <el-button class="button" circle>
                 <i class="el-icon-edit"></i>
               </el-button>
@@ -151,7 +151,7 @@ export default {
 
   },
   mounted(){
-    console.log(returnCitySN);
+    console.log("city",returnCitySN);
     const that = this;
     authorization()
       .then(function (response){

@@ -8,15 +8,20 @@
     <el-container class="main" id="pdfDom">
       <!--图像区域-->
       <el-main style="height: fit-content" class="questionnaire">
+        <el-tabs v-model="activeName" @tab-click="handleClick" style="margin-bottom: 20px;font-size: large">
+          <el-tab-pane label="统计分析" name="first"></el-tab-pane>
+          <el-tab-pane label="交叉分析" name="second"></el-tab-pane>
+        </el-tabs>
+        <!--统计分析-->
         <!--折叠面板-->
-        <div v-for="(answer, index) in info.question_list" :key="index">
+        <div v-if="activeName==='first'" v-for="(answer, index) in info.question_list" :key="index">
           <span style="margin-left: 30px; font-weight: bolder">第{{(index+1)}}题： </span>
           <span style="margin-top: 20px;margin-bottom: 10px"> {{answer.title}} </span>
           <span style="margin-top: 20px;margin-left: 6px;color: darkgray" v-if="answer.type === 'single-choice'">[单选题]</span>
           <span style="margin-top: 20px;margin-left: 6px;color: darkgray" v-if="answer.type === 'multiple-choice'">[多选题]</span>
           <span style="margin-top: 20px;margin-left: 6px;color: darkgray" v-if="answer.type === 'completion'">[填空题]</span>
           <span style="margin-top: 20px;margin-left: 6px;color: darkgray" v-if="answer.type === 'scoring'">[评分题]</span>
-<!--          <span style="margin-top: 20px;margin-left: 10px"> [单选题] </span>-->
+          <!--          <span style="margin-top: 20px;margin-left: 10px"> [单选题] </span>-->
           <el-collapse v-model="tmp[index].activeNames" @change="handleChange(index)" style="margin-top: 10px">
             <el-collapse-item  name="2" style="margin-left: 10px">
               <template slot="title" v-if="answer.type === 'single-choice' || answer.type === 'multiple-choice'">
@@ -69,6 +74,59 @@
             </el-collapse-item>
           </el-collapse>
         </div>
+
+
+        <!--交叉分析-->
+        <div v-if="activeName==='second'" style="display: flex">
+
+          <div class="block">
+            <span class="demonstration">定义行 [一般为需要分析的题目，如爱好，意愿等，限10题。]</span>
+            <div v-for="(i, index) in cross1" :key="index" style="float: left;margin-left: 18.6%;">
+              <el-select  style="margin-bottom: 20px; width: 400px" v-model="i.value" filterable placeholder="请选择">
+                <el-option
+                    v-for="item in info.question_list"
+                    v-if="item.type !== 'completion'"
+                    :key="item.id"
+                    :label="item.ordering + '. ' + item.title"
+                    :value="item.id">
+                </el-option>
+              </el-select>
+              <i @click="remove1(index)" class="el-icon-circle-close" style="margin-left: 10px; color: grey; cursor: pointer" v-if="cross1.length > 1"></i>
+            </div>
+            <el-button class="button" plain @click="add1" v-if="cross1.length < 10">新增题目</el-button>
+          </div>
+          <div class="block">
+            <span class="demonstration">定义列 [一般为样本属性，如性别，年龄等，限10题。]</span>
+            <div v-for="(i, index) in cross2" :key="index" style="float: left;margin-left: 18.6%;">
+              <el-select  style="margin-bottom: 20px; width: 400px" v-model="i.value" filterable placeholder="请选择">
+                <el-option
+                    v-for="item in info.question_list"
+                    v-if="item.type !== 'completion'"
+                    :key="item.id"
+                    :label="item.ordering + '. ' + item.title"
+                    :value="item.id">
+                </el-option>
+              </el-select>
+              <i @click="remove2(index)" class="el-icon-circle-close" style="margin-left: 10px; color: grey; cursor: pointer" v-if="cross2.length > 1"></i>
+            </div>
+            <el-button class="button" plain @click="add2" v-if="cross2.length < 10">新增题目</el-button>
+          </div>
+
+        </div>
+
+
+
+<!--        <el-divider/>-->
+        <el-button  type="primary" @click="crossGen()">生成</el-button>
+        <el-divider/>
+        <div v-for="(i, index) in table_list">
+<!--          <div v-for="(j, jndex) in info.question_list">-->
+            <div :id="'1-1-' + index" :ref="'1-1-' + index" class="image-div">
+            </div>
+<!--          </div>-->
+        </div>
+
+
       </el-main>
     </el-container>
     <!--波浪-->
@@ -84,6 +142,166 @@ import {Base64} from "js-base64";
 var option;
 export default {
   components: {Wave},
+
+  data(){
+    return {
+      placeHoledStyle: {
+        normal: {
+          barBorderColor: 'rgba(0,0,0,0)',
+          color: 'rgba(0,0,0,0)'
+        },
+        emphasis: {
+          barBorderColor: 'rgba(0,0,0,0)',
+          color: 'rgba(0,0,0,0)'
+        }
+      },
+      dataStyle: {
+        normal: {
+          label : {
+            show: true,
+            position: 'insideLeft',
+            formatter: '{c}%'
+          }
+        }
+      },
+      crossShow: false,
+      cross1: [
+        {
+          value: '',
+        },
+      ],
+      cross2:[
+        {
+          value: '',
+        },
+      ],
+
+      questionForm: {
+        title: '',
+        content: '',
+        type: '',
+        ordering: 0,
+        questionnaire: 0,
+        is_must_answer: false,
+        option_list: [
+          {
+            title: '',
+            content: '',
+            ordering: 1,
+            // key: Date.now()
+          }
+        ],
+        answer: ''
+      },
+      questionFormRules:{
+        title:[
+          {
+            required: true,
+            message: '你的题目呢',
+            trigger: 'blur'
+          }
+        ]
+      },
+      activeName: 'first',
+      htmlTitle:'',
+      // 当前用户
+      userLogin: localStorage.getItem('username.myblog'),
+      info: null,
+      // 图标选项栏
+      tab_panes:[
+        {
+          name: '柱状图',
+          type: 0
+        },
+        {
+          name: '饼状图',
+          type: 1
+        },
+        {
+          name: '圆环图',
+          type: 2
+        }
+      ],
+      tmp: [],
+      nums:[],
+      myChart: [],
+      crossName_x :[],
+      crossName_y :[],
+      crossMat:[],
+      pre_list :[
+        {
+          title: "111",
+          num: [85, 50],
+
+        },{
+          title: "2222",
+          num: [15, 50],
+        }
+      ],
+      name:["111","222"],
+      table_list : [
+        {
+          question_x : {
+            title: "问题1",
+            type : "single-choice",
+            ordering : 1
+          },
+          question_y : {
+            title: "问题2",
+            type : "multiple-choice",
+            ordering : 2,
+          },
+          option_x_list : [
+            {
+              id : 231,
+              title : "23号问题的选项1",
+              num : 10, //小计
+              cnt : 2,
+              option_y_list : [
+                {
+                  id: 241,
+                  title: "24号问题的选项1",
+                  num : 10,
+                  percent: 100.0,
+                  percent_string: "100.00%"
+                },
+                {
+                  id : 242,
+                  title: "24号问题的选项2",
+                  num : 0,
+                  percent: 0.0,
+                  percent_string: "0.00%"
+                }
+              ]
+            },
+            {
+              id : 232,
+              title : "23号问题的选项2",
+              num : 3, //小计
+              cnt : 2,
+              option_y_list : [
+                {
+                  id : 241,
+                  title: "24号问题的选项1",
+                  num : 2,
+                  percent: 0.0,
+                  percent_string: "0.00%"
+                },
+                {
+                  id : 242,
+                  title: "24号问题的选项2",
+                  num : 1,
+                  percent: 0.0,
+                  percent_string: "0.00%"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+  }
+  },
+
   mounted: function (){
     const that = this;
     authorization().then(function (response) {
@@ -169,113 +387,67 @@ export default {
       }
     });
   },
-  data(){
-    return {
-      htmlTitle:'',
-      // 当前用户
-      userLogin: localStorage.getItem('username.myblog'),
-      info: null,
-      // 图标选项栏
-      tab_panes:[
-        {
-          name: '柱状图',
-          type: 0
-        },
-        {
-          name: '饼状图',
-          type: 1
-        },
-        {
-          name: '圆环图',
-          type: 2
-        }
-      ],
-      tmp: [],
-      nums:[],
-      answers: [
-        {
-          activeChart: '0',
-          activeNames: ['2',], // 折叠栏全部展开
-          content: '第一个题目',
-          type: "single-choice",
-          result:[{
-            content: "A",
-            number: 2,
-            percent: "10%"
-          },
-            {
-              content: "B",
-              number: 10,
-              percent: "50%"
-            },
-            {
-              content: "C",
-              number: 8,
-              percent: "40%"
-            }
-          ]
-        },
-        {
-          activeChart: '0',
-          activeNames: ['2',],
-          content: '第二个题目',
-          type: "single-choice",
-          result:[{
-            content: "A",
-            number: 2,
-            percent: "10%"
-          },
-            {
-              content: "B",
-              number: 10,
-              percent: "50%"
-            },
-            {
-              content: "C",
-              number: 8,
-              percent: "40%"
-            }
-          ]
-        },
-        {
-          activeChart: '0',
-          activeNames: ['2',], // 折叠栏全部展开
-          content: '第三个题目',
-          type: "single-choice",
-          result:[{
-            content: "A",
-            number: 2,
-            percent: "10%"
-          },
-            {
-              content: "B",
-              number: 10,
-              percent: "50%"
-            },
-            {
-              content: "C",
-              number: 8,
-              percent: "40%"
-            }
-          ]
-        },
-      ]
-    }
-  },
+
   methods: {
+    crossGen() {
+      this.crossName_x.splice(0,this.crossName_x.length)
+      this.crossName_y.splice(0,this.crossName_y.length)
+      this.crossMat.splice(0,this.crossMat.length)
+      this.myChart.splice(0,this.myChart.length)
+      let question_x_list = [];
+      let question_y_list = [];
+      for (let item of this.cross1) {
+        if(item.value !== '') question_x_list.push(item.value);
+      }
+      for (let item of this.cross2) {
+        if(item.value !== '') question_y_list.push(item.value);
+      }
+      const that = this;
+      axios.put('/api/questionnaire/' + this.info.id + '/cross-analysis/', {
+        question_x_list : question_x_list,
+        question_y_list : question_y_list,
+        },{
+        headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+      }
+      ).then(function (response) {
+        console.log(response.data);
+        that.table_list = response.data.table_list;
+      })
+      setTimeout(()=>{
+        this.genData();
+        for (let i = 0; i < that.table_list.length; i ++) {
+          this.myChart.push('');
+          this.genrateCross(i, "1-1-" + i);
+        }
+      }, 500)
+
+
+    },
+    add1() {
+      this.cross1.push({
+        value: '',
+      })
+    },
+    add2() {
+      this.cross2.push({
+        value: '',
+      })
+    },
+    remove1(index) {
+      this.cross1.splice(index, 1);
+    },
+    remove2(index) {
+      this.cross2.splice(index, 1);
+    },
+    handleClick(tab, event) {
+      console.log(tab, event);
+      console.log(this.activeName)
+    },
     downloadExcel() {
       let a = document.createElement('a')
       a.href ="http://49.233.52.139:8000/api/questionnaire/"+this.info.id+"/export-xls/";
       a.click();
     },
-    init(){
-      console.log(this.tmp);
-      for (let i = 0; i < this.answers.length; i++){
-        for (let j = 0; j < 3; j++){
-          this.generateChart(i+'-'+j, j)
-        }
-      }
-      },
     handleChange(index) {
       for (let j = 0; j < 3; j++) {
         this.generateChart(index, index + '-' + j, j);
@@ -285,6 +457,76 @@ export default {
       for (let j = 0; j < 3; j++) {
         this.generateChart(index, index + '-' + j, j);
       }
+    },
+    genData(){
+      for (let item of this.table_list) {
+        let tmpName_x = [];
+        let tmpName_y = [];
+        let tmpMat = [];
+        for (let subItem of item.option_x_list) {
+          tmpName_x.push(subItem.title);
+          let tmp = [];
+          for (let ii of subItem.option_y_list) {
+            tmp.push(ii.num);
+          }
+          console.log(tmp);
+          tmpMat.push({
+            name: subItem.title,
+            type: 'bar',
+            stack: 'total',
+            label: {
+              show: true,
+              position: 'top'
+            },
+            emphasis: {
+              focus: 'series'
+            },
+            data: tmp,
+          });
+        }
+        this.crossMat.push(tmpMat);
+        for (let subItem of item.option_x_list[0].option_y_list) {
+          tmpName_y.push((subItem.title));
+        }
+        this.crossName_x.push(tmpName_x);
+        this.crossName_y.push(tmpName_y);
+        console.log(tmpName_x)
+        console.log(tmpName_y)
+      }
+    },
+    genrateCross(index, eid) {
+      console.log(eid)
+      if (this.myChart[index] != null && this.myChart[index] !== "" && this.myChart[index] !== undefined){
+        this.myChart[index].dispose();
+      }
+      this.myChart[index] = this.$echarts.init(document.getElementById(eid));
+      option = {
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {            // Use axis to trigger tooltip
+              type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
+            }
+          },
+          legend: {
+            // data: ['Direct', 'Mail Ad', 'Affiliate Ad', 'Video Ad', 'Search Engine']
+            data: this.crossName_x[index],
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          xAxis: {
+            type: 'value'
+          },
+          yAxis: {
+            type: 'category',
+            data: this.crossName_y[index],
+          },
+          series: this.crossMat[index],
+      };
+      this.myChart[index].setOption(option)
     },
     generateChart(index, eid, type){
       console.log(eid)
@@ -378,6 +620,34 @@ export default {
           ]
         };
       }
+      else if(type === 3) {
+        option = {
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {            // Use axis to trigger tooltip
+              type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
+            }
+          },
+          legend: {
+            // data: ['Direct', 'Mail Ad', 'Affiliate Ad', 'Video Ad', 'Search Engine']
+            data: this.crossName_x[index],
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          xAxis: {
+            type: 'value'
+          },
+          yAxis: {
+            type: 'category',
+            data: this.crossName_y[index],
+          },
+          series: this.crossMat[index],
+        };
+      }
       myChart.setOption(option)
     }
   },
@@ -395,7 +665,10 @@ export default {
   margin-top: 20pt;
   transform: translate(-50%);
 }
-
+.choiceinput{
+  width: 70%;
+  margin-right: 10%;
+}
 .questionnaire {
   //padding: 20px;
   border-radius: 10px;
@@ -429,4 +702,28 @@ export default {
   top: 50%;
   transform: translate(-50%, 10%);
 }
+
+.block{
+  //padding: 30px 0;
+  text-align: center;
+  border-right: 1px solid #eff2f6;
+  width: 50%;
+  box-sizing: border-box;
+}
+.demonstration{
+  display: block;
+  color: #8492a6;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+.button{
+  width: 400px !important;
+  display: block;
+  margin: 0 auto;
+  //padding-left: 15px;
+}
+//.el-input--suffix .el-input__inner {
+//  padding-right: 230px !important;
+//}
 </style>
+
