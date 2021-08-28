@@ -5,7 +5,7 @@
 <!--    </div>-->
 
 
-    <div class="questionnaire">
+    <div class="questionnaire" v-if="info.is_locked === false">
       <!--标题-->
       <h1 class="title">{{info.title}}</h1>
       <div class="content">&nbsp;{{info.content}}</div>
@@ -103,6 +103,7 @@
     <el-dialog
         title="问卷已加密！"
         center
+        top="200px"
         :visible.sync="info.is_locked"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
