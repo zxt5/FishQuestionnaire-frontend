@@ -1,17 +1,24 @@
 <template>
   <!--添加题目的对话框-->
-  <el-dialog
-      title="添加题目[多选题]"
-      width="50%"
-      :visible.sync="addDialogVisible">
+    <div class="add-question-card">
+    <el-divider></el-divider>
     <el-form :model="questionForm"
              :rules="questionFormRules"
              ref="questionFormRef"
              label-width="80px"
     >
-      <el-form-item label="题目描述" prop="title">
-        <el-input placeholder="请输入题目描述"
+      <el-form-item label="题目标题" prop="title">
+        <el-input placeholder="请输入题目标题"
+                  maxlength="30"
+                  show-word-limit
                   v-model="questionForm.title" :autosize="true"
+                  type="textarea" :clearable="true" resize="none"> </el-input>
+      </el-form-item>
+      <el-form-item label="备注" prop="content">
+        <el-input placeholder="请输入题目备注"
+                  maxlength="60"
+                  show-word-limit
+                  v-model="questionForm.content" :autosize="true"
                   type="textarea" :clearable="true" resize="none"> </el-input>
       </el-form-item>
       <el-form-item label="是否必选" prop="is_must_answer">
@@ -36,12 +43,12 @@
     </el-form>
     <div class="dialog-footer">
       <el-button icon="el-icon-edit" @click="addChoice" type="primary">新增选项</el-button>
-      <div>
+      <!-- <div>
         <el-button icon="el-icon-check" @click="finishQuestion()" type="success">完成</el-button>
         <el-button icon="el-icon-close" @click="cancelQuestion" type="danger"> 取消</el-button>
-      </div>
+      </div> -->
     </div>
-  </el-dialog>
+     </div>
 </template>
 <script>
 
@@ -53,15 +60,7 @@ export default {
   data(){
     return{
       temp: '',
-      addDialogVisible : false,
-      // title: '',
-      // content: '',
-      // type: '',
-      // ordering: 0,
-      // questionnaire: 0,
-      // is_must_answer: false,
-      // option_list: [],
-      // answer: '',
+      editSuccess: true,
       flag : 0,//判断创建还是修改问题
       questionForm: {
         title: '',
@@ -103,11 +102,13 @@ export default {
       this.addDialogVisible = true
     },
     editQuestion(question){
-      this.temp = question
-      this.questionForm = JSON.parse(JSON.stringify(question))
+      if (question.isShow) {
+        this.editSuccess = true
+        this.finishQuestion()
+        return 
+      }
+      this.questionForm = question
       this.flag = question.id
-      // console.log(this.questionForm);
-      this.addDialogVisible = true
     },
     addChoice() {
       this.questionForm.option_list.push({
@@ -126,15 +127,19 @@ export default {
 
     finishQuestion(){
       this.$refs.questionFormRef.validate(valid => {
-        if (!valid) return this.$notify.error({
-          title: '表单有错误'
-        });
-        if (this.questionForm.option_list.length < 2) return this.$notify.error({
-          title: '请至少添加两个选项噢~'
-        })
-        this.addDialogVisible = false;
+        if (!valid){
+          this.editSuccess = false
+          return this.$notify.error({
+          title: '表单有错误'});
+        }
+        if (this.questionForm.option_list.length < 2){
+          this.editSuccess = false
+          return this.$notify.error({
+            title: '请至少添加两个选项噢~'
+          })
+        }
         const that = this;
-        if(this.flag === 0){
+        if(!this.flag){
           axios
               .post('/api/question/', {
                 option_list: that.questionForm.option_list,
@@ -146,7 +151,8 @@ export default {
                 is_must_answer: that.questionForm.is_must_answer,
               })
               .then(function (response){
-                that.reload();
+                // that.reload();
+                that.editSuccess = true
                 that.$notify.success({
                   title: '保存成功'
                 })
@@ -156,6 +162,7 @@ export default {
                   title: '出错啦',
                   message: '编辑失败'
                 })
+                  that.questionForm.isShow = true
               })
         }
         else{
@@ -170,7 +177,7 @@ export default {
                 is_must_answer: that.questionForm.is_must_answer,
               })
               .then(function (response){
-                that.reload();
+                that.editSuccess = true
                 that.$notify.success({
                   title: '保存成功'
                 })
@@ -180,24 +187,11 @@ export default {
                   title: '出错啦',
                   message: '编辑失败'
                 })
+                that.questionForm.isShow = true
               })
         }
-        // console.log(this.$parent.info.questions_list.length);
-        // var index = this.$parent.info.questions_list.indexOf(this.temp)
-        // if (index === -1){
-        //   this.$parent.info.questions_list.push(this.questionForm);
-        // }
-        // else{
-        //   this.$parent.info.questions_list[index] = this.questionForm
-        //   this.$parent.$forceUpdate()
-        // }
       })
     },
-
-    cancelQuestion(){
-      this.$refs.questionFormRef.resetFields()
-      this.addDialogVisible = false
-    }
 
   }
 }

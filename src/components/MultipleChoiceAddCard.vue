@@ -22,11 +22,14 @@
                   v-model="questionForm.content" :autosize="true"
                   type="textarea" :clearable="true" resize="none"> </el-input>
       </el-form-item>
-      <el-form-item label="是否必选" prop="is_must_answer">
-        <el-switch v-model="questionForm.is_must_answer"
-                   active-color="#409eff"
-                   inactive-color="#dcdfe6"></el-switch>
+      <el-form-item >
+
+        <el-checkbox label="是否必填"
+          v-model="questionForm.is_must_answer"></el-checkbox>
+          
+        <el-checkbox label="是否显示结果" v-model="questionForm.is_show_result"></el-checkbox>
       </el-form-item>
+
 
       <el-form-item
           v-for="(option, index) in questionForm.option_list"
@@ -61,15 +64,7 @@ export default {
   data(){
     return{
       temp: '',
-      addDialogVisible : false,
-      // title: '',
-      // content: '',
-      // type: '',
-      // ordering: 0,
-      // questionnaire: 0,
-      // is_must_answer: false,
-      // option_list: [],
-      // answer: '',
+      editSuccess: true,
       flag : 0,//判断创建还是修改问题
       questionForm: {
         title: '',
@@ -108,15 +103,13 @@ export default {
     addQuestion(questionType){
       this.resetForm(questionType)
       this.flag = 0
-      this.addDialogVisible = true
     },
     editQuestion(question){
-      if (this.addDialogVisible) {
-        this.addDialogVisible = false
-        this.finishQuestion()
+      if (question.isShow) {
+        this.editSuccess = true
+        this.finishQuestion(question)
         return 
       }
-      this.addDialogVisible = true
       this.questionForm = question
       this.flag = question.id
     },
@@ -135,17 +128,20 @@ export default {
       }
     },
 
-    finishQuestion(){
+    finishQuestion(question){
       this.$refs.questionFormRef.validate(valid => {
-        if (!valid) return this.$notify.error({
-          title: '表单有错误'
-        });
-        if (this.questionForm.option_list.length < 2) return this.$notify.error({
-          title: '请至少添加两个选项噢~'
-        })
-        this.addDialogVisible = false;
+        if (!valid){
+          this.editSuccess = false
+          return this.$notify.error({
+          title: '表单有错误'});
+        }
+        if (this.questionForm.option_list.length === 0){
+            this.editSuccess = false
+          return this.$notify.error({
+          title: '请至少添加一个选项噢~'})
+        }
         const that = this;
-        if(this.flag === 0){
+        if(!this.flag){
           axios
               .post('/api/question/', {
                 option_list: that.questionForm.option_list,
@@ -155,18 +151,27 @@ export default {
                 ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
+                is_show_result: that.questionForm.is_show_result
               })
               .then(function (response){
                 // that.reload();
+                that.editSuccess = true
                 that.$notify.success({
                   title: '保存成功'
                 })
+                var data = response.data
+                for (var key in data){
+              　　if(data.hasOwnProperty(key)){
+                    question[key] = data[key]
+                  }
+                }
               })
               .catch(function (error){
                 that.$notify.error({
                   title: '出错啦',
                   message: '编辑失败'
                 })
+                that.questionForm.isShow = true
               })
         }
         else{
@@ -179,9 +184,11 @@ export default {
                 ordering: that.questionForm.ordering,
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
+                is_show_result: that.questionForm.is_show_result
               })
               .then(function (response){
                 // that.reload();
+                that.editSuccess = true
                 that.$notify.success({
                   title: '保存成功'
                 })
@@ -191,17 +198,9 @@ export default {
                   title: '出错啦',
                   message: '编辑失败'
                 })
+                that.questionForm.isShow = true
               })
         }
-        // console.log(this.$parent.info.questions_list.length);
-        // var index = this.$parent.info.questions_list.indexOf(this.temp)
-        // if (index === -1){
-        //   this.$parent.info.questions_list.push(this.questionForm);
-        // }
-        // else{
-        //   this.$parent.info.questions_list[index] = this.questionForm
-        //   this.$parent.$forceUpdate()
-        // }
       })
     },
 
