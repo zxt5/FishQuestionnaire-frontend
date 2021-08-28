@@ -288,8 +288,8 @@ export default {
           // 提交问卷
           axios
               .post('/api/answer/', {
-                ip: returnCitySN.cip,
-                cname: returnCitySN.cname,
+                // ip: returnCitySN.cip,
+                // cname: returnCitySN.cname,
                 questionnaire: that.info.id,
                 answer_list: that.submit_list,
               })

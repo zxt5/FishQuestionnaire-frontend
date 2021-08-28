@@ -141,7 +141,8 @@
           <div class="card"  v-for="(item, index) in info.question_list" :key="item.id ? item.id: item.key">
             <div style="padding: 20px">
             <div class="op">
-              <ul>
+              <ul @mouseenter="mouseEnter"
+                  @mouseleave="mouseLeave">
                 <li @click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
                 <li @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
                 <li @click="cardDown(index, item)"><v-icon small>mdi-arrow-down-circle-outline</v-icon>  下移</li>
@@ -258,9 +259,7 @@
             
             <!--编辑界面-->
             <el-container          
-            style="display:inline" 
-            @mouseover.native = "mouseEnter"
-            @mouseout.native =  "mouseLeave"
+            style="display:inline"
             >
             <div class="question-container">
                 <el-collapse-transition>
@@ -285,8 +284,8 @@
             <!--编辑按钮-->
             <el-divider ></el-divider>
             <el-button @click="editQuestion(item, index)"
-            @mouseover.native = "mouseEnter"
-            @mouseout.native = "mouseLeave"
+                       @mouseenter.native="mouseEnter"
+                       @mouseleave.native="mouseLeave"
             class="edit-button"
             :icon=" item.isShow == true ? 'el-icon-arrow-up':'el-icon-arrow-down'"
             >
@@ -328,6 +327,7 @@ import authorization from "@/utils/authorization";
 import ScoringAddCard from "../components/ScoringAddCard";
 import axios from "axios";
 import draggable from 'vuedraggable'
+import TitleContentDialog from "../components/TitleContentDialog";
 // fade/zoom 等
 import 'element-ui/lib/theme-chalk/base.css';
 // collapse 展开折叠
@@ -346,17 +346,19 @@ export default {
         Wave, MultipleChoiceAddCard, SingleCompletionAddCard,
         MultipleCompletionAddCard,
         ScoringAddCard,draggable,
+        TitleContentDialog
   },
   data(){
 
     return {
+      isEdit: false,
       BMap: null,
       geolocation: null, // Geolocation对象实例
       positioning: false, // 定位中
       positioningInterval: null, // 定位倒计时计时器
       countDown: 30, // 倒计时，单位秒
       location: null, // 位置信息
-      disabled: false,
+      disabled: true,
       editPlace: {},
       menuList:[
         {
@@ -666,8 +668,13 @@ export default {
       if (temp.editSuccess){
         item.isShow = !item.isShow
       }
+      if (item.isShow) this.isEdit = true
+      else this.isEdit = false
     },
     cardUp(index, item){
+      if (this.isEdit){
+        return this.$notify.error('请完成当前编辑')
+      }
       if (index === 0){
         return this.$notify.error("已经到顶了啊");
       }
@@ -693,6 +700,9 @@ export default {
         })
     },
     cardDown(index, item){
+      if (this.isEdit){
+        return this.$notify.error('请完成当前编辑')
+      }
       if (index === this.info.question_list.length - 1){
         return this.$notify.error("不能继续往下了")
       }
@@ -718,6 +728,10 @@ export default {
           })
     },
     cardDelete(index, item){
+      if (!item.hasOwnProperty('id')){
+        this.info.question_list.splice(index, 1)
+        return
+      }
       const that = this;
       axios
           .delete('/api/question/' + item.id + '/',  {
@@ -734,6 +748,9 @@ export default {
           })
     },
     cardCopy(index, item){
+      if (this.isEdit){
+        return this.$notify.error('请完成当前编辑')
+      }
       const that = this;
       axios
           .post('/api/question/copy/', {
@@ -798,6 +815,10 @@ export default {
     mouseLeave(){
       this.mouseActivate = true
       this.disabled = false
+    },
+    mouseChange(){
+      if (this.isEdit) this.disabled = true
+      else this.disabled = false
     }
     // 添加成功的事件
   },
@@ -844,7 +865,10 @@ export default {
                 item["isShow"] = false
               }
               for (let item of that.info.question_list) {
-                item.answer = []
+                if (item.type == 'completion'){
+                  item.answer = ''
+                }
+                else item.answer = []
               }
             })
             .catch(function (error) {
