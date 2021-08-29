@@ -274,7 +274,7 @@
 
               <div
               v-if="item.is_scoring"
-               style="color: #F56C6C; margin-top:20px">正确答案: {{item.option_list[0].content}}</div>
+               style="color: #F56C6C; margin-top:20px">正确答案: {{item.answer}}</div>
             </template>
             <!--定位模板-->
             <template v-if="item.type == 'position'">
@@ -845,7 +845,9 @@ export default {
       var temp = this.$refs[questionType+index][0]
 
       if (this.editItem && this.editItem != temp){
-        this.$notify.error("请完成之前题目编辑")
+        this.$notify.error({
+          title: "请完成当前题目的编辑!"
+        })
         this.$nextTick(_=>{
             window.scrollTo({"behavior":"smooth","top": this.editItem.$el.offsetTop - 300});
         })
@@ -853,7 +855,9 @@ export default {
       }
 
       if (this.isEdit && !item.isShow){
-        this.$notify.error("请完成之前题目编辑")
+        this.$notify.error({
+          title: "请完成当前题目的编辑!"
+        })
         this.$nextTick(_=>{
             var el = document.getElementById("app")
             window.scrollTo({"behavior":"smooth","top": el.offsetHeight});
@@ -883,7 +887,9 @@ export default {
     // 上移
     cardUp(index, item){
       if (this.isEdit){
-        return this.$notify.error('请完成当前编辑')
+        return this.$notify.error({
+          title: "请完成当前题目的编辑!"
+        })
       }
       if (index === 0){
         return this.$notify.error("已经到顶了啊");
@@ -913,7 +919,9 @@ export default {
     // 下移
     cardDown(index, item){
       if (this.isEdit){
-        return this.$notify.error('请完成当前编辑')
+        return this.$notify.error({
+          title: "请完成当前题目的编辑!"
+        })
       }
       if (index === this.info.question_list.length - 1){
         return this.$notify.error("不能继续往下了")
@@ -967,7 +975,9 @@ export default {
     // 复制
     cardCopy(index, item){
       if (this.isEdit){
-        return this.$notify.error('请完成当前编辑')
+        return this.$notify.error({
+          title: "请完成当前题目的编辑!"
+        })
       }
       const that = this;
       axios
