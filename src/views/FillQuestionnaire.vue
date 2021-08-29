@@ -434,15 +434,12 @@ export default {
             })
       })
 
-
-
-
   },
 
   methods: {
 
     Djs_time: function(){
-      if(this.timeStamp!==2 && this.timeStamp!==3) {
+      if(this.info.is_end_time) {
         let ret = setInterval( ()=> {
           let startTime = new Date(this.info.start_time).getTime();
           let endTime = new Date(this.info.end_time).getTime();
