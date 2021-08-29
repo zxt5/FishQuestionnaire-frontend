@@ -60,7 +60,9 @@
         v-show="questionForm.is_scoring" :label="index">
           设为正确答案
         </el-checkbox>
-
+        <span v-if="type==='signup'">限额数量：</span>
+        <el-input  v-if="type==='signup'" :disabled="!questionForm.is_limit_answer" :label="index" v-model="option.limit_answer_number" style="width: 10%; margin-right: 20px; margin-left: 10px">
+          <span></span></el-input>
         <el-button @click.prevent="removeChoice(option)" type="danger" style="margin-left: 20px">删除</el-button>
       </el-form-item>
       <!-- </el-checkbox-group> -->
@@ -103,6 +105,7 @@ export default {
         ordering: 0,
         questionnaire: 0,
         is_must_answer: false,
+        is_limit_answer: false,
         option_list: [
         ],
         answer: ''
@@ -135,6 +138,7 @@ export default {
       this.flag = 0
     },
     editQuestion(question){
+      console.log(11111)
       if (question.isShow) {
         this.editSuccess = true
         this.finishQuestion(question)
@@ -148,8 +152,11 @@ export default {
         title: '',
         content: '',
         ordering: this.questionForm.option_list.length + 1,
-        // key: Date.now()
+        is_answer_choice: false,
+        related_logic_question: [],
+        key: Date.now()
       })
+      console.log("addChoice", this.questionForm.option_list)
     },
     removeChoice(item) {
       var index = this.questionForm.option_list.indexOf(item)
@@ -170,7 +177,58 @@ export default {
           return this.$notify.error({
           title: '请至少添加一个选项噢~'})
         }
+        if (this.questionForm.is_scoring){
+          var has_answer = false
+          for (var option of this.questionForm.option_list){
+            if (option.is_answer_choice){
+              has_answer = true
+              break
+            }
+          }
+          if (!has_answer){
+            this.editSuccess = false
+            return this.$notify.error({
+             title: '请设置正确答案'});
+          }
+        }
         const that = this;
+        if (that.questionForm.is_scoring){
+          for (var option in that.questionForm.option_list){
+            that.questionForm.option_list[option].is_answer_choice = false
+          }
+          var index = that.questionForm.answer
+          that.questionForm.option_list[index].is_answer_choice = true
+        }
+
+        let numFlag = true;
+        if (that.questionForm.is_limit_answer){
+
+          let numReg = /^[0-9]*$/;
+          let numRe = new RegExp(numReg);
+          for (var option in that.questionForm.option_list){
+            that.questionForm.option_list[option].is_limit_answer = true;
+            if(numRe.test(that.questionForm.option_list[option].limit_answer_number)) {
+              let num = parseInt(that.questionForm.option_list[option].limit_answer_number);
+              if(num < 0) numFlag = false;
+            }
+            else numFlag = false;
+          }
+        }
+        else {
+          for (var option in that.questionForm.option_list){
+            that.questionForm.option_list[option].is_limit_answer = false;
+          }
+        }
+
+        if(numFlag === false) {
+          that.$notify.error({
+            title: '限额必须为非负整数！',
+            message: '编辑失败'
+          })
+          that.questionForm.isShow = true
+          console.log(error)
+          return;
+        }
         if(!this.flag){
           axios
               .post('/api/question/', {
@@ -182,6 +240,7 @@ export default {
                 questionnaire: that.$route.params.id,
                 is_must_answer: that.questionForm.is_must_answer,
                 is_show_result: that.questionForm.is_show_result,
+                is_limit_answer: that.questionForm.is_limit_answer,
                 is_scoring: that.questionForm.is_scoring,
                 question_score: that.questionForm.question_score
               })
@@ -218,7 +277,10 @@ export default {
                 is_must_answer: that.questionForm.is_must_answer,
                 is_show_result: that.questionForm.is_show_result,
                 is_scoring: that.questionForm.is_scoring,
+                is_limit_answer: that.questionForm.is_limit_answer,
                 question_score: that.questionForm.question_score
+              },{
+                headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
               .then(function (response){
                 // that.reload();

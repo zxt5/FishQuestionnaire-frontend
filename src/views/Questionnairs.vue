@@ -212,10 +212,10 @@
         <!--问卷区域-->
         <el-main style="height: fit-content" class="questionnaire">
           <!--标题区域-->
-          <div class="question-title" contenteditable="true" >
+          <div class="question-title">
             <h2>{{info.title}}</h2>
           </div>
-          <div class="intro" contenteditable="true" @input="info.content = $event.target.innerText" @blur="editTitle(info)"> {{info.content}}</div>
+          <div class="intro"> {{info.content}}</div>
 
             <el-container          
             style="display:inline">
@@ -237,15 +237,17 @@
           @end="onEnd"
           >
           <transition-group>              
-          <div class="card"  v-for="(item, index) in info.question_list" :key="item.id ? item.id: item.key">
+          <div class="card"  v-for="(item, index) in info.question_list" :key="item.id ? item.id: item.key"
+          :id = "item.type+item.id"
+          >
             <div style="padding: 20px">
             <div class="op">
-              <ul @mouseenter="mouseEnter"
-                  @mouseleave="mouseLeave">
-                <li @click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
-                <li @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
-                <li @click="cardDown(index, item)"><v-icon small>mdi-arrow-down-circle-outline</v-icon>  下移</li>
-                <li @click="cardUp(index, item)"><v-icon small>mdi-arrow-up-circle-outline</v-icon>  上移</li>
+              <ul >
+                <li v-show="!isEdit||editID == item.id"@click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
+                <li v-show="!isEdit" @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
+                <li v-show="!isEdit" @click="cardLogical(info.question_list, index)"><v-icon small>mdi-link-variant-plus</v-icon>  逻辑</li>
+                <li v-show="!isEdit" @click="cardDown(index, item)"><v-icon small>mdi-arrow-down-circle-outline</v-icon>  下移</li>
+                <li v-show="!isEdit" @click="cardUp(index, item)"><v-icon small>mdi-arrow-up-circle-outline</v-icon>  上移</li>
               </ul>
             </div>
 
@@ -261,17 +263,29 @@
                 {{item.content}}
               </div>
 
-              <el-radio-group v-model="item.answer">
+              <el-radio-group v-model="item.answer" >
                 <el-radio
                 v-for="(subItem, subIndex)
                 in item.option_list" :key="subItem.id ? subItem.id: subItem.key" :label="subIndex"
-                @click.native="debugShow(subItem)"
                 :disabled = "item.is_scoring"
                 >
                   {{subItem.title}}
                   <span
                   v-if="item.is_scoring && (subIndex === item.answer)"
                    style="color: #F56C6C; margin-left: 20px">[正确答案]</span>
+
+                  <div v-if="subItem.related_logic_question.length" style="margin-top:15px;  font-size: 16px">
+                    <span>选择后显示:</span>
+                    <span
+                    v-for="(tquestion, index) in subItem.related_logic_question"
+                    :key="tquestion.id"
+                    >
+                    题目<b
+                    @mouseenter="mouseEnter"
+                    @mouseleave="mouseLeave" @click="ToPosition(tquestion)"> {{getContent(tquestion)}} </b>
+                    </span>
+                  </div>
+
                 </el-radio>
               </el-radio-group>
             </template>
@@ -283,20 +297,33 @@
                 <span style="color: lightgrey">[多选题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
               </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px;">
                 {{item.content}}
 
               </div>
 
               <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex">
                 <el-checkbox  :label="subIndex" v-model="subItem.is_answer_choice"
-                :disabled = "item.is_scoring">
+                :disabled = "item.is_scoring"
+                >
                   {{subItem.title}}
                    <span
                   v-if="item.is_scoring && subItem.is_answer_choice"
                    style="color: #F56C6C; margin-left: 20px">[正确答案]</span>
-
                 </el-checkbox>
+
+                <div v-if="subItem.related_logic_question.length" style="margin-top:0px; margin-left: 10px">
+                    <span>选择后显示:</span>
+                    <span
+                    v-for="(tquestion, index) in subItem.related_logic_question"
+                    :key="tquestion.id"
+                    >
+                   题目<b
+                   @mouseenter="mouseEnter"
+                   @mouseleave="mouseLeave"
+                   @click="ToPosition(tquestion)"> {{getContent(tquestion)}} </b>
+                    </span>
+                  </div>
               </div>
 
             </template>
@@ -353,8 +380,8 @@
                 {{item.content}}
               </div>
               <el-rate class="scoring-input"
-                  v-model="item.limit_answer_number"
-                  :max="item.option_list.length"
+                       v-model="item.limit_answer_number"
+                       :max="item.option_list.length"
                   show-score
               >
               </el-rate>
@@ -414,11 +441,13 @@
 
     <!--波浪-->
     <!--    <wave></wave>-->
+    <!-- <fish></fish> -->
     <!-- <scoring-add-dialog ref="scoring"></scoring-add-dialog>
     <single-completion-add-dialog ref="completion"></single-completion-add-dialog>
     <single-choice-add-dialog ref="single-choice"></single-choice-add-dialog>
     <multiple-choice-add-dialog ref="multiple-choice"> </multiple-choice-add-dialog>
     <position-add-dialog ref="position"></position-add-dialog> -->
+    <logical-dialog ref="logical-dialog"></logical-dialog>
     <el-backtop></el-backtop>
   </div>
 </template>
@@ -445,6 +474,7 @@ Vue.component(CollapseTransition.name, CollapseTransition)
 
 import { loadBMap } from '../assets/js/loadBMap'
 import PositionAddCard from '../components/PositionAddCard.vue'
+import LogicalDialog from '../components/LogicalDialog.vue'
 
 export default {
   components: {
@@ -452,12 +482,14 @@ export default {
         Wave, MultipleChoiceAddCard, SingleCompletionAddCard,
         MultipleCompletionAddCard,
         ScoringAddCard,draggable,
-        TitleContentDialog
+        TitleContentDialog,
+    LogicalDialog,
   },
   data(){
     return {
       isEdit: false, // 当前是否处于编辑状态
       editItem: '',  // 编辑的元素
+      editID: 0,
       BMap: null,
       geolocation: null, // Geolocation对象实例
       positioning: false, // 定位中
@@ -501,6 +533,13 @@ export default {
     }
   },
   methods:{
+    ToPosition(question){
+
+        this.$nextTick(_=>{
+              var t = document.getElementById(question.type+question.id)
+              window.scrollTo({"behavior":"smooth","top": t.offsetTop});
+        })
+    },
     set_limit_answer_number() {
       const that = this;
       let numReg = /^[0-9]*$/;
@@ -770,8 +809,6 @@ export default {
       else {
         var fl = 1;
         if(this.info.is_start_time && this.info.is_end_time) {
-            // console.log(this.info.start_time);
-            // console.log(this.info.end_time);
             if(Date.parse(this.info.start_time) > Date.parse(this.info.end_time)) {
               fl = 0;
             }
@@ -902,6 +939,15 @@ export default {
       window.open(url);
     },
     Finish(){
+      if (this.isEdit){
+        this.$notify.warning({
+          title: '请完成当前题目编辑'
+        })
+        this.$nextTick(_=>{
+            window.scrollTo({"behavior":"smooth","top": this.editItem.$el.offsetTop - 300});
+        })
+        return
+      }
       if(this.info.question_list.length === 0){
         this.$notify.warning({
           title: '请至少创建一个问题哦'
@@ -925,6 +971,7 @@ export default {
           title: "请完成当前题目的编辑!"
         })
         this.$nextTick(_=>{
+          console.log('add', this.editItem.$el.offsetTop)
             window.scrollTo({"behavior":"smooth","top": this.editItem.$el.offsetTop - 300});
         })
         return;
@@ -937,7 +984,8 @@ export default {
             content:'',
             ordering: 1,
             is_answer_choice: true,
-            key: Date.now()
+            key: Date.now(),
+            related_logic_question: []
           },
         ],
         title: '',
@@ -960,12 +1008,20 @@ export default {
       })
     },
     // 编辑问题
+    updateOrdering(){
+      this.$nextTick(_=>{
+        for (var index in this.info.question_list){
+        this.info.question_list.ordering = index + 1
+        }
+      })
+    },
     editQuestion(item, index){
       var questionType = item.type
       // 切换编辑界面显示
       var temp = this.$refs[questionType+index][0]
-
-      if (this.editItem && this.editItem !== temp){
+      console.log("question", this.info.question_list[index])
+      console.log("ref", temp)
+      if (this.editItem && this.editItem != temp){
         this.$notify.error({
           title: "请完成当前题目的编辑!"
         })
@@ -985,6 +1041,7 @@ export default {
         })
         return
       }
+
       temp.editQuestion(this.info.question_list[index])
 
       // 编辑成功才切换状态
@@ -997,11 +1054,14 @@ export default {
         this.disabled = true
         this.isEdit = true
         this.editItem = temp
+        this.editID = item.id
       }
       else{
         this.disabled = false
         this.isEdit = false
         this.editItem = ''
+        this.editID = 0
+        console.log("edit", this.$refs)
         }
     },
 
@@ -1016,20 +1076,52 @@ export default {
         return this.$notify.error("已经到顶了啊");
       }
       const that = this;
-      console.log(index);
+      const _index = index;
+      var up = this.info.question_list[_index-1]
+      var delete_list = []
+      for (var option of up.option_list){
+        for (var index in option.related_logic_question){ // 遍历被选中的题目的
+            if (item.id == option.related_logic_question[index].id){ // 含有当前选项
+                option.related_logic_question.splice(index, 1) // 删除
+                delete_list.push({
+                  option: option.id,
+                  question: item.id
+                })
+            }
+          }
+        }
+      if (delete_list.length){
+          axios
+              .put('/api/question_option_logic_relation/delete_list/',{"delete_list": delete_list})
+              .then(function (response){
+                that.$notify.success({
+                  title: '自动删除冲突逻辑'
+                })
+              })
+              .catch(function (error){
+                that.$notify.error({
+                  title: '出错啦',
+                  message: '编辑失败'
+                })
+              })
+      }
       axios
         .patch('/api/question/' + item.id + '/', {
-          ordering: index,
+          ordering: _index,
         }, {
           headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
         })
         .then(function (response){
-          let temp = that.info.question_list[index];
-          that.info.question_list[index] = that.info.question_list[index-1];
-          that.info.question_list[index-1] = temp;
-          that.$forceUpdate();
+          let temp = that.info.question_list[_index];
+          that.info.question_list[_index] = that.info.question_list[_index-1];
+          that.info.question_list[_index-1] = temp;
+          that.updateOrdering()
+          that.$notify.success({
+                  title: '上移成功'
+                })
         })
         .catch(function (error){
+          console.log(error)
           that.$notify.error({
             title: '出错啦',
             message: '更换顺序失败'
@@ -1048,20 +1140,54 @@ export default {
         return this.$notify.error("不能继续往下了")
       }
       const that = this;
-      console.log(index);
+      const _index = index
+
       axios
           .patch('/api/question/' + item.id + '/', {
-            ordering: index + 2,
+            ordering: _index + 2,
           }, {
             headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
           })
           .then(function (response){
-            let temp = that.info.question_list[index];
-            that.info.question_list[index] = that.info.question_list[index+1];
-            that.info.question_list[index+1] = temp;
-            that.$forceUpdate();
+            var temp = that.info.question_list[_index];
+            that.info.question_list[_index] = that.info.question_list[_index+1];
+            that.info.question_list[_index+1] = temp;
+            that.updateOrdering()
+            var delete_list = []
+            var down = that.info.question_list[_index];
+            for (var option of item.option_list){
+                for (var index in option.related_logic_question){
+                    if (option.related_logic_question[index].id == down.id){
+                      option.related_logic_question.splice(index, 1)
+                      delete_list.push({
+                        option: option.id,
+                        question: down.id
+                      })
+                    }
+                }
+              }
+            if (delete_list.length){
+                axios
+                    .put('/api/question_option_logic_relation/delete_list/',{"delete_list": delete_list})
+                    .then(function (response){
+                      that.$notify.success({
+                        title: '自动删除冲突逻辑'
+                      })
+                      that.$forceUpdate();
+                    })
+                    .catch(function (error){
+                      that.$notify.error({
+                        title: '出错啦',
+                        message: '编辑失败'
+                      })
+                    })
+            }
+            that.$notify.success({
+              title: '下移成功'
+                })
           })
           .catch(function (error){
+            console.log(error)
             that.$notify.error({
               title: '出错啦',
               message: '更换顺序失败'
@@ -1074,19 +1200,44 @@ export default {
       if (!item.hasOwnProperty('id')){
         this.info.question_list.splice(index, 1)
         this.isEdit = false
-        // item.isShow = false
         this.editItem = ''
         return
       }
+
+      if(item.isShow){
+        this.isEdit = false
+        this.editItem = ''
+      }
+
       const that = this;
+      const _index = index
+      const id = item.id
       axios
           .delete('/api/question/' + item.id + '/',  {
             headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
           })
           .then(function (response){
-            that.info.question_list.splice(index, 1);
+            that.info.question_list.splice(_index, 1);
+            that.updateOrdering()
+
+            for (var question of that.info.question_list){
+              for (var option of question.option_list){
+                for (var index in option.related_logic_question){
+                  var rel_question = option.related_logic_question[index]
+                  if (rel_question.id == id){
+                    option.related_logic_question.splice(index, 1)
+                  }
+                }
+              }
+            }
+
+
+            that.$notify.success({
+                  title: '删除成功'
+                })
           })
           .catch(function (error){
+            console.log(error)
             that.$notify.error({
               title: '出错啦',
               message: '删除失败'
@@ -1102,6 +1253,7 @@ export default {
         })
       }
       const that = this;
+      const _index = index
       axios
           .post('/api/question/copy/', {
             id: item.id,
@@ -1109,7 +1261,10 @@ export default {
             headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
           })
           .then(function (response){
-            that.info.question_list.splice(index + 1, 0, JSON.parse(JSON.stringify(that.info.question_list[index])))
+            that.info.question_list.splice(index + 1, 0, response.data)
+            that.$notify.success({
+              title: '复制成功',
+            })
           })
           .catch(function (error){
             that.$notify.error({
@@ -1118,6 +1273,11 @@ export default {
             })
           })
     },
+    cardLogical(question_list, index){
+      console.log(this.$refs)
+      this.$refs["logical-dialog"].edit(question_list, index, this.info.is_show_question_num)
+    },
+
     // 编辑最上面的标题
     editTitle(info){
       this.info.isShow = !this.info.isShow
@@ -1134,15 +1294,71 @@ export default {
       if (e.oldIndex === e.newIndex){
         return
       }
-      // 重新渲染编辑页面
-      for (let i = 0; i < this.info.question_list.length; i++){
-        var item = this.info.question_list[i]
-        // this.$refs[item.type+(e.ordering-1)][0] = item
-        if (!item.isShow) continue
-        this.$refs[item.type+i][0].questionForm = item
-      }
+
+      var l = Math.min(e.oldIndex, e.newIndex)
+      var r = Math.max(e.oldIndex, e.newIndex)
+
       var id = this.info.question_list[e.newIndex].id
+      var option_list = this.info.question_list[e.newIndex].option_list
+
+      // q往前移动 将会删除中间的所有含有q的关联 遍历中间所有选项是否含有当前题
+      // [l, r] --> 影响 [l + 1, r]
+
+      var delete_list = []
+      if (e.newIndex == l){
+        for (let i = l + 1; i <= r; i++){
+          var item = this.info.question_list[i]
+          for (var option of item.option_list){
+            for (var index in option.related_logic_question){ // 遍历被选中的题目的
+                if (id == option.related_logic_question[index].id){ // 含有当前选项
+                   option.related_logic_question.splice(index, 1) // 删除
+                   delete_list.push({
+                     option: option.id,
+                     question: id
+                   })
+                }
+              }
+            }
+          }
+        }
+
+      // 删除当前问题的选项之中关联的中间问题
+      if (e.newIndex == r){
+         for (var option of option_list){
+           console.log("option", option)
+            for (var index in option.related_logic_question){
+              for (let i = l ; i < r; i++){
+                var item = this.info.question_list[i]
+                // console.log(option.related_logic_question[index])
+                if (option.related_logic_question[index].id == item.id){
+                  option.related_logic_question.splice(index, 1)
+                  delete_list.push({
+                    option: option.id,
+                    question: item.id
+                  })
+                }
+            }
+          }
+        }
+      }
+
       const that = this
+      if (delete_list.length){
+          axios
+              .put('/api/question_option_logic_relation/delete_list/',{"delete_list": delete_list})
+              .then(function (response){
+                that.$notify.success({
+                  title: '自动删除冲突逻辑'
+                })
+              })
+              .catch(function (error){
+                that.$notify.error({
+                  title: '出错啦',
+                  message: '编辑失败'
+                })
+              })
+      }
+
       axios
           .patch('/api/question/' + id + '/', {
             ordering: e.newIndex + 1,
@@ -1170,12 +1386,17 @@ export default {
       if (this.isEdit) this.disabled = true
       else this.disabled = false
     },
-    debugShow(item){
-      console.log("item", item)
+    getContent(question){
+      if (question.title.length <= 3){
+        return question.title
+      }
+      else {
+        return question.title.slice(0, 3) + "..."
+      }
     }
     // 添加成功的事件
   },
-  mounted() {
+  created() {
     const _this = this
     window.initBaiduMapScript = () => {
       _this.BMap = window.BMap
@@ -1229,12 +1450,16 @@ export default {
               }
               if (that.type === "epidemic-check-in"){
               }
+
+              //  设置填写
               for (let item of that.info.question_list) {
                 if (item.type === 'completion'){
                   item.answer = ''
                 }
                 else item.answer = []
               }
+
+              // 选项转换 便于前端绑定
               for (let item of that.info.question_list){
                 item["isShow"] = false
                 for (let i = 0; i < item.option_list.length; i++){
@@ -1514,5 +1739,11 @@ export default {
 /*.el-collapse-item__content{*/
 /*  background-color: #FAFAFA;*/
 /*}*/
-
+.bg{
+  /* background-image: linear-gradient(#fff,rgba(118, 218, 255, 1)); */
+  background-image: linear-gradient(rgb(211, 190, 190),#3a4145);
+  /* overflow: flo; */
+  /* display: flex; */
+  /* visibility: hidden; */
+}
 </style>

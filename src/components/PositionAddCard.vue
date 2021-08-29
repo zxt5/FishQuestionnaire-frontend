@@ -97,6 +97,8 @@ export default {
       this.questionForm = question
     },
     editQuestion(question){
+      
+      console.log("single-choice", question.type)
       if (question.isShow) {
         this.editSuccess = true
         this.finishQuestion(question)

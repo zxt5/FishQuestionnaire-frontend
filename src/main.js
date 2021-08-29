@@ -10,7 +10,7 @@ import Clipboard from "v-clipboard";
 import axios from 'axios';
 import htmlToPdf from "./components/htmlToPdf";
 import BaiduMap from 'vue-baidu-map'
-
+import $ from 'jquery'
 
 Vue.use(BaiduMap, {
   ak: 'cTsGIgzbOe4eeNykwqYy6m0lVHvWTtnF'
@@ -24,7 +24,7 @@ Vue.use(htmlToPdf);
 Vue.use(Affix);
 Vue.use(Modal);
 Vue.prototype.$echarts = echarts
-
+Vue.prototype.$jq=$
 router.beforeEach((to, from, next) => {
     if (to.matched.length === 0) {
       next('/notfound') // 判断此跳转路由的来源路由是否存在，存在的情况跳转到来源路由，否则跳转到404页面

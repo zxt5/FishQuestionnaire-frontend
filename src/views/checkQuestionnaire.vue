@@ -10,17 +10,17 @@
       <!--标题-->
       <h1 class="title">{{info.title}}</h1>
       <div class="content">&nbsp;{{info.content}}</div>
-<!--      <div class="line"></div>-->
+      <!--      <div class="line"></div>-->
       <el-divider/>
 
-<!--      开始遍历问题渲染-->
+      <!--      开始遍历问题渲染-->
       <div class="question_block" v-for="(item, index) in info.question_list" v-if="Show[index]" :key="index">
         <div slot="header">
           <div class="questionTitle">
             <!--显示必填标识-->
             <span v-if="info.is_show_question_num">{{(index+1)+'. '}}</span>
             {{item.title}}
-          <span style="color: #F56C6C;">
+            <span style="color: #F56C6C;">
             <span v-if="item.is_must_answer">*</span>
           </span>
             <span style="color: lightgrey" v-if="item.type==='single-choice'"> [单选题]</span>
@@ -35,40 +35,40 @@
           {{item.content}}
         </div>
 
-<!--        &lt;!&ndash;单选题展示&ndash;&gt;-->
-<!--        <v-app class="choice" v-if="item.type==='single-choice'">-->
-<!--          <v-container-->
-<!--              class="px-0"-->
-<!--              fluid-->
-<!--          >-->
-<!--            <v-radio-group v-model="item.answer">-->
-<!--              <v-radio-->
-<!--                  v-for="optionItem in item.option_list"-->
-<!--                  :key="optionItem.id"-->
-<!--                  :label="optionItem.title"-->
-<!--              ></v-radio>-->
-<!--            </v-radio-group>-->
-<!--          </v-container>-->
-<!--        </v-app>-->
+        <!--        &lt;!&ndash;单选题展示&ndash;&gt;-->
+        <!--        <v-app class="choice" v-if="item.type==='single-choice'">-->
+        <!--          <v-container-->
+        <!--              class="px-0"-->
+        <!--              fluid-->
+        <!--          >-->
+        <!--            <v-radio-group v-model="item.answer">-->
+        <!--              <v-radio-->
+        <!--                  v-for="optionItem in item.option_list"-->
+        <!--                  :key="optionItem.id"-->
+        <!--                  :label="optionItem.title"-->
+        <!--              ></v-radio>-->
+        <!--            </v-radio-group>-->
+        <!--          </v-container>-->
+        <!--        </v-app>-->
 
-<!--        &lt;!&ndash;多选题展示&ndash;&gt;-->
-<!--        <v-app class="choice" v-if="item.type==='multiple-choice'">-->
-<!--          <v-container fluid>-->
-<!--            <div style="float: left" v-for="optionItem in item.option_list">-->
-<!--              <div style="float: left;min-width: 460px;max-width: 560px">-->
-<!--                <v-checkbox-->
-<!--                    :key="optionItem.id"-->
-<!--                    :label="optionItem.title"-->
-<!--                    v-model="optionItem.is_attr_limit"-->
-<!--                    hide-details-->
-<!--                ></v-checkbox>-->
-<!--              </div>-->
-<!--              <div v-if="item.is_show_result" style="float: right; padding-left: 30px;">-->
-<!--                <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </v-container>-->
-<!--        </v-app>-->
+        <!--        &lt;!&ndash;多选题展示&ndash;&gt;-->
+        <!--        <v-app class="choice" v-if="item.type==='multiple-choice'">-->
+        <!--          <v-container fluid>-->
+        <!--            <div style="float: left" v-for="optionItem in item.option_list">-->
+        <!--              <div style="float: left;min-width: 460px;max-width: 560px">-->
+        <!--                <v-checkbox-->
+        <!--                    :key="optionItem.id"-->
+        <!--                    :label="optionItem.title"-->
+        <!--                    v-model="optionItem.is_attr_limit"-->
+        <!--                    hide-details-->
+        <!--                ></v-checkbox>-->
+        <!--              </div>-->
+        <!--              <div v-if="item.is_show_result" style="float: right; padding-left: 30px;">-->
+        <!--                <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </v-container>-->
+        <!--        </v-app>-->
         <!--单选题展示-->
         <v-app class="choice" v-if="item.type==='single-choice'">
           <v-container class="px-0" fluid >
@@ -123,7 +123,7 @@
           ></v-text-field>
         </v-app>
 
-<!--        评分题展示-->
+        <!--        评分题展示-->
         <v-app class="choice" style="margin-top: 20px" v-if="item.type==='scoring'">
           <div style="display: inline-block">
             <v-rating
@@ -140,7 +140,7 @@
             <div style="margin: 6px 20px; float: left !important; font-size: 22px">{{ item.answer }}</div>
           </div>
         </v-app>
-<!--        定位题展示-->
+        <!--        定位题展示-->
         <v-app class="choice" v-if="item.type==='position'">
           <!--          <div style="display: inline-block">  当前定位: </div>-->
           <v-btn

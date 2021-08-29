@@ -1,3 +1,4 @@
+const webpack = require('webpack')
 module.exports = {
   publicPath: '/',
   transpileDependencies: [
@@ -16,5 +17,14 @@ module.exports = {
         }
       }
     }
+  },
+  configureWebpack: {
+    plugins: [
+      new webpack.ProvidePlugin({
+            $:"jquery",
+            jQuery:"jquery",
+            "windows.jQuery":"jquery"
+        })
+    ]
   },
 }
