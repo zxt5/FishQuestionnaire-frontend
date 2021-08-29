@@ -2,7 +2,7 @@
   <div>
 
 <!--    倒计时-->
-    <div v-if="finish === false && is_open && info.is_locked===false && timeStamp!==2 && timeStamp!==3"
+    <div v-if="finish === false && is_open && info.is_locked===false && timeStamp!==2 && timeStamp!==3 && info.is_end_time"
         style="text-align: center;">
       <div style="padding: 20px;background-color: lightskyblue;font-size: 22px;color: blue">
         <h3>考试剩余时间：{{count_down}}</h3>
