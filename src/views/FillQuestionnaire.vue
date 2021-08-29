@@ -359,7 +359,9 @@ export default {
     authorization()
       .then(function (res){
         axios
-            .get('/api/questionnaire/' + parseInt(s1) + '/')
+            .get('/api/questionnaire/' + parseInt(s1) + '/fill_or_preview/', {
+              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+            })
             .then(function (response) {
               that.info = response.data;
               if(that.info.is_required_login && !res[0]){
@@ -419,10 +421,11 @@ export default {
               console.log(that.timeStamp);
             })
             .catch(function (error){
-              that.$notify.error({
-                title: '好像发生了什么错误',
-                message: error.message
-              })
+              // that.$notify.error({
+              //   title: '好像发生了什么错误',
+              //   message: error.response
+              // })
+              console.log(error.response)
             })
       })
 

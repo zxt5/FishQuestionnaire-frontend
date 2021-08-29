@@ -159,9 +159,12 @@ export default {
     s1 = Base64.decode(s1);
     s1 = s1.substring(4,s1.length - 7);
     axios
-        .get('/api/questionnaire/' + parseInt(s1))
+        .get('/api/questionnaire/' + parseInt(s1) + '/fill_or_preview/', {
+          headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+        })
         .then(function (response){
           that.info = response.data;
+          console.log(response.data)
           that.htmlTitle = response.data.title;
           if('' + that.info.author.username !== '' + that.userLogin) {
             that.$router.push({path: '/index'});

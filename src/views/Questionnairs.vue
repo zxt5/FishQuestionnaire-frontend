@@ -150,8 +150,8 @@
                     :disabled="info.is_only_answer_once"
                 >
                 </el-switch>
-                <div v-if="info.is_only_answer_once" style="margin-top: 15px; padding-left: 15px">
-                  <span style="color: #a1a1a1; font-size: 15px">设置限答后，必须打开登录验证</span>
+                <div v-if="info.is_only_answer_once || this.order_type" style="margin-top: 15px; padding-left: 15px">
+                  <span style="color: #a1a1a1; font-size: 15px">设置限答或乱序后，必须打开登录验证</span>
                 </div>
               </div>
               <div style="margin-top: 15px">
@@ -160,6 +160,16 @@
                     style="float: right"
                     @change="is_answer_once"
                     v-model="info.is_only_answer_once"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949">
+                </el-switch>
+              </div>
+              <div style="margin-top: 15px">
+                <span style=" margin-top: 30px">是否开启问题乱序</span>
+                <el-switch
+                    style="float: right"
+                    @change="is_disorder"
+                    v-model="order_type"
                     active-color="#13ce66"
                     inactive-color="#ff4949">
                 </el-switch>
@@ -464,6 +474,7 @@ export default {
       answer: [],
       control_time: '',
       show_num: '',
+      order_type: false,
     }
   },
   methods:{
@@ -758,6 +769,31 @@ export default {
       axios
           .patch('/api/questionnaire/' + that.info.id + '/', {
             is_only_answer_once: this.info.is_only_answer_once,
+            is_required_login: this.info.is_required_login,
+          }, {
+            headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+          })
+          .then(function (response){
+            that.$notify.success({
+              title: '好耶',
+              message: '设置成功'
+            })
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '设置失败'
+            })
+          })
+    },
+    is_disorder(){
+      if(this.order_type && !this.info.is_required_login){
+        this.info.is_required_login = true;
+      }
+      const that = this;
+      axios
+          .patch('/api/questionnaire/' + that.info.id + '/', {
+            order_type: this.order_type ? 'disorder' : 'order',
             is_required_login: this.info.is_required_login,
           }, {
             headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
@@ -1070,7 +1106,8 @@ export default {
               that.info = response.data;
               // that.show_num = response.data.is_show_question_num;
               that.control_time = response.data.is_end_time || response.data.is_start_time;
-              that.info.isShow = []
+              that.info.isShow = [];
+              that.order_type = response.data.order_type === 'disorder';
               console.log(that.info);
               if('' + that.info.author.username !== '' + that.userLogin) {
                 that.$router.push({path: '/index'});
