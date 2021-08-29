@@ -122,7 +122,7 @@
       </div>
     </div>
 
-    <el-button v-if="finish === true" @click="getPdf()">导出PDF</el-button>
+<!--    <el-button v-if="finish === true" @click="getPdf()">导出PDF</el-button>-->
     <div v-if="finish === true" class="questionnaire" id="pdfDom">
       <div style="padding: 10px">
         <h1 style="text-align: center; padding-top: 30px">{{info.title}}</h1>
@@ -152,26 +152,30 @@
             </div>
           </el-col>
         </el-row>
+        <div class="content">&nbsp;问卷到此结束，感谢您的参与！</div>
 
-        <div style="float: right;margin-top: 20px;padding-right: 15px">
-          <span>仅显示错题&nbsp</span>
-          <el-switch
-              v-model="only_show_wrong_question"
-              active-color="#13ce66"
-              inactive-color="#ff4949">
-          </el-switch>
-        </div>
 
-        <div style="margin-top: 35px">
+        <div style="margin-top: 20px; margin-left: 20px">
           <div style="font-size: 16px;">
 
             <div>
-              <h3 style="margin-bottom: 15px;color: midnightblue">答案解析：</h3>
+              <h3 style="margin-bottom: 15px;color: midnightblue; cursor: pointer" @click="isShow = !isShow">答案解析
+                <el-icon v-if="isShow" class="el-icon-arrow-up"/>
+                <el-icon v-else class="el-icon-arrow-down"/>
+              </h3>
+              <div style="margin-top: 20px" v-if="isShow">
+                <span>仅显示错题&nbsp</span>
+                <el-switch
+                    v-model="only_show_wrong_question"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949">
+                </el-switch>
+              </div>
             </div>
 
 
             <div v-for="(item, index) in result.question_list"  :key="index"
-                 style="margin-bottom: 20px">
+                 style="margin-bottom: 20px" v-if="isShow">
               <div v-if="item.is_scoring === true && !(item.is_user_answer_right && only_show_wrong_question)">
 
                 <div slot="header" >
@@ -185,7 +189,7 @@
                   </span>
 
                     <span style="color:gray">
-                    [分值{{item.question_score}}分]
+                    （{{item.question_score}}分）
                   </span>
 
                   </div>
@@ -265,6 +269,10 @@
           </div>
         </div>
       </div>
+      <div class="line"></div>
+      <!--内容结束-->
+
+      <el-button type="primary" @click="$router.push({path: '/'})">确定</el-button>
     </div>
 
     <el-dialog
@@ -319,6 +327,7 @@ export default {
       finish: false,
       only_show_wrong_question: false,
       qq: 1,
+      isShow: false,
     }
   },
   mounted() {
@@ -617,11 +626,11 @@ export default {
           // 提交问卷
           const that = this;
 
-          this.$confirm('交卷后将无法修改答案！', '是否立即交卷？', {
-            confirmButtonText: '确认交卷',
-            cancelButtonText: '我再看看',
-            type: 'warning'
-          }).then(() => {
+          // this.$confirm('交卷后将无法修改答案！', '是否立即交卷？', {
+          //   confirmButtonText: '确认交卷',
+          //   cancelButtonText: '我再看看',
+          //   type: 'warning'
+          // }).then(() => {
             axios
                 .post('/api/answer/', {
                   // ip: returnCitySN.cip,
@@ -634,13 +643,13 @@ export default {
                 .then(function (response){
                   that.result = response.data;
                   console.log(that.result.answer_number);
-                  if(that.info.type === 'exam' && that.result.is_show_answer_detail===true) {
+                  if(that.info.type === 'exam' && that.result.is_show_answer_detail === true) {
                     that.finish = true;
                   }
                   else {
                     let s1 = Base64.encode('moyu' + id + 'wenjuan');
-                    let url = window.location.origin+ "/thank/" + s1;
-                    window.open(url);
+                    // let url = window.location.origin+ "/thank/" + s1;
+                    that.$router.push({path: '/thank/' + s1});
                   }
                 })
                 .catch(function (error){
@@ -649,7 +658,7 @@ export default {
                     message: error.message
                   })
                 })
-          })
+          // })
         }
         else {
           that.$notify.warning({
@@ -720,7 +729,7 @@ p {
 
 .el-button{
   width: 20%;
-  /*color: white;*/
+  color: white;
   display: flex;
   justify-content: center;
   background-image: linear-gradient(to right, #0250c5, #3F87DA);
