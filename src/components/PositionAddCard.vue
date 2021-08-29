@@ -43,6 +43,12 @@ import axios from "axios";
 export default {
   // inject: ['reload'],
   name: "position-addcard",
+  props: {
+    type: {
+      type: String,
+      default: 'normal'
+    }
+  },
   data(){
     return{
       temp: '',

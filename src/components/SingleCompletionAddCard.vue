@@ -24,7 +24,7 @@
       <el-form-item label="设置">
        <el-checkbox label="是否必填"
           v-model="questionForm.is_must_answer"></el-checkbox>
-        <el-checkbox label="是否考试题" v-model="questionForm.is_scoring"></el-checkbox>
+        <el-checkbox v-if="type==='exam'" label="是否考试题" v-model="questionForm.is_scoring"></el-checkbox>
       </el-form-item>
       
       <el-form-item label="正确答案" v-if="questionForm.is_scoring" prop="answer">
@@ -51,6 +51,12 @@ import axios from "axios";
 export default {
   // inject: ['reload'],
   name: "single-completion-addcard",
+  props: {
+    type: {
+      type: String,
+      default: 'normal'
+    }
+  },
   data(){
     return{
       temp: '',

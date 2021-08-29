@@ -46,6 +46,12 @@ import axios from "axios";
 export default {
   inject: ['reload'],
   name: "scoring-addcard",
+  props: {
+    type: {
+      type: String,
+      default: 'normal'
+    }
+  },
   data(){
     return{
       editSuccess: true,
@@ -127,7 +133,7 @@ export default {
         }
         const that = this;
         if(!this.flag){
-          for(var i = 0; i <= that.questionForm.answer; ++i){
+          for(var i = 1; i <= that.questionForm.answer; ++i){
             that.addChoice(i);
           }
           axios
@@ -163,7 +169,7 @@ export default {
               })
         }
         else{
-          for(var i = 0; i <= that.questionForm.answer; ++i){
+          for(var i = 1; i <= that.questionForm.answer; ++i){
             that.addChoice(i);
           }
           axios

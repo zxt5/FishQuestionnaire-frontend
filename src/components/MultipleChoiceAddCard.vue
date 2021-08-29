@@ -26,18 +26,19 @@
 
         <el-checkbox label="是否必填"
           v-model="questionForm.is_must_answer"></el-checkbox>
-          
-        <el-checkbox label="是否显示结果" v-model="questionForm.is_show_result"></el-checkbox>
-        <el-checkbox label="是否考试题" v-model="questionForm.is_scoring"></el-checkbox>
+
+        <el-checkbox v-if="type === 'vote'" label="是否显示结果" v-model="questionForm.is_show_result"></el-checkbox>
+        <el-checkbox v-if="type==='exam'" label="是否考试题" v-model="questionForm.is_scoring"></el-checkbox>
+        <el-checkbox v-if="type==='signup'" label="是否设置限额" v-model="questionForm.is_limit_answer"></el-checkbox>
       </el-form-item>
 
-      <div style="display: flex;
-            margin-bottom: 20px;"> 
-        <span style="margin-left:3%">选项</span> 
-        <span style="margin-left:20%">选项内容</span>
-        <span style="margin-left:35%"><span v-show="questionForm.is_scoring"> 正确答案</span></span>
-        <span style="margin-left:12%">按钮</span>
-        </div>
+<!--      <div style="display: flex;-->
+<!--            margin-bottom: 20px;"> -->
+<!--        <span style="margin-left:3%">选项</span> -->
+<!--        <span style="margin-left:20%">选项内容</span>-->
+<!--        <span style="margin-left:35%"><span v-show="questionForm.is_scoring"> 正确答案</span></span>-->
+<!--        <span style="margin-left:12%">按钮</span>-->
+<!--        </div>-->
       <el-divider></el-divider>
 
       <!-- <el-checkbox-group 
@@ -57,10 +58,10 @@
         <el-checkbox 
         v-model="option.is_answer_choice"
         v-show="questionForm.is_scoring" :label="index">
-          <span></span>
+          设为正确答案
         </el-checkbox>
 
-        <el-button @click.prevent="removeChoice(option)" type="danger" style="margin-left: 80px">删除</el-button>
+        <el-button @click.prevent="removeChoice(option)" type="danger" style="margin-left: 20px">删除</el-button>
       </el-form-item>
       <!-- </el-checkbox-group> -->
       <el-form-item label="题目分数" v-show="questionForm.is_scoring">
@@ -84,6 +85,12 @@ import axios from "axios";
 export default {
   inject: ['reload'],
   name: "multiple-choice-addcard",
+  props: {
+    type: {
+      type: String,
+      default: 'normal'
+    }
+  },
   data(){
     return{
       temp: '',
@@ -242,7 +249,7 @@ export default {
 }
 .choiceinput{
   width: 60%;
-  margin-right: 10%;
+  margin-right: 3%;
 }
 .dialog-footer{
   width: 100%;

@@ -111,8 +111,8 @@
                 <span style="margin-top: 30px">设定答卷密码</span>
                 <el-switch
                     style="float: right"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949"
+                    active-color="#409eff"
+                    inactive-color="#dcdfe6"
                     v-model="info.is_locked"
                     @change="set_islocked"
                 >
@@ -138,6 +138,38 @@
                   </div>
                 </div>
               </div>
+              <!--            问卷设置限额-->
+              <div style="margin-top: 15px" v-if="type === 'vote'">
+                <span style="margin-top: 30px">设定答卷限额</span>
+                <el-switch
+                    style="float: right"
+                    active-color="#409eff"
+                    inactive-color="#dcdfe6"
+                    v-model="info.is_limit_answer"
+                    @change="set_is_limit_answer"
+                >
+                </el-switch>
+                <div v-if="info.is_limit_answer" style="margin-top: 15px; padding-left: 15px">
+                  <span style="font-size: 15px">设置限额数量:</span>
+                  <el-input
+                      placeholder="请输入限额数量"
+                      v-model="info.limit_answer_number"
+                      v-on:keyup.enter.native="set_limit_answer_number"
+                      style="min-width: 180px;max-width: 180px;margin-left: 10px"
+                  >
+                  </el-input>
+                  <div style="margin-top: 15px">
+                    <el-button
+                        size="mini"
+                        type="primary"
+                        @click="set_limit_answer_number"
+                    >
+                      保存更改
+                    </el-button>
+                  </div>
+                </div>
+              </div>
+              <!--登录验证-->
               <div style="margin-top: 15px">
                 <span style=" margin-top: 30px">答题需要登陆验证</span>
 
@@ -145,8 +177,8 @@
                     style="float: right;"
                     @change="is_login_required"
                     v-model="info.is_required_login"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949"
+                    active-color="#409eff"
+                    inactive-color="#dcdfe6"
                     :disabled="info.is_only_answer_once"
                 >
                 </el-switch>
@@ -160,18 +192,18 @@
                     style="float: right"
                     @change="is_answer_once"
                     v-model="info.is_only_answer_once"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949">
+                    active-color="#409eff"
+                    inactive-color="#dcdfe6">
                 </el-switch>
               </div>
-              <div style="margin-top: 15px">
+              <div style="margin-top: 15px" v-if="type === 'exam'">
                 <span style=" margin-top: 30px">是否开启问题乱序</span>
                 <el-switch
                     style="float: right"
                     @change="is_disorder"
                     v-model="order_type"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949">
+                    active-color="#409eff"
+                    inactive-color="#dcdfe6">
                 </el-switch>
               </div>
             </el-menu>
@@ -287,7 +319,7 @@
                style="color: #F56C6C; margin-top:20px">正确答案: {{item.answer}}</div>
             </template>
             <!--定位模板-->
-            <template v-if="item.type == 'position'">
+            <template v-if="item.type === 'position'">
               <div>
                 <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
                 <span style="margin-top: 20px"> {{item.title}} </span>
@@ -321,8 +353,8 @@
                 {{item.content}}
               </div>
               <el-rate class="scoring-input"
-                  v-model="item.answer"
-                  :max="item.option_list.length - 1"
+                  v-model="item.limit_answer_number"
+                  :max="item.option_list.length"
                   show-score
               >
               </el-rate>
@@ -338,18 +370,18 @@
             <div class="question-container">
                 <el-collapse-transition>
                   <div v-show="item.isShow">
-                    <single-choice-add-card :ref="'single-choice'+index" v-if="item.type === 'single-choice'"></single-choice-add-card>
+                    <single-choice-add-card :type="info.type" :ref="'single-choice'+index" v-if="item.type === 'single-choice'"></single-choice-add-card>
         
                     <!--多选对话框-->
-                    <multiple-choice-add-card :ref="'multiple-choice'+index" v-if="item.type === 'multiple-choice'"></multiple-choice-add-card>
+                    <multiple-choice-add-card :type="info.type" :ref="'multiple-choice'+index" v-if="item.type === 'multiple-choice'"></multiple-choice-add-card>
            
                     <!--单项填空对话框-->
-                    <single-completion-add-card :ref="'completion'+index" v-if="item.type === 'completion'"></single-completion-add-card>
+                    <single-completion-add-card :type="info.type" :ref="'completion'+index" v-if="item.type === 'completion'"></single-completion-add-card>
 
                     <!--    评分对话框-->
-                    <scoring-add-card :ref="'scoring'+index" v-if="item.type === 'scoring'"></scoring-add-card>
+                    <scoring-add-card :type="info.type" :ref="'scoring'+index" v-if="item.type === 'scoring'"></scoring-add-card>
 
-                    <position-add-card :ref="'position'+index" v-if="item.type === 'position'"></position-add-card>
+                    <position-add-card :type="info.type" :ref="'position'+index" v-if="item.type === 'position'"></position-add-card>
 
                   </div>
                 </el-collapse-transition>
@@ -458,16 +490,6 @@ export default {
             },
           ]
         },
-        {
-          name: "评分题",
-          type: "scoring",
-          children: [
-            {
-              name: "评分题",
-              type: "scoring",
-            }
-          ]
-        }
       ],
       userLogin: localStorage.getItem('username.myblog'),
       info: null,
@@ -475,9 +497,49 @@ export default {
       control_time: '',
       show_num: '',
       order_type: false,
+      type: '',
     }
   },
   methods:{
+    set_limit_answer_number() {
+      const that = this;
+      let numReg = /^[0-9]*$/;
+      let numRe = new RegExp(numReg);
+      let flag = false;
+      console.log(this.info.limit_answer_number);
+      if(numRe.test(this.info.limit_answer_number)) {
+        let num = parseInt(this.info.limit_answer_number);
+        if(num >= 1) flag = true;
+        console.log(num);
+      }
+      if(flag === false) {
+        that.$notify.error({
+          title: '限额必须为正整数！',
+          // message: '请输入密码！'
+        })
+      }
+      else {
+        axios
+            .patch('/api/questionnaire/' + that.info.id + '/', {
+              is_limit_answer: true,
+              limit_answer_number: parseInt(this.info.limit_answer_number),
+            }, {
+              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+            })
+            .then(function (response){
+              that.$notify.success({
+                title: '设置成功',
+                message: '设置限额成功！'
+              })
+            })
+            .catch(function (error){
+              that.$notify.error({
+                title: '出错啦',
+                message: '设置限额失败！'
+              })
+            })
+      }
+    },
     set_password() {
       const that = this;
       if(this.info.password === '') {
@@ -504,6 +566,29 @@ export default {
               that.$notify.error({
                 title: '出错啦',
                 message: '设置密码失败！'
+              })
+            })
+      }
+    },
+    set_is_limit_answer() {
+      const that = this;
+      if(this.info.is_limit_answer === false) {
+        axios
+            .patch('/api/questionnaire/' + that.info.id + '/', {
+              is_limit_answer: false
+            }, {
+              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+            })
+            .then(function (response){
+              that.$notify.success({
+                title: '编辑成功',
+                message: '问卷限额已取消！'
+              })
+            })
+            .catch(function (error){
+              that.$notify.error({
+                title: '出错啦',
+                message: '问卷限额取消失败！'
               })
             })
       }
@@ -1045,7 +1130,7 @@ export default {
   //拖拽结束事件
     onEnd(e) {
       this.drag = false;
-      if (e.oldIndex == e.newIndex){
+      if (e.oldIndex === e.newIndex){
         return
       }
       // 重新渲染编辑页面
@@ -1107,6 +1192,7 @@ export default {
               // that.show_num = response.data.is_show_question_num;
               that.control_time = response.data.is_end_time || response.data.is_start_time;
               that.info.isShow = [];
+              that.type = that.info.type;
               that.order_type = response.data.order_type === 'disorder';
               console.log(that.info);
               if('' + that.info.author.username !== '' + that.userLogin) {
@@ -1116,8 +1202,9 @@ export default {
                   // message: '爬',
                 });
               }
-              that.menuList.push({
-                  name: "其他功能",
+              if(that.type === 'epidemic-check-in'){
+                that.menuList.push({
+                  name: "打卡题",
                   type: "function",
                   children:[
                     {
@@ -1126,10 +1213,23 @@ export default {
                     },
                   ]
                 })
-              if (that.info.type == "epidemic-check-in"){
+              }
+              else if(that.type === 'normal'){
+                that.menuList.push({
+                  name: "评分题",
+                  type: "function",
+                  children:[
+                    {
+                      name: "星级",
+                      type: "scoring"
+                    },
+                  ]
+                })
+              }
+              if (that.type === "epidemic-check-in"){
               }
               for (let item of that.info.question_list) {
-                if (item.type == 'completion'){
+                if (item.type === 'completion'){
                   item.answer = ''
                 }
                 else item.answer = []
@@ -1138,7 +1238,7 @@ export default {
                 item["isShow"] = false
                 for (let i = 0; i < item.option_list.length; i++){
                   if (item.is_scoring){
-                    if (item.type == "single-choice"){
+                    if (item.type === "single-choice"){
                       if (item.option_list[i].is_answer_choice){
                           item.answer = i
                       }

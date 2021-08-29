@@ -144,14 +144,14 @@ const routes = [
       title: '搜索结果'
     }
   },
-  {
-    path: '/editActivity/:id',
-    name: 'ActivityQuestionnairs',
-    component: ActivityQuestionnairs,
-    meta:{
-      title:'问卷编辑'
-    }
-  },
+  // {
+  //   path: '/editActivity/:id',
+  //   name: 'ActivityQuestionnairs',
+  //   component: ActivityQuestionnairs,
+  //   meta:{
+  //     title:'问卷编辑'
+  //   }
+  // },
   {
     path: '/about',
     name: 'About',

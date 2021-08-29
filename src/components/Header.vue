@@ -36,7 +36,7 @@
         </el-dropdown>
       </div>
       <!--      搜索框-->
-      <div class="search" v-show="hasLogin">
+      <div class="search" v-if="$route.path === '/index' || $route.path === '/questionnaires'">
         <div>
           <el-input v-model="search" placeholder="请输入问卷名进行搜索~" maxLength="100" @keyup.native.enter="toSearch">
             <el-button slot="append" icon="el-icon-search" @click="toSearch"></el-button>

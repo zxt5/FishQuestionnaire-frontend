@@ -2,12 +2,12 @@
   <div>
 
 <!--    倒计时-->
-    <div v-if="finish === false && is_open && info.is_locked===false && timeStamp!==2 && timeStamp!==3"
+    <a-affix v-if="finish === false && is_open && info.is_locked===false && timeStamp === 1 && info.is_end_time"
         style="text-align: center;">
-      <div style="padding: 20px;background-color: lightskyblue;font-size: 22px;color: blue">
+      <div style="padding: 20px;background-color: #fdf1f1; font-size: 22px; color: #ff0000">
         <h3>考试剩余时间：{{count_down}}</h3>
       </div>
-    </div>
+    </a-affix>
 
     <div v-if="finish === false">
       <div class="questionnaire" v-if="info.is_locked === false">
@@ -17,7 +17,7 @@
         <div class="content" v-if="timeStamp===3">&nbsp;很抱歉，此问卷已于 {{endTime}} 结束！</div>
         <div class="content" v-if="timeStamp===4">&nbsp;恭喜，您已成功提交此问卷！</div>
         <div class="content" v-if="timeStamp===5">&nbsp;报歉，此问卷限额已满无法填写！</div>
-        <div class="content" v-if="!canSubmit" style="color: #ea0a1a">&nbsp;报歉，此问卷存在题目限额已满，无法提交！</div>
+        <div class="content" v-if="!canSubmit" style="color: #ea0a1a">&nbsp;报歉，此问卷限额已满，无法提交！</div>
         <div class="line" v-if="timeStamp!==1"></div>
         <el-button v-if="timeStamp!==1" type="primary" @click="toIndex">确定</el-button>
 
@@ -54,10 +54,10 @@
                 <div v-for="optionItem in item.option_list">
                   <div style="float: left;min-width: 460px;max-width: 560px">
                     <v-radio
-                        style="float: left"
+                        style="float: left; margin-bottom: 8px"
                         :key="optionItem.id"
                         :label="optionItem.title "
-                        :disabled="optionItem.limit_answer_number - optionItem.answer_num <= 0"
+                        :disabled="optionItem.limit_answer_number - optionItem.answer_num <= 0 && optionItem.is_limit_answer"
                     ></v-radio>
                     <span v-if="optionItem.is_limit_answer" style="margin-left: 10%">剩余  {{optionItem.limit_answer_number - optionItem.answer_num <= 0 ? 0 : optionItem.limit_answer_number - optionItem.answer_num}}</span>
                   </div>
@@ -107,7 +107,7 @@
                   full-icon="mdi-star"
                   half-icon="mdi-star-half-full"
                   hover
-                  :length="item.option_list.length - 1"
+                  :length="item.option_list.length"
                   size="30"
                   v-model="item.answer"
               ></v-rating>
@@ -218,9 +218,9 @@
                     <div style="float: left;">
                       <v-radio-group v-model="item.answer_ordering-1" disabled>
                         <div v-for="optionItem in item.option_list">
-                          <div style="float: left;min-width: 460px;max-width: 560px">
+                          <div style="float: left;min-width: 460px;max-width: 560px;">
                             <v-radio
-                                style="float: left"
+                                style="float: left; margin-bottom: 8px"
                                 :key="optionItem.id"
                                 :label="optionItem.title "
                             ></v-radio>
@@ -268,8 +268,8 @@
                      style="background-color: whitesmoke; border-radius: 10px;margin-top: 10px;padding: 8px">
                   <div style="color: green">正确答案：</div>
                   <div v-if="item.type === 'single-choice' || item.type === 'multiple-choice'">
-                  <span v-for="optionItem in item.option_list">
-                    <span v-if="optionItem.is_answer_choice">{{optionItem.title}},</span>
+                  <span v-for="(optionItem, index) in item.option_list">
+                    <span v-if="optionItem.is_answer_choice">{{optionItem.title}}, </span>
                   </span>
                   </div>
                   <div v-else>
@@ -435,6 +435,9 @@ export default {
                     // console.log(i)
                 console.log(that.info.is_only_answer_once)
                 console.log(that.timeStamp);
+                if(that.timeStamp === 1) {
+                  _this.Djs_time();
+                }
               })
               .catch(function (error){
                 // that.$notify.error({
@@ -521,6 +524,9 @@ export default {
                     if (flag === false) that.canSubmit = false;
                   }
                 }
+                if(that.timeStamp === 1) {
+                  _this.Djs_time();
+                }
               })
               .catch(function (error){
                 // that.$notify.error({
@@ -532,15 +538,12 @@ export default {
         }
       })
 
-      _this.Djs_time();
-
-
   },
 
   methods: {
 
     Djs_time: function(){
-      if(this.timeStamp!==2 && this.timeStamp!==3) {
+      if(this.info.is_end_time) {
         let ret = setInterval( ()=> {
           let startTime = new Date(this.info.start_time).getTime();
           let endTime = new Date(this.info.end_time).getTime();
@@ -731,10 +734,27 @@ export default {
               console.log('多选')
             }
           }
-          else if(item.type === 'single-choice' || item.type === 'scoring'){
+          else if(item.type === 'single-choice' ){
             tmp = false;
             for(let i of item.option_list){
               if(item.option_list.indexOf(i) === item.answer){
+                let data = {
+                  question: item.id,
+                  option: i.id,
+                };
+                tmp = true;
+                that.submit_list.push(data);
+              }
+            }
+            if(tmp === false && item.is_must_answer) {
+              that.flag = false;
+              console.log('单选 | 评分')
+            }
+          }
+          else if( item.type === 'scoring'){
+            tmp = false;
+            for(let i of item.option_list){
+              if(item.option_list.indexOf(i) + 1 === item.answer){
                 let data = {
                   question: item.id,
                   option: i.id,
@@ -779,9 +799,15 @@ export default {
         }
         console.log(that.submit_list);
         console.log(that.rightTime);
-        if(that.flag === true || that.rightTime > 0) {
+        if(that.flag === true || that.rightTime < 0 ) {
           // 提交问卷
           const that = this;
+
+          // this.$confirm('交卷后将无法修改答案！', '是否立即交卷？', {
+          //   confirmButtonText: '确认交卷',
+          //   cancelButtonText: '我再看看',
+          //   type: 'warning'
+          // }).then(() => {
             axios
                 .post('/api/answer/', {
                   // ip: returnCitySN.cip,
@@ -981,6 +1007,9 @@ h4{
   margin-top: 0 !important;
   padding-top: 0 !important;
   margin-bottom: 8px;
+}
+.v-input--radio-group--column{
+  margin-bottom: 8px !important;
 }
 
 .container{
