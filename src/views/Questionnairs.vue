@@ -111,8 +111,8 @@
                 <span style="margin-top: 30px">设定答卷密码</span>
                 <el-switch
                     style="float: right"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949"
+                    active-color="#409eff"
+                   inactive-color="#dcdfe6"
                     v-model="info.is_locked"
                     @change="set_islocked"
                 >
@@ -145,8 +145,8 @@
                     style="float: right;"
                     @change="is_login_required"
                     v-model="info.is_required_login"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949"
+                  active-color="#409eff"
+                   inactive-color="#dcdfe6"
                     :disabled="info.is_only_answer_once"
                 >
                 </el-switch>
@@ -160,8 +160,8 @@
                     style="float: right"
                     @change="is_answer_once"
                     v-model="info.is_only_answer_once"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949">
+                    active-color="#409eff"
+                   inactive-color="#dcdfe6">
                 </el-switch>
               </div>
             </el-menu>
@@ -196,12 +196,9 @@
           >
           <transition-group>              
           <div class="card"  v-for="(item, index) in info.question_list" :key="item.id ? item.id: item.key">
-            {{item.ordering}}
             <div style="padding: 20px">
             <div class="op">
-              <ul @mouseenter="mouseEnter"
-                  @mouseleave="mouseLeave"
-                  >
+              <ul >
                 <li v-show="!isEdit||editID == item.id"@click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
                 <li v-show="!isEdit" @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
                 <li v-show="!isEdit" @click="cardLogical(info.question_list, index)"><v-icon small>mdi-link-variant-plus</v-icon>  逻辑</li>
@@ -222,9 +219,7 @@
                 {{item.content}}
               </div>
 
-              <el-radio-group v-model="item.answer" 
-                  @mouseenter.native="mouseEnter"
-                  @mouseleave.native="mouseLeave">
+              <el-radio-group v-model="item.answer" >
                 <el-radio
                 v-for="(subItem, subIndex)
                 in item.option_list" :key="subItem.id ? subItem.id: subItem.key" :label="subIndex"
@@ -241,7 +236,9 @@
                     v-for="(tquestion, index) in subItem.related_logic_question"
                     :key="tquestion.id"
                     >
-                    题目<b @click="ToPosition(tquestion)"> {{getContent(tquestion)}} </b>
+                    题目<b 
+                    @mouseenter="mouseEnter"
+                    @mouseleave="mouseLeave" @click="ToPosition(tquestion)"> {{getContent(tquestion)}} </b>
                     </span>
                   </div>
 
@@ -264,8 +261,6 @@
               <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex">
                 <el-checkbox  :label="subIndex" v-model="subItem.is_answer_choice"
                 :disabled = "item.is_scoring"
-                @mouseenter.native="mouseEnter"
-                  @mouseleave.native="mouseLeave"
                 >
                   {{subItem.title}}
                    <span
@@ -279,7 +274,10 @@
                     v-for="(tquestion, index) in subItem.related_logic_question"
                     :key="tquestion.id"
                     >
-                   <b> 题目{{tquestion.ordering}} </b>
+                   题目<b 
+                   @mouseenter="mouseEnter"
+                   @mouseleave="mouseLeave"
+                   @click="ToPosition(tquestion)"> {{getContent(tquestion)}} </b>
                     </span>
                   </div>
               </div>
@@ -399,7 +397,7 @@
 
     <!--波浪-->
     <!--    <wave></wave>-->
-    <fish></fish>
+    <!-- <fish></fish> -->
     <!-- <scoring-add-dialog ref="scoring"></scoring-add-dialog>
     <single-completion-add-dialog ref="completion"></single-completion-add-dialog>
     <single-choice-add-dialog ref="single-choice"></single-choice-add-dialog>
@@ -433,7 +431,6 @@ Vue.component(CollapseTransition.name, CollapseTransition)
 import { loadBMap } from '../assets/js/loadBMap'
 import PositionAddCard from '../components/PositionAddCard.vue'
 import LogicalDialog from '../components/LogicalDialog.vue'
-import Fish from '../components/Fish.vue'
 
 export default {
   components: {
@@ -443,7 +440,6 @@ export default {
         ScoringAddCard,draggable,
         TitleContentDialog,
     LogicalDialog,
-    Fish
   },
   data(){
     return {
@@ -502,12 +498,15 @@ export default {
   },
   methods:{
     ToPosition(question){
-        var position = this.$refs[question.type+(question.ordering-1)][0]
-        // this.$nextTick(_=>{
+ 
+        this.$nextTick(_=>{
+               this.$forceUpdate()
+              var position = this.$refs[question.type+(question.ordering-1)][0]
+              console.log(position)
         //     console.log("height",position.$el.offsetTop)
         //     console.log(this.$refs)
         //     window.scrollTo({"behavior":"smooth","top": position.$el.offsetTop});
-        // })
+        })
     },
     set_password() {
       const that = this;
@@ -821,6 +820,15 @@ export default {
       window.open(url);
     },
     Finish(){
+      if (this.isEdit){
+        this.$notify.warning({
+          title: '请完成当前题目编辑'
+        })
+        this.$nextTick(_=>{
+            window.scrollTo({"behavior":"smooth","top": this.editItem.$el.offsetTop - 300});
+        })
+        return 
+      }
       if(this.info.question_list.length === 0){
         this.$notify.warning({
           title: '请至少创建一个问题哦'
@@ -844,6 +852,7 @@ export default {
           title: "请完成当前题目的编辑!"
         })
         this.$nextTick(_=>{
+          console.log('add', this.editItem.$el.offsetTop)
             window.scrollTo({"behavior":"smooth","top": this.editItem.$el.offsetTop - 300});
         })
         return;
@@ -909,7 +918,7 @@ export default {
         })
         return
       }
-      
+
       temp.editQuestion(this.info.question_list[index])
 
       // 编辑成功才切换状态
@@ -929,6 +938,7 @@ export default {
         this.isEdit = false
         this.editItem = ''
         this.editID = 0
+        console.log("edit", this.$refs)
         }
     },
 
@@ -1067,6 +1077,11 @@ export default {
         return
       }
 
+      if(item.isShow){
+        this.isEdit = false
+        this.editItem = ''
+      }
+
       const that = this;
       const _index = index
       axios
@@ -1116,6 +1131,7 @@ export default {
           })
     },
     cardLogical(question_list, index){
+      console.log(this.$refs)
       this.$refs["logical-dialog"].edit(question_list, index, this.info.is_show_question_num)
     },
 
@@ -1257,11 +1273,12 @@ export default {
               that.info.isShow = []
 
               console.log("init", that.info, 
-              that.info.is_show_question_num);
+              that.info.is_show_question_num)
+
               if('' + that.info.author.username !== '' + that.userLogin) {
                 that.$router.push({path: '/index'});
                 that.$notify.error({
-                  title: '您无权编辑此问卷',
+                  title: '您无权编辑此问卷', 
                   // message: '爬',
                 });
               }
@@ -1569,5 +1586,8 @@ export default {
 .bg{
   /* background-image: linear-gradient(#fff,rgba(118, 218, 255, 1)); */
   background-image: linear-gradient(rgb(211, 190, 190),#3a4145);
+  /* overflow: flo; */
+  /* display: flex; */
+  /* visibility: hidden; */
 }
 </style>

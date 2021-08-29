@@ -120,6 +120,7 @@ export default {
                    })
                }
            }
+           const that = this
            axios
               .put('/api/question_option_logic_relation/edit/', params)
               .then(function (response){
@@ -132,7 +133,7 @@ export default {
                   title: '出错啦',
                   message: '编辑失败'
                 })
-                this.dialogVisible = true
+                that.dialogVisible = true
               })
             this.dialogVisible = false
         },
