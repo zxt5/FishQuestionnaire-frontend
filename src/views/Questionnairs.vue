@@ -243,7 +243,7 @@
             <div style="padding: 20px">
             <div class="op">
               <ul >
-                <li v-show="!isEdit||editID == item.id"@click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
+                <li v-show="!isEdit||editID === item.id"@click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
                 <li v-show="!isEdit" @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
                 <li v-show="!isEdit" @click="cardLogical(info.question_list, index)"><v-icon small>mdi-link-variant-plus</v-icon>  逻辑</li>
                 <li v-show="!isEdit" @click="cardDown(index, item)"><v-icon small>mdi-arrow-down-circle-outline</v-icon>  下移</li>
@@ -339,11 +339,11 @@
                 {{item.content}}
               </div>
               <el-input class="single-completion-input" :autosize="true"
-                        type="textarea" :clearable="true" resize="none" v-model="item.answer" :disabled="item.is_scoring"></el-input>
+                        type="textarea" :clearable="true" resize="none" v-model="item.option_list[0].answer" :disabled="item.is_scoring"></el-input>
 
               <div
               v-if="item.is_scoring"
-               style="color: #F56C6C; margin-top:20px">正确答案: {{item.answer}}</div>
+               style="color: #F56C6C; margin-top:20px">正确答案: {{item.option_list[0].answer}}</div>
             </template>
             <!--定位模板-->
             <template v-if="item.type === 'position'">

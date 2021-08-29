@@ -97,7 +97,7 @@
           <!--填空题展示-->
           <v-app class="choice" v-if="item.type==='completion'">
             <v-text-field
-                v-model="item.option_list[0].answer"
+                v-model="item.answer"
                 label="请在此输入答案~"
                 single-line
             ></v-text-field>
@@ -788,7 +788,7 @@ export default {
             }
           }
           else if(item.type === 'completion'){
-            if(item.option_list[0].answer === '' && item.is_must_answer) {
+            if(item.answer === '' && item.is_must_answer) {
               that.flag = false;
               console.log('填空')
             }
@@ -796,7 +796,7 @@ export default {
               let data = {
                 question: item.id,
                 option: item.option_list[0].id,
-                content: item.option_list[0].answer,
+                content: item.answer,
               };
               that.submit_list.push(data);
             }
