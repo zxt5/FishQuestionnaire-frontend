@@ -27,7 +27,7 @@
         <el-checkbox label="是否考试题" v-model="questionForm.is_scoring"></el-checkbox>
       </el-form-item>
       
-      <el-form-item label="正确答案" v-show="questionForm.is_scoring">
+      <el-form-item label="正确答案" v-if="questionForm.is_scoring">
         <el-input v-model="questionForm.option_list[0].content"></el-input>
       </el-form-item>
       <el-form-item label="题目分数" v-show="questionForm.is_scoring">

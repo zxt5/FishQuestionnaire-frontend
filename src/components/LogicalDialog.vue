@@ -1,7 +1,6 @@
 <template>
     <div>
         <el-dialog  :visible.sync="dialogVisible" title="逻辑跳转设置">
-
             <div class="logical-dialog-false" v-if="questionForm.type!='single-choice' && questionForm.type != 'multiple-choice'">
                 暂且没有关联问题设置
             </div>

@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div class="bg">
     <!--主题内容区域-->
     <el-container class="main">
       <el-container>
@@ -196,10 +196,12 @@
           >
           <transition-group>              
           <div class="card"  v-for="(item, index) in info.question_list" :key="item.id ? item.id: item.key">
+            {{item.ordering}}
             <div style="padding: 20px">
             <div class="op">
               <ul @mouseenter="mouseEnter"
-                  @mouseleave="mouseLeave">
+                  @mouseleave="mouseLeave"
+                  >
                 <li @click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
                 <li v-show="!isEdit" @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
                 <li v-show="!isEdit" @click="cardLogical(info.question_list, index)"><v-icon small>mdi-link-variant-plus</v-icon>  逻辑</li>
@@ -220,11 +222,12 @@
                 {{item.content}}
               </div>
 
-              <el-radio-group v-model="item.answer">
+              <el-radio-group v-model="item.answer" 
+                  @mouseenter.native="mouseEnter"
+                  @mouseleave.native="mouseLeave">
                 <el-radio
                 v-for="(subItem, subIndex)
                 in item.option_list" :key="subItem.id ? subItem.id: subItem.key" :label="subIndex"
-                @click.native="debugShow(subItem)"
                 :disabled = "item.is_scoring"
                 >
                   {{subItem.title}}
@@ -238,7 +241,7 @@
                     v-for="(tquestion, index) in subItem.related_logic_question"
                     :key="tquestion.id"
                     >
-                   <b> 题目{{tquestion.ordering}} </b>
+                    题目<b @click="ToPosition(tquestion)"> {{getContent(tquestion)}} </b>
                     </span>
                   </div>
 
@@ -260,7 +263,10 @@
 
               <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex">
                 <el-checkbox  :label="subIndex" v-model="subItem.is_answer_choice"
-                :disabled = "item.is_scoring">
+                :disabled = "item.is_scoring"
+                @mouseenter.native="mouseEnter"
+                  @mouseleave.native="mouseLeave"
+                >
                   {{subItem.title}}
                    <span
                   v-if="item.is_scoring && subItem.is_answer_choice"
@@ -393,6 +399,7 @@
 
     <!--波浪-->
     <!--    <wave></wave>-->
+    <fish></fish>
     <!-- <scoring-add-dialog ref="scoring"></scoring-add-dialog>
     <single-completion-add-dialog ref="completion"></single-completion-add-dialog>
     <single-choice-add-dialog ref="single-choice"></single-choice-add-dialog>
@@ -426,6 +433,7 @@ Vue.component(CollapseTransition.name, CollapseTransition)
 import { loadBMap } from '../assets/js/loadBMap'
 import PositionAddCard from '../components/PositionAddCard.vue'
 import LogicalDialog from '../components/LogicalDialog.vue'
+import Fish from '../components/Fish.vue'
 
 export default {
   components: {
@@ -434,7 +442,8 @@ export default {
         MultipleCompletionAddCard,
         ScoringAddCard,draggable,
         TitleContentDialog,
-    LogicalDialog
+    LogicalDialog,
+    Fish
   },
   data(){
     return {
@@ -491,6 +500,14 @@ export default {
     }
   },
   methods:{
+    ToPosition(question){
+        var position = this.$refs[question.type+(question.ordering-1)][0]
+        // this.$nextTick(_=>{
+        //     console.log("height",position.$el.offsetTop)
+        //     console.log(this.$refs)
+        //     window.scrollTo({"behavior":"smooth","top": position.$el.offsetTop});
+        // })
+    },
     set_password() {
       const that = this;
       if(this.info.password === '') {
@@ -862,7 +879,15 @@ export default {
       })
     },
     // 编辑问题
+    updateOrdering(){
+      this.$nextTick(_=>{
+        for (var index in this.info.question_list){
+        this.info.question_list.ordering = index + 1
+        }
+      })      
+    },
     editQuestion(item, index){
+      console.log("ordering", item.ordering)
       var questionType = item.type
       // 切换编辑界面显示
       var temp = this.$refs[questionType+index][0]
@@ -912,23 +937,52 @@ export default {
         return this.$notify.error("已经到顶了啊");
       }
       const that = this;
-      console.log(index);
+      const _index = index;
+      var up = this.info.question_list[_index-1]
+      var delete_list = []
+      for (var option of up.option_list){
+        for (var index in option.related_logic_question){ // 遍历被选中的题目的
+            if (item.id == option.related_logic_question[index].id){ // 含有当前选项
+                option.related_logic_question.splice(index, 1) // 删除
+                delete_list.push({
+                  option: option.id,
+                  question: item.id
+                })
+            }
+          }
+        }
+      if (delete_list.length){
+          axios
+              .put('/api/question_option_logic_relation/delete_list/',{"delete_list": delete_list})
+              .then(function (response){
+                that.$notify.success({
+                  title: '自动删除冲突逻辑'
+                })
+              })
+              .catch(function (error){
+                that.$notify.error({
+                  title: '出错啦',
+                  message: '编辑失败'
+                })
+              })
+      }
       axios
         .patch('/api/question/' + item.id + '/', {
-          ordering: index,
+          ordering: _index,
         }, {
           headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
         })
         .then(function (response){
-          let temp = that.info.question_list[index];
-          that.info.question_list[index] = that.info.question_list[index-1];
-          that.info.question_list[index-1] = temp;
-          that.$forceUpdate();
+          let temp = that.info.question_list[_index];
+          that.info.question_list[_index] = that.info.question_list[_index-1];
+          that.info.question_list[_index-1] = temp;
+          that.updateOrdering()
           that.$notify.success({
                   title: '上移成功'
                 })
         })
         .catch(function (error){
+          console.log(error)
           that.$notify.error({
             title: '出错啦',
             message: '更换顺序失败'
@@ -945,23 +999,54 @@ export default {
         return this.$notify.error("不能继续往下了")
       }
       const that = this;
-      console.log(index);
+      const _index = index
+
       axios
           .patch('/api/question/' + item.id + '/', {
-            ordering: index + 2,
+            ordering: _index + 2,
           }, {
             headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
           })
           .then(function (response){
-            let temp = that.info.question_list[index];
-            that.info.question_list[index] = that.info.question_list[index+1];
-            that.info.question_list[index+1] = temp;
-            that.$forceUpdate();
+            var temp = that.info.question_list[_index];
+            that.info.question_list[_index] = that.info.question_list[_index+1];
+            that.info.question_list[_index+1] = temp;
+            that.updateOrdering()
+            var delete_list = []
+            var down = that.info.question_list[_index];
+            for (var option of item.option_list){
+                for (var index in option.related_logic_question){
+                    if (option.related_logic_question[index].id == down.id){
+                      option.related_logic_question.splice(index, 1)
+                      delete_list.push({
+                        option: option.id,
+                        question: down.id
+                      })
+                    }
+                }
+              }
+            if (delete_list.length){
+                axios
+                    .put('/api/question_option_logic_relation/delete_list/',{"delete_list": delete_list})
+                    .then(function (response){
+                      that.$notify.success({
+                        title: '自动删除冲突逻辑'
+                      })
+                      that.$forceUpdate();
+                    })
+                    .catch(function (error){
+                      that.$notify.error({
+                        title: '出错啦',
+                        message: '编辑失败'
+                      })
+                    })
+            }
             that.$notify.success({
               title: '下移成功'
                 })
           })
           .catch(function (error){
+            console.log(error)
             that.$notify.error({
               title: '出错啦',
               message: '更换顺序失败'
@@ -977,19 +1062,22 @@ export default {
         this.editItem = ''
         return
       }
+
       const that = this;
+      const _index = index
       axios
           .delete('/api/question/' + item.id + '/',  {
             headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
           })
           .then(function (response){
-            that.info.question_list.splice(index, 1);
-            that.$forceUpdate()
+            that.info.question_list.splice(_index, 1);
+            that.updateOrdering()
             that.$notify.success({
                   title: '删除成功'
                 })
           })
           .catch(function (error){
+            console.log(error)
             that.$notify.error({
               title: '出错啦',
               message: '删除失败'
@@ -1003,6 +1091,7 @@ export default {
         return this.$notify.error('请完成当前编辑')
       }
       const that = this;
+      const _index = index
       axios
           .post('/api/question/copy/', {
             id: item.id,
@@ -1010,11 +1099,7 @@ export default {
             headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
           })
           .then(function (response){
-            var data = JSON.parse(JSON.stringify(that.info.question_list[index]))
-            for (var option of data['option_list']){
-              option['related_logic_question'] = []
-            }
-            that.info.question_list.splice(index + 1, 0, data)
+            that.info.question_list.splice(index + 1, 0, response.data)
             that.$notify.success({
               title: '复制成功',
             })
@@ -1057,7 +1142,6 @@ export default {
       // [l, r] --> 影响 [l + 1, r]
 
       var delete_list = []
-
       if (e.newIndex == l){
         for (let i = l + 1; i <= r; i++){
           var item = this.info.question_list[i]
@@ -1141,10 +1225,18 @@ export default {
     },
     debugShow(item){
       console.log("item", item)
+    },
+    getContent(question){
+      if (question.title.length <= 3){
+        return question.title
+      }
+      else {
+        return question.title.slice(0, 3) + "..."
+      }
     }
     // 添加成功的事件
   },
-  mounted() {
+  created() {
     const _this = this
     window.initBaiduMapScript = () => {
       _this.BMap = window.BMap
@@ -1162,7 +1254,9 @@ export default {
               // that.show_num = response.data.is_show_question_num;
               that.control_time = response.data.is_end_time || response.data.is_start_time;
               that.info.isShow = []
-              console.log(that.info);
+
+              console.log("init", that.info, 
+              that.info.is_show_question_num);
               if('' + that.info.author.username !== '' + that.userLogin) {
                 that.$router.push({path: '/index'});
                 that.$notify.error({
@@ -1471,5 +1565,8 @@ export default {
 /*.el-collapse-item__content{*/
 /*  background-color: #FAFAFA;*/
 /*}*/
-
+.bg{
+  /* background-image: linear-gradient(#fff,rgba(118, 218, 255, 1)); */
+  background-image: linear-gradient(rgb(211, 190, 190),#3a4145);
+}
 </style>
