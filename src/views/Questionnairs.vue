@@ -698,8 +698,6 @@ export default {
       else {
         var fl = 1;
         if(this.info.is_start_time && this.info.is_end_time) {
-            // console.log(this.info.start_time);
-            // console.log(this.info.end_time);
             if(Date.parse(this.info.start_time) > Date.parse(this.info.end_time)) {
               fl = 0;
             }
@@ -926,6 +924,9 @@ export default {
           that.info.question_list[index] = that.info.question_list[index-1];
           that.info.question_list[index-1] = temp;
           that.$forceUpdate();
+          that.$notify.success({
+                  title: '上移成功'
+                })
         })
         .catch(function (error){
           that.$notify.error({
@@ -956,6 +957,9 @@ export default {
             that.info.question_list[index] = that.info.question_list[index+1];
             that.info.question_list[index+1] = temp;
             that.$forceUpdate();
+            that.$notify.success({
+              title: '下移成功'
+                })
           })
           .catch(function (error){
             that.$notify.error({
@@ -973,7 +977,6 @@ export default {
         this.editItem = ''
         return
       }
-      this.$forceUpdate()
       const that = this;
       axios
           .delete('/api/question/' + item.id + '/',  {
@@ -981,6 +984,10 @@ export default {
           })
           .then(function (response){
             that.info.question_list.splice(index, 1);
+            that.$forceUpdate()
+            that.$notify.success({
+                  title: '删除成功'
+                })
           })
           .catch(function (error){
             that.$notify.error({
@@ -1003,14 +1010,14 @@ export default {
             headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
           })
           .then(function (response){
+            var data = JSON.parse(JSON.stringify(that.info.question_list[index]))
+            for (var option of data['option_list']){
+              option['related_logic_question'] = []
+            }
+            that.info.question_list.splice(index + 1, 0, data)
             that.$notify.success({
               title: '复制成功',
             })
-            var data = JSON.parse(JSON.stringify(that.info.question_list[index]))
-            for (var option of data.option_list){
-              option.related_logic_question = []
-            }
-            that.info.question_list.splice(index + 1, 0, data)
           })
           .catch(function (error){
             that.$notify.error({
