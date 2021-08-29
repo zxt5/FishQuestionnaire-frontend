@@ -21,6 +21,7 @@
           <span style="margin-top: 20px;margin-left: 6px;color: darkgray" v-if="answer.type === 'multiple-choice'">[多选题]</span>
           <span style="margin-top: 20px;margin-left: 6px;color: darkgray" v-if="answer.type === 'completion'">[填空题]</span>
           <span style="margin-top: 20px;margin-left: 6px;color: darkgray" v-if="answer.type === 'scoring'">[评分题]</span>
+          <span style="margin-top: 20px;margin-left: 6px;color: darkgray" v-if="answer.type === 'position'">[定位题]</span>
           <!--          <span style="margin-top: 20px;margin-left: 10px"> [单选题] </span>-->
           <el-collapse v-model="tmp[index].activeNames" @change="handleChange(index)" style="margin-top: 10px">
             <el-collapse-item  name="2" style="margin-left: 10px">
@@ -29,6 +30,9 @@
               </template>
               <template slot="title" v-if="answer.type === 'completion'">
                 填空结果 <i class="header-icon el-icon-info"></i>
+              </template>
+              <template slot="title" v-if="answer.type === 'position'">
+                定位结果 <i class="header-icon el-icon-info"></i>
               </template>
               <template slot="title" v-if="answer.type === 'scoring'">
                 评分结果 <i class="header-icon el-icon-info"></i>
@@ -59,9 +63,17 @@
                 <el-table-column prop="content" label="答案文本">
                 </el-table-column>
               </el-table>
+              <el-table :data="answer.option_list[0].answer_list" stripe style="margin-left: 20px" v-if="answer.type === 'position'">
+                <el-table-column prop="ordering" label="序号">
+                </el-table-column>
+                <el-table-column prop="modified_time" label="提交答卷时间">
+                </el-table-column>
+                <el-table-column prop="content" label="答案文本">
+                </el-table-column>
+              </el-table>
             </el-collapse-item>
             <!--图片-->
-            <el-collapse-item  name="3" style="margin-left: 10px" v-if="answer.type !== 'completion'">
+            <el-collapse-item  name="3" style="margin-left: 10px" v-if="answer.type !== 'completion' && answer.type !== 'position'">
               <template slot="title">
                 图表分析<i class="header-icon el-icon-info"></i>
               </template>
@@ -340,7 +352,7 @@ export default {
                 });
               }
               for (let item of that.info.question_list) {
-                if(item.type === 'completion') {
+                if(item.type === 'completion' || item.type === 'position') {
                   that.tmp.push({
                     activeChart: '0',
                     activeNames: [],
