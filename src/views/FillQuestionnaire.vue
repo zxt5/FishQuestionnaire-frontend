@@ -1,5 +1,14 @@
 <template>
   <div>
+
+<!--    倒计时-->
+    <div v-if="finish === false && is_open && info.is_locked===false && timeStamp!==2 && timeStamp!==3 && info.is_end_time"
+        style="text-align: center;">
+      <div style="padding: 20px;background-color: lightskyblue;font-size: 22px;color: blue">
+        <h3>考试剩余时间：{{count_down}}</h3>
+      </div>
+    </div>
+
     <div v-if="finish === false">
       <div class="questionnaire" v-if="info.is_locked === false">
         <!--标题-->
@@ -279,6 +288,7 @@
       <el-button type="primary" @click="$router.push({path: '/'})">确定</el-button>
     </div>
 
+
     <el-dialog
         title="问卷已加密！"
         :visible.sync="info.is_locked"
@@ -295,6 +305,7 @@
         <el-button style="margin-bottom: 0 !important;" type="primary" @click="check_password">确   定</el-button>
       </div>
     </el-dialog>
+
   </div>
 
 </template>
@@ -331,10 +342,15 @@ export default {
       result:'',
       finish: false,
       only_show_wrong_question: false,
-      qq: 1,
       isShow: false,
+      is_start: false,
+      is_end: false,
+      count_down: '',
+      is_open: true,
+      rightTime: '',
     }
   },
+
   mounted() {
     const _this = this
     window.initBaiduMapScript = () => {
@@ -419,6 +435,9 @@ export default {
                     // console.log(i)
                 console.log(that.info.is_only_answer_once)
                 console.log(that.timeStamp);
+                if(that.timeStamp === 1) {
+                  _this.Djs_time();
+                }
               })
               .catch(function (error){
                 // that.$notify.error({
@@ -505,6 +524,9 @@ export default {
                     if (flag === false) that.canSubmit = false;
                   }
                 }
+                if(that.timeStamp === 1) {
+                  _this.Djs_time();
+                }
               })
               .catch(function (error){
                 // that.$notify.error({
@@ -517,7 +539,40 @@ export default {
       })
 
   },
+
   methods: {
+
+    Djs_time: function(){
+      if(this.info.is_end_time) {
+        let ret = setInterval( ()=> {
+          let startTime = new Date(this.info.start_time).getTime();
+          let endTime = new Date(this.info.end_time).getTime();
+          let presentTime=new Date().getTime();
+          this.rightTime = endTime - presentTime;
+          if( this.info.is_start_time && (presentTime - startTime < 0) ) {
+            this.count_down = "问卷还未开始！";
+          }
+          else {
+            if (this.rightTime > 0) {
+              let dd = Math.floor(this.rightTime / 1000 / 60 / 60 / 24);
+              let hh = Math.floor((this.rightTime / 1000 / 60 / 60) % 24);
+              let mm = Math.floor((this.rightTime / 1000 / 60) % 60);
+              let ss = Math.floor((this.rightTime / 1000) % 60);
+              this.count_down= dd + "天" + hh + "小时" + mm + "分" + ss + "秒";
+              this.is_open = true;
+            }
+            else if(this.rightTime === 0){
+              // this.count_down="问卷已结束"
+              this.is_open = false;
+            }
+            else {
+              this.click(this.info.id);
+              clearInterval(ret);
+            }
+          }
+        }, 1000);
+      }
+    },
 
     resetPositioning() {
       this.positioning = false
@@ -720,7 +775,6 @@ export default {
             }
             else {
               let data = {
-                // questionnaire: that.info.id,
                 question: item.id,
                 option: item.option_list[0].id,
                 content: item.option_list[0].answer,
@@ -735,7 +789,6 @@ export default {
             }
             else {
               let data = {
-                // questionnaire: that.info.id,
                 question: item.id,
                 option: item.option_list[0].id,
                 content: that.location['城市'],
@@ -745,7 +798,8 @@ export default {
           }
         }
         console.log(that.submit_list);
-        if(that.flag === true) {
+        console.log(that.rightTime);
+        if(that.flag === true || that.rightTime < 0 ) {
           // 提交问卷
           const that = this;
 
@@ -799,6 +853,41 @@ export default {
         }
       }
     },
+    click_1(id) {
+      const that = this;
+      // this.$confirm('交卷后将无法修改答案！', '是否立即交卷？', {
+      //   confirmButtonText: '确认交卷',
+      //   cancelButtonText: '我再看看',
+      //   type: 'warning'
+      // }).then(() => {
+      axios
+          .post('/api/answer/', {
+            // ip: returnCitySN.cip,
+            // cname: returnCitySN.cname,
+            questionnaire: that.info.id,
+            answer_list: that.submit_list,
+          }, {
+            headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+          })
+          .then(function (response){
+            that.result = response.data;
+            console.log(that.result.answer_number);
+            if(that.info.type === 'exam' && that.result.is_show_answer_detail === true) {
+              that.finish = true;
+            }
+            else {
+              let s1 = Base64.encode('moyu' + id + 'wenjuan');
+              // let url = window.location.origin+ "/thank/" + s1;
+              that.$router.push({path: '/thank/' + s1});
+            }
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '好像发生了什么错误',
+              message: error.message
+            })
+          })
+    }
   }
 }
 </script>
