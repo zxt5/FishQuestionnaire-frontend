@@ -1,128 +1,270 @@
 <template>
   <div>
-    <div class="reminder"  v-if="info.status==='closed'">
-      <h4>摸小鱼温馨提示：当前问卷处于关闭状态，无法提交哦~</h4>
-    </div>
-    <div class="questionnaire" v-if="info.is_locked === false">
-      <!--标题-->
-      <h1 class="title">{{info.title}}</h1>
-      <div class="content" v-if="timeStamp===2">&nbsp;很抱歉，此问卷将于 {{startTime}} 开放！</div>
-      <div class="content" v-if="timeStamp===3">&nbsp;很抱歉，此问卷已于 {{endTime}} 结束！</div>
-      <div class="content" v-if="timeStamp===4">&nbsp;恭喜，您已成功提交此问卷！</div>
-      <div class="line" v-if="timeStamp!==1"></div>
-      <el-button v-if="timeStamp!==1" type="primary" @click="toIndex">确定</el-button>
+    <div v-if="finish === false">
+      <div class="questionnaire" v-if="info.is_locked === false">
+        <!--标题-->
+        <h1 class="title">{{info.title}}</h1>
+        <div class="content" v-if="timeStamp===2">&nbsp;很抱歉，此问卷将于 {{startTime}} 开放！</div>
+        <div class="content" v-if="timeStamp===3">&nbsp;很抱歉，此问卷已于 {{endTime}} 结束！</div>
+        <div class="content" v-if="timeStamp===4">&nbsp;恭喜，您已成功提交此问卷！</div>
+        <div class="line" v-if="timeStamp!==1"></div>
+        <el-button v-if="timeStamp!==1" type="primary" @click="toIndex">确定</el-button>
 
 
-      <div v-if="timeStamp===1" class="content">&nbsp;{{info.content}}</div>
-<!--      <div class="line"></div>-->
-      <el-divider v-if="timeStamp===1"/>
-      <div v-if="timeStamp===1" class="question_block" v-for="(item, index) in info.question_list" :key="index">
-        <div slot="header">
-          <div class="questionTitle">
-            <!--显示必填标识-->
-            <span v-if="info.is_show_question_num">{{(index+1)+'. '}}</span>
-            {{item.title}}
-            <span style="color: #F56C6C;">
+        <div v-if="timeStamp===1" class="content">&nbsp;{{info.content}}</div>
+        <!--      <div class="line"></div>-->
+        <el-divider v-if="timeStamp===1"/>
+        <div v-if="timeStamp===1" class="question_block" v-for="(item, index) in info.question_list" :key="index">
+          <div slot="header">
+            <div class="questionTitle">
+              <!--显示必填标识-->
+              <span v-if="info.is_show_question_num">{{(index+1)+'. '}}</span>
+              {{item.title}}
+              <span style="color: #F56C6C;">
             <span v-if="item.is_must_answer">*</span>
           </span>
-            <span style="color: lightgrey" v-if="item.type==='single-choice'">[单选题]</span>
-            <span style="color: lightgrey" v-if="item.type==='multiple-choice'">[多选题]</span>
-            <span style="color: lightgrey" v-if="item.type==='completion'">[填空题]</span>
-            <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]（默认评分0）</span>
-            <span style="color: lightgrey" v-if="item.type==='position'">[定位题]</span>
+              <span style="color: lightgrey" v-if="item.type==='single-choice'">[单选题]</span>
+              <span style="color: lightgrey" v-if="item.type==='multiple-choice'">[多选题]</span>
+              <span style="color: lightgrey" v-if="item.type==='completion'">[填空题]</span>
+              <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]（默认评分0）</span>
+              <span style="color: lightgrey" v-if="item.type==='position'">[定位题]</span>
+            </div>
           </div>
-        </div>
-        <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
-          {{item.content}}
-        </div>
-        <!--单选题展示-->
-        <v-app class="choice" v-if="item.type==='single-choice'">
-          <v-container class="px-0" fluid >
-<!--            遍历选项-->
-            <div style="float: left;">
-              <v-radio-group v-model="item.answer" >
-                <div v-for="optionItem in item.option_list">
-                  <div style="float: left;min-width: 460px;max-width: 560px">
-                    <v-radio
-                        style="float: left"
-                        :key="optionItem.id"
-                        :label="optionItem.title "
-                    ></v-radio>
+          <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+            {{item.content}}
+          </div>
+          <!--单选题展示-->
+          <v-app class="choice" v-if="item.type==='single-choice'">
+            <v-container class="px-0" fluid >
+              <!--            遍历选项-->
+              <div style="float: left;">
+                <v-radio-group v-model="item.answer" >
+                  <div v-for="optionItem in item.option_list">
+                    <div style="float: left;min-width: 460px;max-width: 560px">
+                      <v-radio
+                          style="float: left"
+                          :key="optionItem.id"
+                          :label="optionItem.title "
+                      ></v-radio>
+                    </div>
+                    <div v-if="item.is_show_result" style="float: right;padding-left: 30px;">
+                      <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
+                    </div>
                   </div>
-                  <div v-if="item.is_show_result" style="float: right;padding-left: 30px;">
-                    <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
+                </v-radio-group>
+              </div>
+            </v-container>
+          </v-app>
+
+          <!--多选题展示-->
+          <v-app class="choice" v-if="item.type==='multiple-choice'">
+            <v-container fluid>
+              <div style="float: left" v-for="optionItem in item.option_list">
+                <div style="float: left;min-width: 460px;max-width: 560px">
+                  <v-checkbox
+                      :key="optionItem.id"
+                      :label="optionItem.title"
+                      v-model="optionItem.is_answer_choice"
+                      hide-details
+                  ></v-checkbox>
+                </div>
+                <div v-if="item.is_show_result" style="float: right;padding-left: 30px;">
+                  <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
+                </div>
+              </div>
+            </v-container>
+          </v-app>
+
+          <!--填空题展示-->
+          <v-app class="choice" v-if="item.type==='completion'">
+            <v-text-field
+                v-model="item.answer"
+                label="请在此输入答案~"
+                single-line
+            ></v-text-field>
+          </v-app>
+
+          <v-app class="choice" style="margin-top: 20px" v-if="item.type==='scoring'">
+            <div style="display: inline-block">
+              <v-rating
+                  style="float: left !important;"
+                  color="primary"
+                  empty-icon="mdi-star-outline"
+                  full-icon="mdi-star"
+                  half-icon="mdi-star-half-full"
+                  hover
+                  :length="item.option_list.length - 1"
+                  size="30"
+                  v-model="item.answer"
+              ></v-rating>
+              <div style="margin: 6px 20px; float: left !important; font-size: 22px">{{ item.answer }}</div>
+            </div>
+          </v-app>
+
+          <v-app class="choice" v-if="item.type==='position'">
+            <!--          <div style="display: inline-block">  当前定位: </div>-->
+            <v-btn
+                class="ma-2"
+                outlined
+                color="indigo"
+                @click="getLocation"
+            >
+              <span v-if="location && !positioning">{{ location["省份"] + ' ' + location["城市"] }}</span>
+              <span v-show="!location && !positioning" >点击获取位置</span>
+              <span v-show="positioning"><i class="el-icon-loading"></i>&nbsp;等待获取中 {{ countDown }} 秒</span>
+            </v-btn>
+          </v-app>
+        </div>
+
+        <el-button v-if="timeStamp===1" type="primary" @click="click(info.id)">提 交</el-button>
+
+      </div>
+    </div>
+
+    <el-button v-if="finish === true" @click="getPdf()">导出PDF</el-button>
+    <div v-if="finish === true" class="questionnaire" id="pdfDom">
+      <div>
+        <h1 style="text-align: center; padding-top: 30px">{{info.title}}</h1>
+        <el-row style="margin-top: 35px">
+          <el-col :span="8">
+            <div style="box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)">
+              <div style="text-align: center;padding:10px 10px 10px 10px;">
+                <h3>试卷得分</h3>
+                <p style="margin-top: 10px">{{result.user_get_score}}分</p>
+              </div>
+            </div>
+          </el-col>
+          <el-col :span="8">
+            <div style="box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)">
+              <div style="text-align: center; padding:10px 10px 10px 10px;">
+                <h3>做对题数</h3>
+                <p style="margin-top: 10px">{{result.user_get_score_question_cnt}}道</p>
+              </div>
+            </div>
+          </el-col>
+          <el-col :span="8">
+            <div style="box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)">
+              <div style="text-align: center;padding:10px 10px 10px 10px;">
+                <h3>正确率</h3>
+                <p style="margin-top: 10px">{{result.correct_rate}}</p>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+
+        <div style="float: right;margin-top: 20px;padding-right: 15px">
+          <span>仅显示错题&nbsp</span>
+          <el-switch
+              v-model="only_show_wrong_question"
+              active-color="#13ce66"
+              inactive-color="#ff4949">
+          </el-switch>
+        </div>
+
+        <div style="margin-top: 35px">
+          <div style="font-size: 16px;">
+
+            <div>
+              <h3 style="margin-bottom: 15px;color: midnightblue">答案解析：</h3>
+            </div>
+
+
+            <div v-for="(item, index) in result.question_list"  :key="index"
+                 style="margin-bottom: 20px">
+              <div v-if="item.is_scoring === true && !(item.is_user_answer_right && only_show_wrong_question)">
+
+                <div slot="header" >
+                  <div class="questionTitle">
+                    <!--显示必填标识-->
+                    <span v-if="info.is_show_question_num">{{(index+1)+'. '}}</span>
+                    {{item.title}}
+
+                    <span style="color: #F56C6C;">
+                    <span v-if="item.is_must_answer">*</span>
+                  </span>
+
+                    <span style="color:gray">
+                    [分值{{item.question_score}}分]
+                  </span>
+
                   </div>
                 </div>
-              </v-radio-group>
-            </div>
-          </v-container>
-        </v-app>
+                <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+                  {{item.content}}
+                </div>
 
-        <!--多选题展示-->
-        <v-app class="choice" v-if="item.type==='multiple-choice'">
-          <v-container fluid>
-            <div style="float: left" v-for="optionItem in item.option_list">
-              <div style="float: left;min-width: 460px;max-width: 560px">
-                <v-checkbox
-                    :key="optionItem.id"
-                    :label="optionItem.title"
-                    v-model="optionItem.is_answer_choice"
-                    hide-details
-                ></v-checkbox>
+
+                <v-app class="choice" v-if="item.type==='single-choice'">
+                  <v-container class="px-0" fluid >
+                    <!--            遍历选项-->
+                    <div style="float: left;">
+                      <v-radio-group v-model="item.answer " >
+                        <div v-for="optionItem in item.option_list">
+                          <div style="float: left;min-width: 460px;max-width: 560px">
+                            <v-radio
+                                style="float: left"
+                                :key="optionItem.id"
+                                :label="optionItem.title "
+                            ></v-radio>
+                          </div>
+                        </div>
+                      </v-radio-group>
+                    </div>
+                  </v-container>
+                </v-app>
+
+                <v-app class="choice" v-if="item.type==='multiple-choice'">
+                  <v-container fluid>
+                    <div style="float: left" v-for="optionItem in item.option_list">
+                      <div style="float: left;min-width: 460px;max-width: 560px">
+                        <v-checkbox
+                            :key="optionItem.id"
+                            :label="optionItem.title"
+                            v-model="optionItem.is_answer_choice"
+                            hide-details
+                        ></v-checkbox>
+                      </div>
+                    </div>
+                  </v-container>
+                </v-app>
+
+                <v-app class="choice" v-if="item.type==='completion'" style="margin-bottom: 10px">
+                  <div v-for="optionItem in item.option_list">
+                    你的答案：{{optionItem.user_answer_content}}
+                  </div>
+                </v-app>
+
+                <div style="background-color: whitesmoke; border-radius: 10px;">
+                  <div style="padding: 8px">
+                    <span v-if="item.is_user_answer_right" style="color: green">回答正确</span>
+                    <span v-else style="color: darkred">回答错误</span>
+                    <i class="el-icon-success" v-if="item.is_user_answer_right" style="color: green"></i>
+                    <i class="el-icon-error" style="color: red" v-else></i>
+                    <span v-if="item.is_user_answer_right" style="float: right; padding-right: 5px;color: green">+{{item.user_get_score}}分</span>
+                    <span v-else style="float: right; padding-right: 5px;color: red">+{{item.user_get_score}}分</span>
+                  </div>
+                </div>
+
+                <div v-if="item.is_user_answer_right === false"
+                     style="background-color: whitesmoke; border-radius: 10px;margin-top: 10px;padding: 8px">
+                  <div style="color: green">正确答案：</div>
+                  <div v-if="item.type === 'single-choice' || item.type === 'multiple=choice'">
+                  <span v-for="optionItem in item.option_list">
+                    <span v-if="optionItem.is_answer_choice">{{optionItem.title}},</span>
+                  </span>
+                  </div>
+                  <div v-else>
+                    <span v-for="optionItem in item.option_list">{{optionItem.content}}</span>
+                  </div>
+                </div>
+
               </div>
-              <div v-if="item.is_show_result" style="float: right;padding-left: 30px;">
-                <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
-              </div>
             </div>
-          </v-container>
-        </v-app>
-
-        <!--填空题展示-->
-        <v-app class="choice" v-if="item.type==='completion'">
-          <v-text-field
-              v-model="item.answer"
-              label="请在此输入答案~"
-              single-line
-          ></v-text-field>
-        </v-app>
-
-        <v-app class="choice" style="margin-top: 20px" v-if="item.type==='scoring'">
-          <div style="display: inline-block">
-            <v-rating
-                style="float: left !important;"
-                color="primary"
-                empty-icon="mdi-star-outline"
-                full-icon="mdi-star"
-                half-icon="mdi-star-half-full"
-                hover
-                :length="item.option_list.length - 1"
-                size="30"
-                v-model="item.answer"
-            ></v-rating>
-            <div style="margin: 6px 20px; float: left !important; font-size: 22px">{{ item.answer }}</div>
           </div>
-        </v-app>
-
-        <v-app class="choice" v-if="item.type==='position'">
-<!--          <div style="display: inline-block">  当前定位: </div>-->
-          <v-btn
-              class="ma-2"
-              outlined
-              color="indigo"
-              @click="getLocation"
-          >
-            <span v-if="location && !positioning">{{ location["省份"] + ' ' + location["城市"] }}</span>
-            <span v-show="!location && !positioning" >点击获取位置</span>
-            <span v-show="positioning"><i class="el-icon-loading"></i>&nbsp;等待获取中 {{ countDown }} 秒</span>
-          </v-btn>
-        </v-app>
+        </div>
       </div>
-
-      <el-button v-if="timeStamp===1" type="primary" @click="click(info.id)">提 交</el-button>
-<!--      <div class="line"></div>-->
-<!--      <div class="text2"> 摸鱼问卷 提供技术支持 </div>-->
     </div>
-<!--    <el-dialog title="分享问卷" :visible.sync="info.is_locked" :close-on-click-modal="false" class="share_window" @opened="makeQrcode" append-to-body>-->
+
     <el-dialog
         title="问卷已加密！"
         :visible.sync="info.is_locked"
@@ -132,9 +274,6 @@
         width="30%"
         center
     >
-      <!--        <div style="float: left">-->
-      <!--          <span style="font-size: 17px">请输入密码：</span>-->
-      <!--        </div>-->
       <div style="width: 50%; margin: 0 auto">
         <el-input placeholder="请输入密码" v-model="password" show-password v-on:keyup.enter.native="check_password"></el-input>
       </div>
@@ -176,6 +315,9 @@ export default {
       positioningInterval: null, // 定位倒计时计时器
       countDown: 30, // 倒计时，单位秒
       location: null, // 位置信息
+      result:'',
+      finish: false,
+      only_show_wrong_question: false,
     }
   },
   mounted() {
@@ -195,8 +337,6 @@ export default {
             .then(function (response) {
               that.info = response.data;
               if(that.info.is_required_login && !res[0]){
-                // localStorage.setItem('flag.myblog', 'true');
-                // localStorage.setItem('url.myblog', that.$route.params.text);
                 that.$store.commit('flag_true');
                 that.$store.commit('toUrl', that.$route.params.text);
                 that.$notify.warning({
@@ -479,9 +619,16 @@ export default {
                 headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
               .then(function (response){
-                let s1 = Base64.encode('moyu' + id + 'wenjuan');
-                let url = window.location.origin+ "/thank/" + s1;
-                window.open(url);
+                that.result = response.data;
+                console.log(that.result.answer_number);
+                if(that.info.type === 'exam' && that.result.is_show_answer_detail===true) {
+                  that.finish = true;
+                }
+                else {
+                  let s1 = Base64.encode('moyu' + id + 'wenjuan');
+                  let url = window.location.origin+ "/thank/" + s1;
+                  window.open(url);
+                }
               })
               .catch(function (error){
                 that.$notify.error({
