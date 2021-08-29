@@ -21,12 +21,10 @@
           <span style="color: #F56C6C;">
             <span v-if="item.is_must_answer">*</span>
           </span>
-            <span style="color: lightgrey" v-if="item.type==='single-choice'"> [单选题]</span>
-            <span style="color: lightgrey" v-if="item.type==='multiple-choice'"> [多选题]</span>
-            <span style="color: lightgrey" v-if="item.type==='completion'"> [填空题]</span>
-            <span style="color: lightgrey" v-if="item.type==='scoring'"> [评分题]</span>
-            <span style="color: lightgrey" v-if="item.type==='position'">[定位题]</span>
-            <span style="color: #F56C6C" v-if="item.is_scoring">（{{item.question_score}}分）</span>
+            <span style="color: lightgrey" v-if="item.type==='single-choice'">[单选题]</span>
+            <span style="color: lightgrey" v-if="item.type==='multiple-choice'">[多选题]</span>
+            <span style="color: lightgrey" v-if="item.type==='completion'">[填空题]</span>
+            <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]（默认评分0）</span>
           </div>
         </div>
         <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
@@ -52,19 +50,13 @@
         <!--多选题展示-->
         <v-app class="choice" v-if="item.type==='multiple-choice'">
           <v-container fluid>
-            <div style="float: left" v-for="optionItem in item.option_list">
-              <div style="float: left;min-width: 460px;max-width: 560px">
-                <v-checkbox
-                    :key="optionItem.id"
-                    :label="optionItem.title"
-                    v-model="optionItem.is_attr_limit"
-                    hide-details
-                ></v-checkbox>
-              </div>
-              <div v-if="item.is_show_result" style="float: right; padding-left: 30px;">
-                <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
-              </div>
-            </div>
+            <v-checkbox
+                v-for="optionItem in item.option_list"
+                :key="optionItem.id"
+                :label="optionItem.title"
+                v-model="optionItem.is_answer_choice"
+                hide-details
+            ></v-checkbox>
           </v-container>
         </v-app>
 
@@ -159,12 +151,9 @@ export default {
     s1 = Base64.decode(s1);
     s1 = s1.substring(4,s1.length - 7);
     axios
-        .get('/api/questionnaire/' + parseInt(s1) + '/fill_or_preview/', {
-          headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-        })
+        .get('/api/questionnaire/' + parseInt(s1))
         .then(function (response){
           that.info = response.data;
-          console.log(response.data)
           that.htmlTitle = response.data.title;
           if('' + that.info.author.username !== '' + that.userLogin) {
             that.$router.push({path: '/index'});

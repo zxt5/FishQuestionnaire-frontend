@@ -52,7 +52,7 @@
                     @change="delete_time_control"
                     v-model="control_time"
                     active-color="#409eff"
-                   inactive-color="#dcdfe6">
+                    inactive-color="#dcdfe6">
                 </el-switch>
                 <div v-if="control_time" style="padding-left: 15px">
                   <!--                开始时间-->
@@ -103,10 +103,10 @@
                     @change="is_show_num"
                     v-model="info.is_show_question_num"
                     active-color="#409eff"
-                   inactive-color="#dcdfe6">
+                    inactive-color="#dcdfe6">
                 </el-switch>
               </div>
-              <!--              问卷设置密码-->
+              <!--            问卷设置密码-->
               <div style="margin-top: 15px">
                 <span style="margin-top: 30px">设定答卷密码</span>
                 <el-switch
@@ -138,6 +138,38 @@
                   </div>
                 </div>
               </div>
+              <!--            问卷设置限额-->
+              <div style="margin-top: 15px">
+                <span style="margin-top: 30px">设定答卷限额</span>
+                <el-switch
+                    style="float: right"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949"
+                    v-model="info.is_limit_answer"
+                    @change="set_is_limit_answer"
+                >
+                </el-switch>
+                <div v-if="info.is_limit_answer" style="margin-top: 15px; padding-left: 15px">
+                  <span style="font-size: 15px">设置限额数量:</span>
+                  <el-input
+                      placeholder="请输入限额数量"
+                      v-model="info.limit_answer_number"
+                      v-on:keyup.enter.native="set_limit_answer_number"
+                      style="min-width: 180px;max-width: 180px;margin-left: 10px"
+                  >
+                  </el-input>
+                  <div style="margin-top: 15px">
+                    <el-button
+                        size="mini"
+                        type="primary"
+                        @click="set_limit_answer_number"
+                    >
+                      保存更改
+                    </el-button>
+                  </div>
+                </div>
+              </div>
+              <!--登录验证-->
               <div style="margin-top: 15px">
                 <span style=" margin-top: 30px">答题需要登陆验证</span>
 
@@ -154,6 +186,7 @@
                   <span style="color: #a1a1a1; font-size: 15px">设置限答后，必须打开登录验证</span>
                 </div>
               </div>
+              <!--每个用户仅答一次-->
               <div style="margin-top: 15px">
                 <span style=" margin-top: 30px">每个用户仅答一次</span>
                 <el-switch
@@ -175,189 +208,189 @@
           </div>
           <div class="intro" contenteditable="true" @input="info.content = $event.target.innerText" @blur="editTitle(info)"> {{info.content}}</div>
 
-            <el-container          
-            style="display:inline">
-              <el-collapse v-model="info.isShow" class="question-container" @change="editTitle(info)">
-                <el-collapse-item >
-                    <template slot="title">
-                        <span style="margin-left: 85%">  编辑标题和简介 </span>
-                    </template>
-                    <title-content-dialog ref="title-content-dialog"></title-content-dialog>
-                </el-collapse-item>
-              </el-collapse>
-            </el-container>
+          <el-container
+              style="display:inline">
+            <el-collapse v-model="info.isShow" class="question-container" @change="editTitle(info)">
+              <el-collapse-item >
+                <template slot="title">
+                  <span style="margin-left: 85%">  编辑标题和简介 </span>
+                </template>
+                <title-content-dialog ref="title-content-dialog"></title-content-dialog>
+              </el-collapse-item>
+            </el-collapse>
+          </el-container>
 
 
-          <draggable :list="info.question_list" animation="500" 
-          chosen-class="chosen" 
-          :disabled="disabled" 
-          @start="onStart" 
-          @end="onEnd"
+          <draggable :list="info.question_list" animation="500"
+                     chosen-class="chosen"
+                     :disabled="disabled"
+                     @start="onStart"
+                     @end="onEnd"
           >
-          <transition-group>              
-          <div class="card"  v-for="(item, index) in info.question_list" :key="item.id ? item.id: item.key">
-            <div style="padding: 20px">
-            <div class="op">
-              <ul @mouseenter="mouseEnter"
-                  @mouseleave="mouseLeave">
-                <li @click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
-                <li @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
-                <li @click="cardDown(index, item)"><v-icon small>mdi-arrow-down-circle-outline</v-icon>  下移</li>
-                <li @click="cardUp(index, item)"><v-icon small>mdi-arrow-up-circle-outline</v-icon>  上移</li>
-              </ul>
-            </div>
+            <transition-group>
+              <div class="card"  v-for="(item, index) in info.question_list" :key="item.id ? item.id: item.key">
+                <div style="padding: 20px">
+                  <div class="op">
+                    <ul @mouseenter="mouseEnter"
+                        @mouseleave="mouseLeave">
+                      <li @click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
+                      <li @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
+                      <li @click="cardDown(index, item)"><v-icon small>mdi-arrow-down-circle-outline</v-icon>  下移</li>
+                      <li @click="cardUp(index, item)"><v-icon small>mdi-arrow-up-circle-outline</v-icon>  上移</li>
+                    </ul>
+                  </div>
 
-            <!--单选框模板-->
-            <template v-if="item.type === 'single-choice'">
-              <div>
-                <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
-                <span style="margin-top: 20px"> {{item.title}} </span>
-                <span style="color: lightgrey">[单选题]</span>
-                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
-              </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
-                {{item.content}}
-              </div>
+                  <!--单选框模板-->
+                  <template v-if="item.type === 'single-choice'">
+                    <div>
+                      <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
+                      <span style="margin-top: 20px"> {{item.title}} </span>
+                      <span style="color: lightgrey">[单选题]</span>
+                      <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+                    </div>
+                    <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
+                      {{item.content}}
+                    </div>
 
-              <el-radio-group v-model="item.answer">
-                <el-radio
-                v-for="(subItem, subIndex)
+                    <el-radio-group v-model="item.answer">
+                      <el-radio
+                          v-for="(subItem, subIndex)
                 in item.option_list" :key="subItem.id ? subItem.id: subItem.key" :label="subIndex"
-                @click.native="debugShow(subItem)"
-                :disabled = "item.is_scoring"
-                >
-                  {{subItem.title}}
-                  <span
-                  v-if="item.is_scoring && (subIndex === item.answer)"
-                   style="color: #F56C6C; margin-left: 20px">[正确答案]</span>
-                </el-radio>
-              </el-radio-group>
-            </template>
-            <!--多选框模板-->
-            <template v-if="item.type === 'multiple-choice'">
-              <div>
-                <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
-                <span style="margin-top: 20px"> {{item.title}} </span>
-                <span style="color: lightgrey">[多选题]</span>
-                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
-              </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
-                {{item.content}}
+                          @click.native="debugShow(subItem)"
+                          :disabled = "item.is_scoring"
+                      >
+                        {{subItem.title}}
+                        <span
+                            v-if="item.is_scoring && (subIndex === item.answer)"
+                            style="color: #F56C6C; margin-left: 20px">[正确答案]</span>
+                      </el-radio>
+                    </el-radio-group>
+                  </template>
+                  <!--多选框模板-->
+                  <template v-if="item.type === 'multiple-choice'">
+                    <div>
+                      <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
+                      <span style="margin-top: 20px"> {{item.title}} </span>
+                      <span style="color: lightgrey">[多选题]</span>
+                      <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+                    </div>
+                    <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
+                      {{item.content}}
 
-              </div>
+                    </div>
 
-              <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex">
-                <el-checkbox  :label="subIndex" v-model="subItem.is_answer_choice"
-                :disabled = "item.is_scoring">
-                  {{subItem.title}}
-                   <span
-                  v-if="item.is_scoring && subItem.is_answer_choice"
-                   style="color: #F56C6C; margin-left: 20px">[正确答案]</span>
+                    <div v-for="(subItem, subIndex) in item.option_list" :key="subIndex">
+                      <el-checkbox  :label="subIndex" v-model="subItem.is_answer_choice"
+                                    :disabled = "item.is_scoring">
+                        {{subItem.title}}
+                        <span
+                            v-if="item.is_scoring && subItem.is_answer_choice"
+                            style="color: #F56C6C; margin-left: 20px">[正确答案]</span>
 
-                </el-checkbox>
-              </div>
+                      </el-checkbox>
+                    </div>
 
-            </template>
-            <!--填空模板-->
-            <template v-if="item.type === 'completion'">
-              <div>
-                <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
-                <span style="margin-top: 20px"> {{item.title}} </span>
-                <span style="color: lightgrey">[填空题]</span>
-                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
-              </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
-                {{item.content}}
-              </div>
-              <el-input class="single-completion-input" :autosize="true"
-                        type="textarea" :clearable="true" resize="none" v-model="item.answer" :disabled="item.is_scoring"></el-input>
+                  </template>
+                  <!--填空模板-->
+                  <template v-if="item.type === 'completion'">
+                    <div>
+                      <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
+                      <span style="margin-top: 20px"> {{item.title}} </span>
+                      <span style="color: lightgrey">[填空题]</span>
+                      <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+                    </div>
+                    <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
+                      {{item.content}}
+                    </div>
+                    <el-input class="single-completion-input" :autosize="true"
+                              type="textarea" :clearable="true" resize="none" v-model="item.answer" :disabled="item.is_scoring"></el-input>
 
-              <div
-              v-if="item.is_scoring"
-               style="color: #F56C6C; margin-top:20px">正确答案: {{item.option_list[0].content}}</div>
-            </template>
-            <!--定位模板-->
-            <template v-if="item.type == 'position'">
-              <div>
-                <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
-                <span style="margin-top: 20px"> {{item.title}} </span>
-                <span style="color: lightgrey">[定位题]</span>
-                <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
-                {{item.content}}
-              </div>
-                <br>
-<!--                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>-->
-<!--                <span style="margin-right:20px">  当前定位: </span>-->
-                <el-button style="margin-left: 17px; width: 25%" :icon="positioning ? 'el-icon-loading': none " @click="getLocation">
-                  <span v-if="location">{{ location["省份"] + ' ' + location["城市"] }}</span>
-                  <div v-show="!location && !positioning" >点击获取位置</div>
-                  <span v-show="positioning">
+                    <div
+                        v-if="item.is_scoring"
+                        style="color: #F56C6C; margin-top:20px">正确答案: {{item.option_list[0].content}}</div>
+                  </template>
+                  <!--定位模板-->
+                  <template v-if="item.type == 'position'">
+                    <div>
+                      <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
+                      <span style="margin-top: 20px"> {{item.title}} </span>
+                      <span style="color: lightgrey">[定位题]</span>
+                      <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
+                        {{item.content}}
+                      </div>
+                      <br>
+                      <!--                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>-->
+                      <!--                <span style="margin-right:20px">  当前定位: </span>-->
+                      <el-button style="margin-left: 17px; width: 25%" :icon="positioning ? 'el-icon-loading': none " @click="getLocation">
+                        <span v-if="location">{{ location["省份"] + ' ' + location["城市"] }}</span>
+                        <div v-show="!location && !positioning" >点击获取位置</div>
+                        <span v-show="positioning">
                           &nbsp;
                           等待获取中
                           <span class="red">{{ countDown }}</span> 秒
                       </span>
-                  </el-button>
-              </div>
-            </template>
-          <!--评分题-->
-          <template v-if="item.type === 'scoring'">
-              <div>
-                <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
-                <span style="margin-top: 20px"> {{item.title}} </span>
-                <span style="color: lightgrey">[评分题]</span>
-                <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
-              </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
-                {{item.content}}
-              </div>
-              <el-rate class="scoring-input"
-                  v-model="item.answer"
-                  :max="item.option_list.length - 1"
-                  show-score
-              >
-              </el-rate>
-            </template>
+                      </el-button>
+                    </div>
+                  </template>
+                  <!--评分题-->
+                  <template v-if="item.type === 'scoring'">
+                    <div>
+                      <span v-if="info.is_show_question_num">{{(index+1)}}. </span>
+                      <span style="margin-top: 20px"> {{item.title}} </span>
+                      <span style="color: lightgrey">[评分题]</span>
+                      <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
+                    </div>
+                    <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
+                      {{item.content}}
+                    </div>
+                    <el-rate class="scoring-input"
+                             v-model="item.answer"
+                             :max="item.option_list.length - 1"
+                             show-score
+                    >
+                    </el-rate>
+                  </template>
 
-            <div v-show="item.is_scoring" style="margin-top: 20px; color: #F56C6C">本题分值: {{item.question_score}}</div>
+                  <div v-show="item.is_scoring" style="margin-top: 20px; color: #F56C6C">本题分值: {{item.question_score}}</div>
 
-            </div>
-            <!--编辑界面-->
-            <el-container          
-            style="display:inline"
-            >
-            <div class="question-container">
-                <el-collapse-transition>
-                  <div v-show="item.isShow">
-                    <single-choice-add-card :ref="'single-choice'+index" v-if="item.type === 'single-choice'"></single-choice-add-card>
-        
-                    <!--多选对话框-->
-                    <multiple-choice-add-card :ref="'multiple-choice'+index" v-if="item.type === 'multiple-choice'"></multiple-choice-add-card>
-           
-                    <!--单项填空对话框-->
-                    <single-completion-add-card :ref="'completion'+index" v-if="item.type === 'completion'"></single-completion-add-card>
+                </div>
+                <!--编辑界面-->
+                <el-container
+                    style="display:inline"
+                >
+                  <div class="question-container">
+                    <el-collapse-transition>
+                      <div v-show="item.isShow">
+                        <single-choice-add-card :type="info.type" :ref="'single-choice'+index" v-if="item.type === 'single-choice'"></single-choice-add-card>
 
-                    <!--    评分对话框-->
-                    <scoring-add-card :ref="'scoring'+index" v-if="item.type === 'scoring'"></scoring-add-card>
+                        <!--多选对话框-->
+                        <multiple-choice-add-card :ref="'multiple-choice'+index" v-if="item.type === 'multiple-choice'"></multiple-choice-add-card>
 
-                    <position-add-card :ref="'position'+index" v-if="item.type === 'position'"></position-add-card>
+                        <!--单项填空对话框-->
+                        <single-completion-add-card :ref="'completion'+index" v-if="item.type === 'completion'"></single-completion-add-card>
 
+                        <!--    评分对话框-->
+                        <scoring-add-card :ref="'scoring'+index" v-if="item.type === 'scoring'"></scoring-add-card>
+
+                        <position-add-card :ref="'position'+index" v-if="item.type === 'position'"></position-add-card>
+
+                      </div>
+                    </el-collapse-transition>
                   </div>
-                </el-collapse-transition>
-            </div>
-            </el-container>
-            <!--编辑按钮-->
-            <el-divider ></el-divider>
-            <el-button @click="editQuestion(item, index)"
-                       @mouseenter.native="mouseEnter"
-                       @mouseleave.native="mouseLeave"
-            class="edit-button"
-            :icon=" item.isShow === true ? 'el-icon-arrow-up':'el-icon-arrow-down'"
-            >
-              <div v-show="item.isShow === true">完成编辑</div>
-              <div v-show="item.isShow === false">进入编辑</div>
-            </el-button>
-            
-            </div>
+                </el-container>
+                <!--编辑按钮-->
+                <el-divider ></el-divider>
+                <el-button @click="editQuestion(item, index)"
+                           @mouseenter.native="mouseEnter"
+                           @mouseleave.native="mouseLeave"
+                           class="edit-button"
+                           :icon=" item.isShow === true ? 'el-icon-arrow-up':'el-icon-arrow-down'"
+                >
+                  <div v-show="item.isShow === true">完成编辑</div>
+                  <div v-show="item.isShow === false">进入编辑</div>
+                </el-button>
+
+              </div>
             </transition-group>
           </draggable>
 
@@ -406,11 +439,11 @@ import PositionAddCard from '../components/PositionAddCard.vue'
 
 export default {
   components: {
-        PositionAddCard, SingleChoiceAddCard,
-        Wave, MultipleChoiceAddCard, SingleCompletionAddCard,
-        MultipleCompletionAddCard,
-        ScoringAddCard,draggable,
-        TitleContentDialog
+    PositionAddCard, SingleChoiceAddCard,
+    Wave, MultipleChoiceAddCard, SingleCompletionAddCard,
+    MultipleCompletionAddCard,
+    ScoringAddCard,draggable,
+    TitleContentDialog
   },
   data(){
     return {
@@ -467,6 +500,45 @@ export default {
     }
   },
   methods:{
+    set_limit_answer_number() {
+      const that = this;
+      let numReg = /^[0-9]*$/;
+      let numRe = new RegExp(numReg);
+      let flag = false;
+      console.log(this.info.limit_answer_number);
+      if(numRe.test(this.info.limit_answer_number)) {
+        let num = parseInt(this.info.limit_answer_number);
+        if(num >= 1) flag = true;
+        console.log(num);
+      }
+      if(flag === false) {
+        that.$notify.error({
+          title: '限额必须为正整数！',
+          // message: '请输入密码！'
+        })
+      }
+      else {
+        axios
+            .patch('/api/questionnaire/' + that.info.id + '/', {
+              is_limit_answer: true,
+              limit_answer_number: parseInt(this.info.limit_answer_number),
+            }, {
+              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+            })
+            .then(function (response){
+              that.$notify.success({
+                title: '设置成功',
+                message: '设置限额成功！'
+              })
+            })
+            .catch(function (error){
+              that.$notify.error({
+                title: '出错啦',
+                message: '设置限额失败！'
+              })
+            })
+      }
+    },
     set_password() {
       const that = this;
       if(this.info.password === '') {
@@ -493,6 +565,29 @@ export default {
               that.$notify.error({
                 title: '出错啦',
                 message: '设置密码失败！'
+              })
+            })
+      }
+    },
+    set_is_limit_answer() {
+      const that = this;
+      if(this.info.is_limit_answer === false) {
+        axios
+            .patch('/api/questionnaire/' + that.info.id + '/', {
+              is_limit_answer: false
+            }, {
+              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+            })
+            .then(function (response){
+              that.$notify.success({
+                title: '编辑成功',
+                message: '问卷限额已取消！'
+              })
+            })
+            .catch(function (error){
+              that.$notify.error({
+                title: '出错啦',
+                message: '问卷限额取消失败！'
               })
             })
       }
@@ -528,101 +623,101 @@ export default {
     },
     // 获得定位信息
     getLocation() {
-        const _this = this
-        _this.geolocation = new _this.BMap.Geolocation()
-        if (_this.geolocation) {
-          // 开启SDK辅助定位，仅当使用环境为移动web混合开发，且开启了定位sdk辅助定位功能后生效
-          _this.geolocation.enableSDKLocation()
-          // 开始定位
-          this.positioning = true
-          // 倒计时
-          this.positioningInterval = setInterval(() => {
-            if (this.countDown === 0) {
-              this.countDown = 30
-              clearInterval(this.positioningInterval)
-            } else {
-              this.countDown--
-            }
-          }, 1000)
-          // 位置选项
-          const positionOptions = {
-            enableHighAccuracy: true, // 要求浏览器获取最佳结果
-            timeout: 30, //    超时时间
-            maximumAge: 0 // 允许返回指定时间内的缓存结果。如果此值为0，则浏览器将立即获取新定位结果
+      const _this = this
+      _this.geolocation = new _this.BMap.Geolocation()
+      if (_this.geolocation) {
+        // 开启SDK辅助定位，仅当使用环境为移动web混合开发，且开启了定位sdk辅助定位功能后生效
+        _this.geolocation.enableSDKLocation()
+        // 开始定位
+        this.positioning = true
+        // 倒计时
+        this.positioningInterval = setInterval(() => {
+          if (this.countDown === 0) {
+            this.countDown = 30
+            clearInterval(this.positioningInterval)
+          } else {
+            this.countDown--
           }
-          // 获取用户位置信息
-          _this.geolocation.getCurrentPosition(position => {
-            _this.resetPositioning()
-            // 获取定位结果状态码
-            const statusCode = _this.geolocation.getStatus()
-            let msg = '由于未知错误而无法检索设备的位置' // 提示消息
-            let msgType = 'error' // 消息类型
-            // 判断结果状态码，为0代表获取成功，读取省市、经纬度
-            switch (statusCode) {
-              case 0:
-                msgType = 'success'
-                msg = '获取地理位置定位请求成功'
-                if (position) {
-                  // 数据变量定义
-                  let lat = 0.0 // 经度
-                  let lng = 0.0 // 纬度
-                  let province = '未知' // 经度
-                  let city = '未知' // 纬度
+        }, 1000)
+        // 位置选项
+        const positionOptions = {
+          enableHighAccuracy: true, // 要求浏览器获取最佳结果
+          timeout: 30, //    超时时间
+          maximumAge: 0 // 允许返回指定时间内的缓存结果。如果此值为0，则浏览器将立即获取新定位结果
+        }
+        // 获取用户位置信息
+        _this.geolocation.getCurrentPosition(position => {
+          _this.resetPositioning()
+          // 获取定位结果状态码
+          const statusCode = _this.geolocation.getStatus()
+          let msg = '由于未知错误而无法检索设备的位置' // 提示消息
+          let msgType = 'error' // 消息类型
+          // 判断结果状态码，为0代表获取成功，读取省市、经纬度
+          switch (statusCode) {
+            case 0:
+              msgType = 'success'
+              msg = '获取地理位置定位请求成功'
+              if (position) {
+                // 数据变量定义
+                let lat = 0.0 // 经度
+                let lng = 0.0 // 纬度
+                let province = '未知' // 经度
+                let city = '未知' // 纬度
 
-                  // 坐标
-                  if (position.point) {
-                    lat = position.point.lat
-                    lng = position.point.lng
-                  }
-                  // 位置
-                  if (position.address) {
-                    province = position.address.province
-                    city = position.address.city
-                  }
-                  _this.location = {
-                    省份: province,
-                    城市: city,
-                    经度: lat,
-                    纬度: lng
-                  }
-                } else {
-                  msg = '由于未知错误而无法检索设备的位置'
+                // 坐标
+                if (position.point) {
+                  lat = position.point.lat
+                  lng = position.point.lng
                 }
-                break
-              case 2:
+                // 位置
+                if (position.address) {
+                  province = position.address.province
+                  city = position.address.city
+                }
+                _this.location = {
+                  省份: province,
+                  城市: city,
+                  经度: lat,
+                  纬度: lng
+                }
+              } else {
                 msg = '由于未知错误而无法检索设备的位置'
-                break
-              case 4:
-              case 5:
-                msg = '位置服务请求非法'
-                break
-              case 6:
-                msg = '应用程序没有使用位置服务的权限'
-                break
-              case 7:
-                msg = '网络不可用或者无法连接到获取位置信息的卫星'
-                break
-              case 8:
-                msg = '无法在指定的最大超时间隔内检索位置信息'
-                break
-              default:
-                msg = '由于未知错误而无法检索设备的位置'
-                break
-            }
-            _this.$notify[msgType]({
-              key: NotificationKey,
-              message: '提示',
-              description: msg
-            })
-          }, positionOptions)
-        } else {
-          _this.$notify.error({
+              }
+              break
+            case 2:
+              msg = '由于未知错误而无法检索设备的位置'
+              break
+            case 4:
+            case 5:
+              msg = '位置服务请求非法'
+              break
+            case 6:
+              msg = '应用程序没有使用位置服务的权限'
+              break
+            case 7:
+              msg = '网络不可用或者无法连接到获取位置信息的卫星'
+              break
+            case 8:
+              msg = '无法在指定的最大超时间隔内检索位置信息'
+              break
+            default:
+              msg = '由于未知错误而无法检索设备的位置'
+              break
+          }
+          _this.$notify[msgType]({
             key: NotificationKey,
             message: '提示',
-            description: '您的浏览器不支持地理位置服务'
+            description: msg
           })
-        }
-      },
+        }, positionOptions)
+      } else {
+        _this.$notify.error({
+          key: NotificationKey,
+          message: '提示',
+          description: '您的浏览器不支持地理位置服务'
+        })
+      }
+    },
     delete_time_control() {
       const that = this;
       if(this.control_time === false) {
@@ -674,11 +769,11 @@ export default {
       else {
         var fl = 1;
         if(this.info.is_start_time && this.info.is_end_time) {
-            // console.log(this.info.start_time);
-            // console.log(this.info.end_time);
-            if(Date.parse(this.info.start_time) > Date.parse(this.info.end_time)) {
-              fl = 0;
-            }
+          // console.log(this.info.start_time);
+          // console.log(this.info.end_time);
+          if(Date.parse(this.info.start_time) > Date.parse(this.info.end_time)) {
+            fl = 0;
+          }
         }
         if(fl === 1) {
           axios
@@ -804,7 +899,7 @@ export default {
           title: "请完成当前题目的编辑!"
         })
         this.$nextTick(_=>{
-            window.scrollTo({"behavior":"smooth","top": this.editItem.$el.offsetTop - 300});
+          window.scrollTo({"behavior":"smooth","top": this.editItem.$el.offsetTop - 300});
         })
         return;
       }
@@ -833,8 +928,8 @@ export default {
       this.$nextTick(_=>{
         this.editQuestion(this.info.question_list[index], index)
         this.$nextTick(_=>{
-            var el = document.getElementById("app")
-            window.scrollTo({"behavior":"smooth","top": el.offsetHeight});
+          var el = document.getElementById("app")
+          window.scrollTo({"behavior":"smooth","top": el.offsetHeight});
         })
       })
     },
@@ -847,7 +942,7 @@ export default {
       if (this.editItem && this.editItem != temp){
         this.$notify.error("请完成之前题目编辑")
         this.$nextTick(_=>{
-            window.scrollTo({"behavior":"smooth","top": this.editItem.$el.offsetTop - 300});
+          window.scrollTo({"behavior":"smooth","top": this.editItem.$el.offsetTop - 300});
         })
         return
       }
@@ -855,8 +950,8 @@ export default {
       if (this.isEdit && !item.isShow){
         this.$notify.error("请完成之前题目编辑")
         this.$nextTick(_=>{
-            var el = document.getElementById("app")
-            window.scrollTo({"behavior":"smooth","top": el.offsetHeight});
+          var el = document.getElementById("app")
+          window.scrollTo({"behavior":"smooth","top": el.offsetHeight});
         })
         return
       }
@@ -877,7 +972,7 @@ export default {
         this.disabled = false
         this.isEdit = false
         this.editItem = ''
-        }
+      }
     },
 
     // 上移
@@ -891,23 +986,23 @@ export default {
       const that = this;
       console.log(index);
       axios
-        .patch('/api/question/' + item.id + '/', {
-          ordering: index,
-        }, {
-          headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-        })
-        .then(function (response){
-          let temp = that.info.question_list[index];
-          that.info.question_list[index] = that.info.question_list[index-1];
-          that.info.question_list[index-1] = temp;
-          that.$forceUpdate();
-        })
-        .catch(function (error){
-          that.$notify.error({
-            title: '出错啦',
-            message: '更换顺序失败'
+          .patch('/api/question/' + item.id + '/', {
+            ordering: index,
+          }, {
+            headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
           })
-        })
+          .then(function (response){
+            let temp = that.info.question_list[index];
+            that.info.question_list[index] = that.info.question_list[index-1];
+            that.info.question_list[index-1] = temp;
+            that.$forceUpdate();
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '更换顺序失败'
+            })
+          })
     },
 
     // 下移
@@ -992,11 +1087,11 @@ export default {
       this.$refs["title-content-dialog"].edit(info)
     },
     onStart() {
-    this.drag = true;
-    console.log("start")
-    console.log(this.info.question_list)
+      this.drag = true;
+      console.log("start")
+      console.log(this.info.question_list)
     },
-  //拖拽结束事件
+    //拖拽结束事件
     onEnd(e) {
       this.drag = false;
       if (e.oldIndex == e.newIndex){
@@ -1069,16 +1164,20 @@ export default {
                   // message: '爬',
                 });
               }
+              if(that.info.is_limit_answer == true) {
+                console.log(11111);
+                console.log(that.info.limit_answer_number);
+              }
               that.menuList.push({
-                  name: "其他功能",
-                  type: "function",
-                  children:[
-                    {
-                      name: "定位",
-                      type: "position"
-                    },
-                  ]
-                })
+                name: "其他功能",
+                type: "function",
+                children:[
+                  {
+                    name: "定位",
+                    type: "position"
+                  },
+                ]
+              })
               if (that.info.type == "epidemic-check-in"){
               }
               for (let item of that.info.question_list) {
@@ -1093,7 +1192,7 @@ export default {
                   if (item.is_scoring){
                     if (item.type == "single-choice"){
                       if (item.option_list[i].is_answer_choice){
-                          item.answer = i
+                        item.answer = i
                       }
                     }
                   }
@@ -1128,7 +1227,7 @@ export default {
 }
 
 .edit-button{
-  width: 100%; 
+  width: 100%;
   border: none;
   border-radius: 10px;
   display: flex;
@@ -1194,11 +1293,11 @@ export default {
 
 // 侧边栏布局
 .el-aside {
- background-color: #FFFFFF;
- opacity: 0.95;
- margin-top: 0;
- padding-top: 10pt;
- //border-radius: 3%;
+  background-color: #FFFFFF;
+  opacity: 0.95;
+  margin-top: 0;
+  padding-top: 10pt;
+  //border-radius: 3%;
 }
 
 .bottom-button{
@@ -1332,9 +1431,9 @@ export default {
 }
 
 .chosen {
-    border: solid 2px #0d9fcf !important;
-    background: #F7F8F9;
-    opacity: 0.5;
+  border: solid 2px #0d9fcf !important;
+  background: #F7F8F9;
+  opacity: 0.5;
 }
 
 .el-rate{

@@ -150,7 +150,8 @@ export default {
                   .then(function (response){
                     // console.log(response.data);
                     // that.dialog=false;
-                    that.$router.push({path: '/edit/' + response.data.id});
+                    if(item.type === 'signup')  that.$router.push({path: '/editActivity/' + response.data.id});
+                    else  that.$router.push({path: '/edit/' + response.data.id});
                   }).catch(function (error){
                 // that.dialog=false;
                 that.$notify.error({

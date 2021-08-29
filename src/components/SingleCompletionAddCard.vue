@@ -27,8 +27,8 @@
         <el-checkbox label="是否考试题" v-model="questionForm.is_scoring"></el-checkbox>
       </el-form-item>
       
-      <el-form-item label="正确答案" v-if="questionForm.is_scoring" prop="answer">
-        <el-input v-model="questionForm.answer"></el-input>
+      <el-form-item label="正确答案" v-show="questionForm.is_scoring">
+        <el-input v-model="questionForm.option_list[0].content"></el-input>
       </el-form-item>
       <el-form-item label="题目分数" v-show="questionForm.is_scoring">
         <el-input-number v-model="questionForm.question_score" :step="1"></el-input-number>
@@ -72,13 +72,6 @@ export default {
           {
             required: true,
             message: '你的题目呢',
-            trigger: 'blur'
-          }
-        ],
-        answer:[
-          {
-            required: true,
-            message: '你的答案呢',
             trigger: 'blur'
           }
         ]
@@ -137,12 +130,11 @@ export default {
           title: '表单有错误'});
         }
         const that = this;
-        this.questionForm.option_list[0].title = '正确答案';
+        this.questionForm.option_list[0].title = '正确答案'
         if(!this.flag){
           axios
               .post('/api/question/', {
                 option_list: that.questionForm.option_list,
-                answer: that.questionForm.answer,
                 title: that.questionForm.title,
                 content: that.questionForm.content,
                 type: that.questionForm.type,
@@ -179,7 +171,6 @@ export default {
           axios
               .patch('/api/question/' + that.flag + '/', {
                 option_list: that.questionForm.option_list,
-                answer: that.questionForm.answer,
                 title: that.questionForm.title,
                 content: that.questionForm.content,
                 type: that.questionForm.type,

@@ -28,15 +28,19 @@
           
         <el-checkbox label="是否显示结果" v-model="questionForm.is_show_result"></el-checkbox>
 
-        <el-checkbox label="是否考试题" v-model="questionForm.is_scoring"></el-checkbox>
+        <el-checkbox v-if="type==='exam'" label="是否考试题" v-model="questionForm.is_scoring"></el-checkbox>
+        <el-checkbox v-if="type==='signup'" label="是否设置限额" v-model="questionForm.is_limit_answer"></el-checkbox>
       </el-form-item>
 
       <div style="display: flex;
             margin-bottom: 20px;"> 
         <span style="margin-left:3%">选项</span> 
         <span style="margin-left:20%">选项内容</span>
-        <span style="margin-left:35%"><span v-show="questionForm.is_scoring"> 正确答案</span></span>
-        <span style="margin-left:12%">按钮</span>
+        <span style="margin-left:33%">
+          <span v-if="type==='signup'">选项限额</span>
+          <span v-if="type==='exam'">选项限额</span>
+        </span>
+        <span style="margin-left:6.5%">按钮</span>
         </div>
 <el-divider></el-divider>
 
@@ -53,7 +57,8 @@
         <el-input v-model="option.title" class="choiceinput">
         </el-input >
         <el-radio  v-show="questionForm.is_scoring" :label="index"><span></span></el-radio>
-        <el-button @click.prevent="removeChoice(option)" type="danger" style="margin-left: 60px">删除</el-button>
+        <el-input  v-if="type==='signup'" :disabled="!questionForm.is_limit_answer" :label="index" v-model="option.limit_answer_number" style="width: 10%;"><span></span></el-input>
+        <el-button @click.prevent="removeChoice(option)" type="danger" style="float: right;margin-right: 14%">删除</el-button>
       </el-form-item>
       </el-radio-group>
       <el-form-item label="题目分数"  prop="question_score"  v-show="questionForm.is_scoring">
@@ -77,6 +82,12 @@ import axios from "axios";
 export default {
   // inject: ['reload'],
   name: "single-choice-addcard",
+  props: {
+    type: {
+      type: String,
+      default: 'normal'
+    }
+  },
   data(){
     return{
       temp: '',
@@ -89,6 +100,7 @@ export default {
         ordering: 0,
         questionnaire: 0,
         is_must_answer: false,
+        is_limit_answer: false,
         option_list: [
         ],
         answer: '',
@@ -166,6 +178,35 @@ export default {
           var index = that.questionForm.answer
           that.questionForm.option_list[index].is_answer_choice = true
         }
+        let numFlag = true;
+        if (that.questionForm.is_limit_answer){
+
+          let numReg = /^[0-9]*$/;
+          let numRe = new RegExp(numReg);
+          for (var option in that.questionForm.option_list){
+            that.questionForm.option_list[option].is_limit_answer = true;
+            if(numRe.test(that.questionForm.option_list[option].limit_answer_number)) {
+              let num = parseInt(that.questionForm.option_list[option].limit_answer_number);
+              if(num < 0) numFlag = false;
+            }
+            else numFlag = false;
+          }
+        }
+        else {
+          for (var option in that.questionForm.option_list){
+            that.questionForm.option_list[option].is_limit_answer = false;
+          }
+        }
+
+        if(numFlag === false) {
+          that.$notify.error({
+            title: '限额必须为非负整数！',
+            message: '编辑失败'
+          })
+          that.questionForm.isShow = true
+          console.log(error)
+          return;
+        }
 
         if(!this.flag){
           axios
@@ -178,6 +219,7 @@ export default {
                 is_must_answer: that.questionForm.is_must_answer,
                 is_show_result: that.questionForm.is_show_result,
                 is_scoring: that.questionForm.is_scoring,
+                is_limit_answer: that.questionForm.is_limit_answer,
                 question_score: that.questionForm.question_score
               }, {
                 headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
@@ -221,6 +263,7 @@ export default {
                 is_must_answer: that.questionForm.is_must_answer,
                 is_show_result: that.questionForm.is_show_result,
                 is_scoring: that.questionForm.is_scoring,
+                is_limit_answer: that.questionForm.is_limit_answer,
                 question_score: that.questionForm.question_score
               }, {
                 headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
@@ -258,7 +301,7 @@ export default {
 }
 .choiceinput{
   width: 60%;
-  margin-right: 10%;
+  margin-right: 3%;
 }
 
 </style>
