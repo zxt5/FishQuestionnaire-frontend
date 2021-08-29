@@ -7,6 +7,8 @@
         <div class="content" v-if="timeStamp===2">&nbsp;很抱歉，此问卷将于 {{startTime}} 开放！</div>
         <div class="content" v-if="timeStamp===3">&nbsp;很抱歉，此问卷已于 {{endTime}} 结束！</div>
         <div class="content" v-if="timeStamp===4">&nbsp;恭喜，您已成功提交此问卷！</div>
+        <div class="content" v-if="timeStamp===5">&nbsp;报歉，此问卷限额已满无法填写！</div>
+        <div class="content" v-if="!canSubmit" style="color: #ea0a1a">&nbsp;报歉，此问卷存在题目限额已满，无法提交！</div>
         <div class="line" v-if="timeStamp!==1"></div>
         <el-button v-if="timeStamp!==1" type="primary" @click="toIndex">确定</el-button>
 
@@ -46,7 +48,9 @@
                         style="float: left"
                         :key="optionItem.id"
                         :label="optionItem.title "
+                        :disabled="optionItem.limit_answer_number - optionItem.answer_num <= 0"
                     ></v-radio>
+                    <span v-if="optionItem.is_limit_answer" style="margin-left: 10%">剩余  {{optionItem.limit_answer_number - optionItem.answer_num <= 0 ? 0 : optionItem.limit_answer_number - optionItem.answer_num}}</span>
                   </div>
                   <div v-if="item.is_show_result" style="float: right;padding-left: 30px;">
                     <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
@@ -117,7 +121,7 @@
           </v-app>
         </div>
 
-        <el-button v-if="timeStamp===1" type="primary" @click="click(info.id)">提 交</el-button>
+        <el-button :disabled="!canSubmit" v-if="timeStamp===1" type="primary" @click="click(info.id)">提 交</el-button>
 
       </div>
     </div>
@@ -306,6 +310,7 @@ export default {
   components: {},
   data(){
     return {
+      canSubmit: true,
       single: 0,
       multiple: [],
       questionnaire_id: 1,
@@ -342,75 +347,173 @@ export default {
     s1 = s1.substring(4,s1.length - 7);
     authorization()
       .then(function (res){
-        axios
-            .get('/api/questionnaire/' + parseInt(s1) + '/fill_or_preview/', {
-              headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-            })
-            .then(function (response) {
-              that.info = response.data;
-              if(that.info.is_required_login && !res[0]){
-                that.$store.commit('flag_true');
-                that.$store.commit('toUrl', that.$route.params.text);
-                that.$notify.warning({
-                  title: '请先登录',
-                  message: '发布者设置了登陆验证'
-                })
-                that.$router.push({path: '/login'});
-              }
-              // console.log(that.info);
-              if(that.info.is_start_time) {
-                var time = that.info.start_time;
-                var date = new Date(time).toJSON();
-                // console.log(date);
-                var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
-                // console.log(str);
-                that.startTime = str;
-                if(Date.parse(that.info.start_time) > Date.now()) {
-                  that.timeStamp = 2;
+        if(res[0]){
+          axios
+              .get('/api/questionnaire/' + parseInt(s1) + '/fill_or_preview/', {
+                headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+              })
+              .then(function (response) {
+                that.info = response.data;
+                if(that.info.is_start_time) {
+                  var time = that.info.start_time;
+                  var date = new Date(time).toJSON();
+                  // console.log(date);
+                  var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
+                  // console.log(str);
+                  that.startTime = str;
+                  if(Date.parse(that.info.start_time) > Date.now()) {
+                    that.timeStamp = 2;
+                  }
                 }
-              }
-              if(that.info.is_end_time) {
-                var time = that.info.end_time;
-                var date = new Date(time).toJSON();
-                // console.log(date);
-                var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
-                // console.log(str);
-                that.endTime = str;
-                if(Date.parse(that.info.end_time) < Date.now()) {
-                  that.timeStamp = 3;
+                if(that.info.is_end_time) {
+                  var time = that.info.end_time;
+                  var date = new Date(time).toJSON();
+                  // console.log(date);
+                  var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
+                  // console.log(str);
+                  that.endTime = str;
+                  if(Date.parse(that.info.end_time) < Date.now()) {
+                    that.timeStamp = 3;
+                  }
                 }
-              }
-              if(that.info.is_only_answer_once){
-                const _that = that;
-                axios
-                    .put('/api/answer/check_answer/', {
-                      id: _that.info.id
-                    }, {
-                      headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-                    })
-                    .then(function (resp){
-                      console.log(resp.data)
-                      if(resp.data.has_answer === true){
-                        _that.timeStamp = 4;
-                      }
-                    })
-                    .catch(function (error){
-                      _that.$notify.error({
-                        title: '出错啦',
-                        message: '限制失败'
+                if(that.info.is_only_answer_once){
+                  const _that = that;
+                  axios
+                      .put('/api/answer/check_answer/', {
+                        id: _that.info.id
+                      }, {
+                        headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
                       })
-                    })
-              }
-              console.log(that.info.is_only_answer_once)
-              console.log(that.timeStamp);
-            })
-            .catch(function (error){
-              // that.$notify.error({
-              //   title: '好像发生了什么错误',
-              //   message: error.response
-              // })
-              console.log(error.response)
-            })
+                      .then(function (resp){
+                        console.log(resp.data)
+                        if(resp.data.has_answer === true){
+                          _that.timeStamp = 4;
+                        }
+                      })
+                      .catch(function (error){
+                        _that.$notify.error({
+                          title: '出错啦',
+                          message: '限制失败'
+                        })
+                      })
+                }
+                if(that.info.is_limit_answer) {
+                  let total = that.info.limit_answer_number;
+                  let num = that.info.answer_num;
+                  if(num >= total && that.timeStamp !== 4)  that.timeStamp = 5;
+                }
+                if(that.timeStamp === 1) {
+                  let flag = true;
+                  for (let i of that.info.question_list) {
+                    if (i.is_limit_answer && i.is_must_answer) {
+                      let tmp = false;
+                      for (let j of i.option_list) {
+                        if (j.limit_answer_number - j.answer_num > 0) tmp = true;
+                      }
+                      if (tmp === false) flag = false;
+                      // console.log(i.title);
+                    }
+                    if (flag === false) that.canSubmit = false;
+                  }
+                }
+                    // console.log(i)
+                console.log(that.info.is_only_answer_once)
+                console.log(that.timeStamp);
+              })
+              .catch(function (error){
+                // that.$notify.error({
+                //   title: '好像发生了什么错误',
+                //   message: error.response
+                // })
+                console.log(error.response)
+              })
+        }
+        else{
+          axios
+              .get('/api/questionnaire/' + parseInt(s1) + '/fill_or_preview/')
+              .then(function (response) {
+                that.info = response.data;
+                if(that.info.is_required_login){
+                  that.$store.commit('flag_true');
+                  that.$store.commit('toUrl', that.$route.params.text);
+                  that.$notify.warning({
+                    title: '请先登录',
+                    message: '发布者设置了登陆验证'
+                  })
+                  that.$router.push({path: '/login'});
+                }
+                // console.log(that.info);
+                if(that.info.is_start_time) {
+                  var time = that.info.start_time;
+                  var date = new Date(time).toJSON();
+                  // console.log(date);
+                  var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
+                  // console.log(str);
+                  that.startTime = str;
+                  if(Date.parse(that.info.start_time) > Date.now()) {
+                    that.timeStamp = 2;
+                  }
+                }
+                if(that.info.is_end_time) {
+                  var time = that.info.end_time;
+                  var date = new Date(time).toJSON();
+                  // console.log(date);
+                  var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
+                  // console.log(str);
+                  that.endTime = str;
+                  if(Date.parse(that.info.end_time) < Date.now()) {
+                    that.timeStamp = 3;
+                  }
+                }
+                if(that.info.is_only_answer_once){
+                  const _that = that;
+                  axios
+                      .put('/api/answer/check_answer/', {
+                        id: _that.info.id
+                      }, {
+                        headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+                      })
+                      .then(function (resp){
+                        console.log(resp.data)
+                        if(resp.data.has_answer === true){
+                          _that.timeStamp = 4;
+                        }
+                      })
+                      .catch(function (error){
+                        _that.$notify.error({
+                          title: '出错啦',
+                          message: '限制失败'
+                        })
+                      })
+                }
+                if(that.info.is_limit_answer) {
+                  let total = that.info.limit_answer_number;
+                  let num = that.info.answer_num;
+                  if(num >= total && that.timeStamp !== 4)  that.timeStamp = 5;
+                }
+                if(that.timeStamp === 1) {
+                  let flag = true;
+                  for (let i of that.info.question_list) {
+                    if (i.is_limit_answer && i.is_must_answer) {
+                      let tmp = false;
+                      for (let j of i.option_list) {
+                        if (j.limit_answer_number - j.answer_num > 0) tmp = true;
+                      }
+                      if (tmp === false) flag = false;
+                      // console.log(i.title);
+                    }
+                    if (flag === false) that.canSubmit = false;
+                  }
+                }
+              })
+              .catch(function (error){
+                // that.$notify.error({
+                //   title: '好像发生了什么错误',
+                //   message: error.response
+                // })
+                console.log(error.response)
+              })
+        }
       })
 
   },
@@ -656,10 +759,19 @@ export default {
                   }
                 })
                 .catch(function (error){
-                  that.$notify.error({
-                    title: '好像发生了什么错误',
-                    message: error.message
-                  })
+                  if(error.response.status === 400) {
+                    that.$notify.warning({
+                      title: '问卷限额已满，提交失败！',
+                      // message: error.message
+                    })
+                    that.$router.push({path: '/'});
+                  }
+                  else {
+                    that.$notify.error({
+                      title: '好像发生了什么错误',
+                      message: error.message
+                    })
+                  }
                 })
           // })
         }
