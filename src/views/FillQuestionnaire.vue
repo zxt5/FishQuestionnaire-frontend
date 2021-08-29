@@ -491,27 +491,27 @@ export default {
                     that.timeStamp = 3;
                   }
                 }
-                if(that.info.is_only_answer_once){
-                  const _that = that;
-                  axios
-                      .put('/api/answer/check_answer/', {
-                        id: _that.info.id
-                      }, {
-                        headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-                      })
-                      .then(function (resp){
-                        console.log(resp.data)
-                        if(resp.data.has_answer === true){
-                          _that.timeStamp = 4;
-                        }
-                      })
-                      .catch(function (error){
-                        _that.$notify.error({
-                          title: '出错啦',
-                          message: '限制失败'
-                        })
-                      })
-                }
+                // if(that.info.is_only_answer_once){
+                //   const _that = that;
+                //   axios
+                //       .put('/api/answer/check_answer/', {
+                //         id: _that.info.id
+                //       }, {
+                //         headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+                //       })
+                //       .then(function (resp){
+                //         console.log(resp.data)
+                //         if(resp.data.has_answer === true){
+                //           _that.timeStamp = 4;
+                //         }
+                //       })
+                //       .catch(function (error){
+                //         _that.$notify.error({
+                //           title: '出错啦',
+                //           message: '限制失败'
+                //         })
+                //       })
+                // }
                 if(that.info.is_limit_answer) {
                   let total = that.info.limit_answer_number;
                   let num = that.info.answer_num;
