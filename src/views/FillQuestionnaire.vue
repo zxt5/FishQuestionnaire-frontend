@@ -25,7 +25,7 @@
         <div v-if="timeStamp" class="content">&nbsp;{{info.content}}</div>
         <!--      <div class="line"></div>-->
         <el-divider v-if="timeStamp===1"/>
-        <div v-if="timeStamp===1" class="question_block" v-for="(item, index) in info.question_list" :key="index">
+        <div v-if="timeStamp===1&&Show[index]" class="question_block" v-for="(item, index) in info.question_list" :key="index">
           <div slot="header">
             <div class="questionTitle">
               <!--显示必填标识-->
@@ -51,7 +51,7 @@
             <v-container class="px-0" fluid >
   <!--            遍历选项-->
               <div style="float: left;">
-                <v-radio-group v-model="item.answer" >
+                <v-radio-group v-model="item.answer" @change="solveSin(index, item.answer)">
                   <div v-for="optionItem in item.option_list">
                     <div style="float: left;min-width: 460px;max-width: 560px">
                       <v-radio
@@ -83,6 +83,7 @@
                       v-model="optionItem.is_attr_limit"
                       :disabled="optionItem.limit_answer_number - optionItem.answer_num <= 0 && optionItem.is_limit_answer"
                       hide-details
+                      @change="solveMul(index, item.option_list)"
                   >
                   </v-checkbox>
 
@@ -355,6 +356,11 @@ export default {
       count_down: '',
       is_open: true,
       rightTime: '',
+      Show: [],
+      sTmp:[],
+      mTmp:[],
+      f:[],
+      rep:[],
     }
   },
 
@@ -376,7 +382,9 @@ export default {
                 headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
               .then(function (response) {
+
                 that.info = response.data;
+
                 if(that.info.is_start_time) {
                   var time = that.info.start_time;
                   var date = new Date(time).toJSON();
@@ -445,6 +453,7 @@ export default {
                 if(that.timeStamp === 1) {
                   _this.Djs_time();
                 }
+                that.init();
               })
               .catch(function (error){
                 // that.$notify.error({
@@ -459,6 +468,7 @@ export default {
               .get('/api/questionnaire/' + parseInt(s1) + '/fill_or_preview/')
               .then(function (response) {
                 that.info = response.data;
+                that.init();
                 if(that.info.is_required_login){
                   that.$store.commit('flag_true');
                   that.$store.commit('toUrl', that.$route.params.text);
@@ -548,6 +558,159 @@ export default {
   },
 
   methods: {
+    init(){
+      const that = this;
+      // console.log(that.info.question_list.length)
+      for(let item of that.info.question_list){
+        this.sTmp.push({
+          last: null,
+        })
+        this.rep.push(item.relate_logic_option);
+        if(item.relate_logic_option.length !== 0){
+          this.Show.push(false);
+        }
+        else{
+          this.Show.push(true);
+        }
+        let tmp = [];
+        let mmp = [];
+        for (let op of item.option_list) {
+          tmp.push({
+            rlq: op.related_logic_question,
+            select:false,
+          })
+          mmp.push({
+            select:false,
+          })
+        }
+        this.f.push(tmp);
+        this.mTmp.push(mmp);
+        // console.log(tmp);
+      }
+      console.log(this.f);
+      console.log(this.rep);
+    },
+    cancelOption(i, j) {
+      // console.log(i, j)
+      let option_queue = [];
+      option_queue.push({x:i,y:j});
+      this.f[i][j].select = false;
+      while(option_queue.length > 0) {
+        let p = option_queue.shift();
+        // console.log("!!!")
+        // console.log(p.x, p.y);
+        if(this.f[p.x][p.y].rlq.length !== 0) {
+          for (let q of this.f[p.x][p.y].rlq) {
+            // console.log(q.ordering - 1)
+            let f1 = this.Show[q.ordering - 1];
+            // console.log('f1', f1);
+            if(this.rep[q.ordering - 1].length <= 1) this.Show[q.ordering - 1] = false;
+            else {
+              let flag = false;
+              for (let pp of this.rep[q.ordering - 1]) {
+                if(this.f[pp.question_ordering - 1][pp.ordering - 1].select) flag = true;
+              }
+              // console.log('flag', flag);
+              if(!flag) this.Show[q.ordering - 1] = false;
+            }
+            // console.log('this.Show[q.ordering - 1]', this.Show[q.ordering - 1]);
+            if(f1 && !this.Show[q.ordering - 1]) {
+              for (let pp  = 0; pp <  this.info.question_list[q.ordering - 1].option_list.length; pp ++) {
+                // console.log('pp', pp)
+                // console.log('this.f[q.ordering - 1][pp].select',this.f[q.ordering - 1][pp].select);
+                if(this.f[q.ordering - 1][pp].select) {
+                  this.f[q.ordering - 1][pp].select = false;
+                  option_queue.push({x:q.ordering - 1,y:pp});
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    reSetF(){
+      let i = 0;
+      for(let item of this.info.question_list){
+        if(item.type === 'single-choice') {
+          if(item.answer !== '' || item.answer !== undefined) {
+            if(this.f[i][item.answer] !== undefined)
+              this.f[i][item.answer].select = true;
+          }
+        }
+        else if(item.type === 'multiple-choice') {
+          let j = 0;
+          for (let op of item.option_list) {
+            if(op.is_attr_limit) {
+              if(this.f[i][j] !== undefined)
+                this.f[i][j].select = true;
+            }
+            j ++;
+          }
+        }
+        i ++;
+      }
+    },
+    addOption(i, j) {
+      this.reSetF();
+      let option_queue = [];
+      option_queue.push({x:i,y:j});
+      this.f[i][j].select = true;
+      while(option_queue.length > 0) {
+        let p = option_queue.shift();
+        console.log("!!!")
+        console.log(p.x, p.y);
+        if(this.f[p.x][p.y].rlq.length !== 0) {
+          for (let q of this.f[p.x][p.y].rlq) {
+            console.log(q.ordering - 1)
+            let f1 = this.Show[q.ordering - 1];
+            console.log('f1', f1);
+            if(!f1) {
+              this.Show[q.ordering - 1]  = true;
+              for (let pp  = 0; pp <  this.info.question_list[q.ordering - 1].option_list.length; pp ++) {
+                console.log('pp', pp)
+                console.log(q.ordering - 1, pp)
+                console.log('this.f[q.ordering - 1][pp].select',this.f[q.ordering - 1][pp].select);
+                if(this.f[q.ordering - 1][pp].select) {
+                  option_queue.push({x:q.ordering - 1,y:pp});
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    solveSin(i, j) {
+      console.log(i, j);
+      if(this.sTmp[i].last !== null) {
+        this.cancelOption(i, this.sTmp[i].last);
+      }
+      this.sTmp[i].last = j;
+      this.f[i][j].select = true;
+      // for (let j of this.f[i][j].rlq) {
+      //   this.Show[j.ordering - 1] = true;
+      // }
+      this.addOption(i, j);
+    },
+    solveMul(i, list){
+      let j = 0;
+      for (j  = 0; j < list.length; j ++) {
+        if(list[j].is_attr_limit !== this.mTmp[i][j].select) {
+          this.f[i][j].select = list[j].is_attr_limit;
+          this.mTmp[i][j].select = list[j].is_attr_limit;
+          break;
+        }
+      }
+      console.log(i, j, this.mTmp[i][j].select)
+      if(this.mTmp[i][j].select) {
+        // for (let k of this.f[i][j].rlq) {
+        //   this.Show[k.ordering - 1] = true;
+        // }
+        this.addOption(i, j);
+      }
+      else {
+        this.cancelOption(i, j);
+      }
+    },
 
     Djs_time: function(){
       if(this.info.is_end_time) {

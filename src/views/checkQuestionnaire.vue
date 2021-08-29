@@ -268,10 +268,70 @@ export default {
       console.log(this.rep);
     },
     cancelOption(i, j) {
-      console.log(i, j)
+      // console.log(i, j)
       let option_queue = [];
       option_queue.push({x:i,y:j});
       this.f[i][j].select = false;
+      while(option_queue.length > 0) {
+        let p = option_queue.shift();
+        // console.log("!!!")
+        // console.log(p.x, p.y);
+        if(this.f[p.x][p.y].rlq.length !== 0) {
+          for (let q of this.f[p.x][p.y].rlq) {
+            // console.log(q.ordering - 1)
+            let f1 = this.Show[q.ordering - 1];
+            // console.log('f1', f1);
+            if(this.rep[q.ordering - 1].length <= 1) this.Show[q.ordering - 1] = false;
+            else {
+              let flag = false;
+              for (let pp of this.rep[q.ordering - 1]) {
+                if(this.f[pp.question_ordering - 1][pp.ordering - 1].select) flag = true;
+              }
+              // console.log('flag', flag);
+              if(!flag) this.Show[q.ordering - 1] = false;
+            }
+            // console.log('this.Show[q.ordering - 1]', this.Show[q.ordering - 1]);
+            if(f1 && !this.Show[q.ordering - 1]) {
+              for (let pp  = 0; pp <  this.info.question_list[q.ordering - 1].option_list.length; pp ++) {
+                // console.log('pp', pp)
+                // console.log('this.f[q.ordering - 1][pp].select',this.f[q.ordering - 1][pp].select);
+                if(this.f[q.ordering - 1][pp].select) {
+                  this.f[q.ordering - 1][pp].select = false;
+                  option_queue.push({x:q.ordering - 1,y:pp});
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    reSetF(){
+      let i = 0;
+      for(let item of this.info.question_list){
+        if(item.type === 'single-choice') {
+          if(item.answer !== '' || item.answer !== undefined) {
+            if(this.f[i][item.answer] !== undefined)
+                this.f[i][item.answer].select = true;
+          }
+        }
+        else if(item.type === 'multiple-choice') {
+          let j = 0;
+          for (let op of item.option_list) {
+            if(op.is_attr_limit) {
+              if(this.f[i][j] !== undefined)
+                this.f[i][j].select = true;
+            }
+            j ++;
+          }
+        }
+        i ++;
+      }
+    },
+    addOption(i, j) {
+      this.reSetF();
+      let option_queue = [];
+      option_queue.push({x:i,y:j});
+      this.f[i][j].select = true;
       while(option_queue.length > 0) {
         let p = option_queue.shift();
         console.log("!!!")
@@ -281,22 +341,13 @@ export default {
             console.log(q.ordering - 1)
             let f1 = this.Show[q.ordering - 1];
             console.log('f1', f1);
-            if(this.rep[q.ordering - 1].length <= 1) this.Show[q.ordering - 1] = false;
-            else {
-              let flag = false;
-              for (let pp of this.rep[q.ordering - 1]) {
-                if(this.f[pp.question_ordering - 1][pp.ordering - 1].select) flag = true;
-              }
-              console.log('flag', flag);
-              if(!flag) this.Show[q.ordering - 1] = false;
-            }
-            console.log('this.Show[q.ordering - 1]', this.Show[q.ordering - 1]);
-            if(f1 && !this.Show[q.ordering - 1]) {
+            if(!f1) {
+              this.Show[q.ordering - 1]  = true;
               for (let pp  = 0; pp <  this.info.question_list[q.ordering - 1].option_list.length; pp ++) {
                 console.log('pp', pp)
+                console.log(q.ordering - 1, pp)
                 console.log('this.f[q.ordering - 1][pp].select',this.f[q.ordering - 1][pp].select);
                 if(this.f[q.ordering - 1][pp].select) {
-                  this.f[q.ordering - 1][pp].select = false;
                   option_queue.push({x:q.ordering - 1,y:pp});
                 }
               }
@@ -312,9 +363,10 @@ export default {
       }
       this.sTmp[i].last = j;
       this.f[i][j].select = true;
-      for (let j of this.f[i][j].rlq) {
-        this.Show[j.ordering - 1] = true;
-      }
+      // for (let j of this.f[i][j].rlq) {
+      //   this.Show[j.ordering - 1] = true;
+      // }
+      this.addOption(i, j);
     },
     solveMul(i, list){
       let j = 0;
@@ -327,139 +379,13 @@ export default {
       }
       console.log(i, j, this.mTmp[i][j].select)
       if(this.mTmp[i][j].select) {
-        for (let k of this.f[i][j].rlq) {
-          this.Show[k.ordering - 1] = true;
-        }
+        // for (let k of this.f[i][j].rlq) {
+        //   this.Show[k.ordering - 1] = true;
+        // }
+        this.addOption(i, j);
       }
       else {
         this.cancelOption(i, j);
-      }
-    },
-    change_Single(item){
-      // console.log(1111);
-      const that = this;
-      for(let i of item.option_list){
-        if(item.option_list.indexOf(i) === item.answer){
-          for(let j of item.option_list[item.answer].related_logic_question){
-            this.Show[j.ordering - 1] = true;
-          }
-        }
-        else{
-          var flag = false;
-          for(let j of i.related_logic_question){
-            if(j.type === 'single-choice'){
-              for(let k of that.info.question_list[j.ordering - 1].relate_logic_option){
-                if(this.info.question_list[k.question_ordering - 1].answer === k.ordering - 1){
-                  flag = true;
-                }
-              }
-              this.Show[j.ordering - 1] = flag;
-              if(!flag){
-                for(let k of that.info.question_list[j.ordering - 1].option_list){
-                  if(that.info.question_list[k.question_ordering - 1].answer !== -1){
-                    that.info.question_list[k.question_ordering - 1].answer = -1;
-                    that.change_Single(that.info.question_list[k.question_ordering - 1]);
-                  }
-                }
-              }
-            }
-            else if(j.type === 'multiple-choice'){
-              for(let k of that.info.question_list[j.ordering - 1].relate_logic_option){
-                if(this.info.question_list[k.question_ordering - 1].option_list[k.ordering - 1].is_attr_limit){
-                  flag = true;
-                }
-              }
-              this.Show[j.ordering - 1] = flag;
-              if(!flag){
-                for(let k of that.info.question_list[j.ordering - 1].option_list){
-                  for(let p of that.info.question_list[k.question_ordering - 1].option_list){
-                    if(p.is_attr_limit){
-                      p.is_attr_limit = false;
-                      that.change_Multiple(p);
-                    }
-                  }
-                }
-              }
-            }
-            else{
-              this.Show[j.ordering - 1] = false;
-            }
-          }
-        }
-      }
-    },
-    change_Multiple(item){
-      // console.log(2222);
-      const that = this;
-      if(item.is_attr_limit){
-        for(let i of item.related_logic_question){
-          this.Show[i.ordering - 1] = true;
-        }
-      }
-      else{
-        var flag = false;
-        for(let j of item.related_logic_question){
-          if(j.type === 'single-choice'){
-            for(let k of that.info.question_list[j.ordering - 1].relate_logic_option){
-              if(this.info.question_list[k.question_ordering - 1].answer === k.ordering - 1){
-                flag = true;
-                console.log(k.question_ordering - 1)
-                console.log(k.ordering - 1)
-              }
-            }
-            this.Show[j.ordering - 1] = flag;
-            if(!flag){
-              for(let k of that.info.question_list[j.ordering - 1].option_list){
-                if(that.info.question_list[k.question_ordering - 1].answer !== -1){
-                  that.info.question_list[k.question_ordering - 1].answer = -1;
-                  that.change_Single(that.info.question_list[k.question_ordering - 1]);
-                }
-              }
-            }
-          }
-          else if(j.type === 'multiple-choice'){
-            for(let k of that.info.question_list[j.ordering - 1].relate_logic_option){
-              if(this.info.question_list[k.question_ordering - 1].option_list[k.ordering - 1].is_attr_limit){
-                flag = true;
-                console.log(k.question_ordering - 1)
-                console.log(k.ordering - 1)
-              }
-            }
-            this.Show[j.ordering - 1] = flag;
-            if(!flag){
-              for(let k of that.info.question_list[j.ordering - 1].option_list){
-                for(let p of that.info.question_list[k.question_ordering - 1].option_list){
-                  if(p.is_attr_limit){
-                    p.is_attr_limit = false;
-                    that.change_Multiple(p);
-                  }
-                }
-              }
-            }
-          }
-          else{
-            this.Show[j.ordering - 1] = false;
-          }
-          // 问题被取消
-          // if(!flag){
-          //   for(let k of that.info.question_list[j.ordering - 1].option_list){
-          //     if(k.type === 'single-choice'){
-          //       if(that.info.question_list[k.question_ordering - 1].answer !== -1){
-          //         that.info.question_list[k.question_ordering - 1].answer = -1;
-          //         that.change_Single(that.info.question_list[k.question_ordering - 1]);
-          //       }
-          //     }
-          //     else if(k.type === 'multiple-choice'){
-          //       for(let p of that.info.question_list[k.question_ordering - 1].option_list){
-          //         if(p.is_attr_limit){
-          //           p.is_attr_limit = false;
-          //           that.change_Multiple(p);
-          //         }
-          //       }
-          //     }
-          //   }
-          // }
-        }
       }
     },
 
