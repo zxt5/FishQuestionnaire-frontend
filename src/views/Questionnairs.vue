@@ -965,7 +965,7 @@ export default {
       // 切换编辑界面显示
       var temp = this.$refs[questionType+index][0]
 
-      if (this.editItem && this.editItem != temp){
+      if (this.editItem && this.editItem !== temp){
         this.$notify.error({
           title: "请完成当前题目的编辑!"
         })
@@ -1074,6 +1074,7 @@ export default {
       if (!item.hasOwnProperty('id')){
         this.info.question_list.splice(index, 1)
         this.isEdit = false
+        // item.isShow = false
         this.editItem = ''
         return
       }
