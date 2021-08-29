@@ -236,7 +236,20 @@ export default {
       this.countDown = 30
       clearInterval(this.positioningInterval)
     },
+
     getLocation() {
+      const that = this;
+      if(!this.location && !this.positioning) {
+        this.$confirm('请选择是否同意获取定位', '该题需要获取您的地理位置', {
+          confirmButtonText: '同意',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          that._getLocation()
+        })
+      }
+    },
+    _getLocation() {
       const _this = this
       _this.geolocation = new _this.BMap.Geolocation()
       if (_this.geolocation) {

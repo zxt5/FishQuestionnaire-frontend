@@ -32,72 +32,78 @@
               <span v-if="info.is_show_question_num">{{(index+1)+'. '}}</span>
               {{item.title}}
               <span style="color: #F56C6C;">
-            <span v-if="item.is_must_answer">*</span>
-          </span>
-            <span style="color: lightgrey" v-if="item.type==='single-choice'">[单选题]</span>
-            <span style="color: lightgrey" v-if="item.type==='multiple-choice'">[多选题]</span>
-            <span style="color: lightgrey" v-if="item.type==='completion'">[填空题]</span>
-            <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]</span>
-            <span style="color: lightgrey" v-if="item.type==='position'">[定位题]</span>
-            <span style="color: #F56C6C" v-if="item.is_scoring">（{{item.question_score}}分）</span>
+                <span v-if="item.is_must_answer">*</span>
+              </span>
+              <span style="color: lightgrey" v-if="item.type==='single-choice'">[单选题]</span>
+              <span style="color: lightgrey" v-if="item.type==='multiple-choice'">[多选题]</span>
+              <span style="color: lightgrey" v-if="item.type==='completion'">[填空题]</span>
+              <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]</span>
+              <span style="color: lightgrey" v-if="item.type==='position'">[定位题]</span>
+              <span style="color: #F56C6C" v-if="item.is_scoring">（{{item.question_score}}分）</span>
+            </div>
           </div>
-        </div>
-        <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
-          {{item.content}}
-        </div>
-        <!--单选题展示-->
-        <v-app class="choice" v-if="item.type==='single-choice'">
-          <v-container class="px-0" fluid >
-<!--            遍历选项-->
-            <div style="float: left;">
-              <v-radio-group v-model="item.answer" >
-                <div v-for="optionItem in item.option_list">
-                  <div style="float: left;min-width: 460px;max-width: 560px">
-                    <v-radio
-                        style="float: left; margin-bottom: 8px"
-                        :key="optionItem.id"
-                        :label="optionItem.title "
-                        :disabled="optionItem.limit_answer_number - optionItem.answer_num <= 0 && optionItem.is_limit_answer"
-                    ></v-radio>
-                    <span v-if="optionItem.is_limit_answer" style="margin-left: 10%">剩余  {{optionItem.limit_answer_number - optionItem.answer_num <= 0 ? 0 : optionItem.limit_answer_number - optionItem.answer_num}}</span>
+          <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
+            {{item.content}}
+          </div>
+
+          <!--单选题展示-->
+          <v-app class="choice" v-if="item.type==='single-choice'">
+            <v-container class="px-0" fluid >
+  <!--            遍历选项-->
+              <div style="float: left;">
+                <v-radio-group v-model="item.answer" >
+                  <div v-for="optionItem in item.option_list">
+                    <div style="float: left;min-width: 460px;max-width: 560px">
+                      <v-radio
+                          style="float: left; margin-bottom: 8px"
+                          :key="optionItem.id"
+                          :label="optionItem.title "
+                          :disabled="optionItem.limit_answer_number - optionItem.answer_num <= 0 && optionItem.is_limit_answer"
+                      ></v-radio>
+                      <span v-if="optionItem.is_limit_answer" style="margin-left: 10%">剩余  {{optionItem.limit_answer_number - optionItem.answer_num <= 0 ? 0 : optionItem.limit_answer_number - optionItem.answer_num}}</span>
+                    </div>
+                    <div v-if="item.is_show_result" style="float: right;padding-left: 30px;">
+                      <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
+                    </div>
                   </div>
-                  <div v-if="item.is_show_result" style="float: right;padding-left: 30px;">
-                    <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
-                  </div>
+                </v-radio-group>
+              </div>
+            </v-container>
+          </v-app>
+
+          <!--多选题展示-->
+          <v-app class="choice" v-if="item.type==='multiple-choice'">
+            <v-container fluid>
+              <div style="float: left" v-for="optionItem in item.option_list">
+                <div style="float: left;min-width: 460px;max-width: 560px">
+                  <span v-if="optionItem.is_limit_answer" style="margin-right: 70%; float:right">剩余  {{optionItem.limit_answer_number - optionItem.answer_num <= 0 ? 0 : optionItem.limit_answer_number - optionItem.answer_num}}</span>
+                  <v-checkbox
+                      :key="optionItem.id"
+                      :label="optionItem.title"
+                      v-model="optionItem.is_attr_limit"
+                      :disabled="optionItem.limit_answer_number - optionItem.answer_num <= 0 && optionItem.is_limit_answer"
+                      hide-details
+                  >
+                  </v-checkbox>
+
                 </div>
-              </v-radio-group>
-            </div>
-          </v-container>
-        </v-app>
-
-        <!--多选题展示-->
-        <v-app class="choice" v-if="item.type==='multiple-choice'">
-          <v-container fluid>
-            <div style="float: left" v-for="optionItem in item.option_list">
-              <div style="float: left;min-width: 460px;max-width: 560px">
-                <v-checkbox
-                    :key="optionItem.id"
-                    :label="optionItem.title"
-                    v-model="optionItem.is_attr_limit"
-                    hide-details
-                ></v-checkbox>
+                <div v-if="item.is_show_result" style="float: right; padding-left: 30px;">
+                  <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
+                </div>
               </div>
-              <div v-if="item.is_show_result" style="float: right; padding-left: 30px;">
-                <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
-              </div>
-            </div>
-          </v-container>
-        </v-app>
+            </v-container>
+          </v-app>
 
-        <!--填空题展示-->
-        <v-app class="choice" v-if="item.type==='completion'">
-          <v-text-field
-              v-model="item.option_list[0].answer"
-              label="请在此输入答案~"
-              single-line
-          ></v-text-field>
-        </v-app>
+          <!--填空题展示-->
+          <v-app class="choice" v-if="item.type==='completion'">
+            <v-text-field
+                v-model="item.option_list[0].answer"
+                label="请在此输入答案~"
+                single-line
+            ></v-text-field>
+          </v-app>
 
+          <!--评分题展示-->
           <v-app class="choice" style="margin-top: 20px" v-if="item.type==='scoring'">
             <div style="display: inline-block">
               <v-rating
@@ -115,6 +121,7 @@
             </div>
           </v-app>
 
+          <!--定位题展示-->
           <v-app class="choice" v-if="item.type==='position'">
             <!--          <div style="display: inline-block">  当前定位: </div>-->
             <v-btn
@@ -582,6 +589,18 @@ export default {
     },
 
     getLocation() {
+      const that = this;
+      if(!this.location && !this.positioning) {
+        this.$confirm('请选择是否同意获取定位', '该题需要获取您的地理位置', {
+          confirmButtonText: '同意',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          that._getLocation()
+        })
+      }
+    },
+    _getLocation() {
       const _this = this
       _this.geolocation = new _this.BMap.Geolocation()
       if (_this.geolocation) {
@@ -788,11 +807,21 @@ export default {
               console.log('定位')
             }
             else {
-              let data = {
-                question: item.id,
-                option: item.option_list[0].id,
-                content: that.location['城市'],
-              };
+              let data;
+              if(that.location === null) {
+                data = {
+                  question: item.id,
+                  option: item.option_list[0].id,
+                  content: '',
+                };
+              }
+              else {
+                data = {
+                  question: item.id,
+                  option: item.option_list[0].id,
+                  content: that.location['城市'],
+                };
+              }
               that.submit_list.push(data);
             }
           }
