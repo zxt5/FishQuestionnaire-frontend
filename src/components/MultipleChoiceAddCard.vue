@@ -140,7 +140,6 @@ export default {
     editQuestion(question){
       console.log(11111)
       if (question.isShow) {
-
         this.editSuccess = true
         this.finishQuestion(question)
         return 
@@ -153,8 +152,11 @@ export default {
         title: '',
         content: '',
         ordering: this.questionForm.option_list.length + 1,
-        // key: Date.now()
+        is_answer_choice: false,
+        related_logic_question: [],
+        key: Date.now()
       })
+      console.log("addChoice", this.questionForm.option_list)
     },
     removeChoice(item) {
       var index = this.questionForm.option_list.indexOf(item)
@@ -174,6 +176,20 @@ export default {
             this.editSuccess = false
           return this.$notify.error({
           title: '请至少添加一个选项噢~'})
+        }
+        if (this.questionForm.is_scoring){
+          var has_answer = false
+          for (var option of this.questionForm.option_list){
+            if (option.is_answer_choice){
+              has_answer = true
+              break
+            }
+          }
+          if (!has_answer){
+            this.editSuccess = false
+            return this.$notify.error({
+             title: '请设置正确答案'});
+          }
         }
         const that = this;
         if (that.questionForm.is_scoring){

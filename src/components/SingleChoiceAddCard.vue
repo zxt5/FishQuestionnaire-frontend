@@ -136,6 +136,7 @@ export default {
       this.flag = 0
     },
     editQuestion(question){
+      console.log("single-choice", question.type)
       if (question.isShow) {
         this.editSuccess = true
         this.finishQuestion(question)
@@ -149,7 +150,10 @@ export default {
         title: '',
         content: '',
         ordering: this.questionForm.option_list.length + 1,
-        // key: Date.now()
+        key: Date.now(),
+        is_answer_choice: false,
+        related_logic_question: [],
+        key: Date.now()
       })
     },
     removeChoice(item) {
