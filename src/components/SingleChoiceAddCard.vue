@@ -123,6 +123,7 @@ export default {
       this.flag = 0
     },
     editQuestion(question){
+      console.log("single-choice", question.type)
       if (question.isShow) {
         this.editSuccess = true
         this.finishQuestion(question)

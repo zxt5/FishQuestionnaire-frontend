@@ -202,7 +202,7 @@
               <ul @mouseenter="mouseEnter"
                   @mouseleave="mouseLeave"
                   >
-                <li @click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
+                <li v-show="!isEdit||editID == item.id"@click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
                 <li v-show="!isEdit" @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
                 <li v-show="!isEdit" @click="cardLogical(info.question_list, index)"><v-icon small>mdi-link-variant-plus</v-icon>  逻辑</li>
                 <li v-show="!isEdit" @click="cardDown(index, item)"><v-icon small>mdi-arrow-down-circle-outline</v-icon>  下移</li>
@@ -449,6 +449,7 @@ export default {
     return {
       isEdit: false, // 当前是否处于编辑状态
       editItem: '',  // 编辑的元素
+      editID: 0,
       BMap: null,
       geolocation: null, // Geolocation对象实例
       positioning: false, // 定位中
@@ -887,11 +888,11 @@ export default {
       })      
     },
     editQuestion(item, index){
-      console.log("ordering", item.ordering)
       var questionType = item.type
       // 切换编辑界面显示
       var temp = this.$refs[questionType+index][0]
-
+      console.log("question", this.info.question_list[index])
+      console.log("ref", temp)
       if (this.editItem && this.editItem != temp){
         this.$notify.error("请完成之前题目编辑")
         this.$nextTick(_=>{
@@ -908,6 +909,7 @@ export default {
         })
         return
       }
+      
       temp.editQuestion(this.info.question_list[index])
 
       // 编辑成功才切换状态
@@ -920,11 +922,13 @@ export default {
         this.disabled = true
         this.isEdit = true
         this.editItem = temp
+        this.editID = item.id
       }
       else{
         this.disabled = false
         this.isEdit = false
         this.editItem = ''
+        this.editID = 0
         }
     },
 
@@ -1222,9 +1226,6 @@ export default {
     mouseChange(){
       if (this.isEdit) this.disabled = true
       else this.disabled = false
-    },
-    debugShow(item){
-      console.log("item", item)
     },
     getContent(question){
       if (question.title.length <= 3){

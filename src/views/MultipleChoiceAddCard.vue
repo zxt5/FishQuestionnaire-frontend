@@ -101,6 +101,7 @@ export default {
       this.addDialogVisible = true
     },
     editQuestion(question){
+      console.log("mul-question", question)
       if (question.isShow) {
         this.editSuccess = true
         this.finishQuestion()
@@ -137,9 +138,7 @@ export default {
             title: '请至少添加两个选项噢~'
           })
         }
-        console.log("questionForm", this.questionForm)
         if (this.questionForm.is_scoring){
-          console.log(111)
           var has_answer = false
           for (var option of this.questionForm.option_list){
             if (option.is_answer_choice){
@@ -169,6 +168,7 @@ export default {
               .then(function (response){
                 // that.reload();
                 that.editSuccess = true
+                
                 that.$notify.success({
                   title: '保存成功'
                 })
@@ -194,6 +194,7 @@ export default {
               })
               .then(function (response){
                 that.editSuccess = true
+                console.log(1111)
                 that.$notify.success({
                   title: '保存成功'
                 })
