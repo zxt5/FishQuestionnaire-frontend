@@ -87,7 +87,7 @@
                 full-icon="mdi-star"
                 half-icon="mdi-star-half-full"
                 hover
-                :length="item.option_list.length - 1"
+                :length="item.option_list.length"
                 size="30"
                 v-model="item.answer"
             ></v-rating>

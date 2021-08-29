@@ -2,7 +2,7 @@
   <div>
     <div class="questionnaire">
       <div v-if="info.type === 'vote'">
-        <h1 class="title"> 投票结果:</h1>
+        <h1 class="title"> {{htmlTitle}}投票结果:</h1>
 <!--        <p v-if="flag">hhhhh</p>-->
         <div v-for="(item, index) in info.question_list" :key="index" style="margin-top:30px;padding-left: 10px">
 
@@ -29,7 +29,7 @@
         </div>
       </div>
 
-      <h1 class="title">感谢填写!</h1>
+      <h1 class="title" v-if="info.type !== 'vote'">感谢填写!</h1>
 
       <div class="content">&nbsp;问卷到此结束，感谢您的参与！</div>
       <div class="line"></div>
