@@ -201,9 +201,10 @@
               <ul @mouseenter="mouseEnter"
                   @mouseleave="mouseLeave">
                 <li @click="cardDelete(index, item)"><v-icon small>mdi-delete-variant</v-icon>  删除</li>
-                <li @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
-                <li @click="cardDown(index, item)"><v-icon small>mdi-arrow-down-circle-outline</v-icon>  下移</li>
-                <li @click="cardUp(index, item)"><v-icon small>mdi-arrow-up-circle-outline</v-icon>  上移</li>
+                <li v-show="!isEdit" @click="cardCopy(index, item)"><v-icon small>mdi-content-copy</v-icon>  复制</li>
+                <li v-show="!isEdit" @click="cardLogical(info.question_list, index)"><v-icon small>mdi-link-variant-plus</v-icon>  逻辑</li>
+                <li v-show="!isEdit" @click="cardDown(index, item)"><v-icon small>mdi-arrow-down-circle-outline</v-icon>  下移</li>
+                <li v-show="!isEdit" @click="cardUp(index, item)"><v-icon small>mdi-arrow-up-circle-outline</v-icon>  上移</li>
               </ul>
             </div>
 
@@ -230,6 +231,17 @@
                   <span
                   v-if="item.is_scoring && (subIndex === item.answer)"
                    style="color: #F56C6C; margin-left: 20px">[正确答案]</span>
+
+                  <div v-if="subItem.related_logic_question.length" style="margin-top:15px;  font-size: 16px">
+                    <span>选择后显示:</span>
+                    <span
+                    v-for="(tquestion, index) in subItem.related_logic_question"
+                    :key="tquestion.id"
+                    >
+                   <b> 题目{{tquestion.ordering}} </b>
+                    </span>
+                  </div>
+
                 </el-radio>
               </el-radio-group>
             </template>
@@ -241,7 +253,7 @@
                 <span style="color: lightgrey">[多选题]</span>
                 <span v-if="item.is_must_answer" style="color: #F56C6C">* </span>
               </div>
-              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px">
+              <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 15px;">
                 {{item.content}}
 
               </div>
@@ -253,8 +265,17 @@
                    <span
                   v-if="item.is_scoring && subItem.is_answer_choice"
                    style="color: #F56C6C; margin-left: 20px">[正确答案]</span>
-
                 </el-checkbox>
+
+                <div v-if="subItem.related_logic_question.length" style="margin-top:0px; margin-left: 10px">
+                    <span>选择后显示:</span>
+                    <span
+                    v-for="(tquestion, index) in subItem.related_logic_question"
+                    :key="tquestion.id"
+                    >
+                   <b> 题目{{tquestion.ordering}} </b>
+                    </span>
+                  </div>
               </div>
 
             </template>
@@ -377,6 +398,7 @@
     <single-choice-add-dialog ref="single-choice"></single-choice-add-dialog>
     <multiple-choice-add-dialog ref="multiple-choice"> </multiple-choice-add-dialog>
     <position-add-dialog ref="position"></position-add-dialog> -->
+    <logical-dialog ref="logical-dialog"></logical-dialog>
     <el-backtop></el-backtop>
   </div>
 </template>
@@ -403,6 +425,7 @@ Vue.component(CollapseTransition.name, CollapseTransition)
 
 import { loadBMap } from '../assets/js/loadBMap'
 import PositionAddCard from '../components/PositionAddCard.vue'
+import LogicalDialog from '../components/LogicalDialog.vue'
 
 export default {
   components: {
@@ -410,7 +433,8 @@ export default {
         Wave, MultipleChoiceAddCard, SingleCompletionAddCard,
         MultipleCompletionAddCard,
         ScoringAddCard,draggable,
-        TitleContentDialog
+        TitleContentDialog,
+    LogicalDialog
   },
   data(){
     return {
@@ -816,7 +840,8 @@ export default {
             content:'',
             ordering: 1,
             is_answer_choice: true,
-            key: Date.now()
+            key: Date.now(),
+            related_logic_question: []
           },
         ],
         title: '',
@@ -948,6 +973,7 @@ export default {
         this.editItem = ''
         return
       }
+      this.$forceUpdate()
       const that = this;
       axios
           .delete('/api/question/' + item.id + '/',  {
@@ -977,7 +1003,14 @@ export default {
             headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
           })
           .then(function (response){
-            that.info.question_list.splice(index + 1, 0, JSON.parse(JSON.stringify(that.info.question_list[index])))
+            that.$notify.success({
+              title: '复制成功',
+            })
+            var data = JSON.parse(JSON.stringify(that.info.question_list[index]))
+            for (var option of data.option_list){
+              option.related_logic_question = []
+            }
+            that.info.question_list.splice(index + 1, 0, data)
           })
           .catch(function (error){
             that.$notify.error({
@@ -986,6 +1019,10 @@ export default {
             })
           })
     },
+    cardLogical(question_list, index){
+      this.$refs["logical-dialog"].edit(question_list, index, this.info.is_show_question_num)
+    },
+
     // 编辑最上面的标题
     editTitle(info){
       this.info.isShow = !this.info.isShow
@@ -1002,15 +1039,72 @@ export default {
       if (e.oldIndex == e.newIndex){
         return
       }
-      // 重新渲染编辑页面
-      for (let i = 0; i < this.info.question_list.length; i++){
-        var item = this.info.question_list[i]
-        // this.$refs[item.type+(e.ordering-1)][0] = item
-        if (!item.isShow) continue
-        this.$refs[item.type+i][0].questionForm = item
-      }
+
+      var l = Math.min(e.oldIndex, e.newIndex)
+      var r = Math.max(e.oldIndex, e.newIndex)
+
       var id = this.info.question_list[e.newIndex].id
+      var option_list = this.info.question_list[e.newIndex].option_list
+
+      // q往前移动 将会删除中间的所有含有q的关联 遍历中间所有选项是否含有当前题
+      // [l, r] --> 影响 [l + 1, r]
+
+      var delete_list = []
+
+      if (e.newIndex == l){
+        for (let i = l + 1; i <= r; i++){
+          var item = this.info.question_list[i]
+          for (var option of item.option_list){
+            for (var index in option.related_logic_question){ // 遍历被选中的题目的
+                if (id == option.related_logic_question[index].id){ // 含有当前选项
+                   option.related_logic_question.splice(index, 1) // 删除
+                   delete_list.push({
+                     option: option.id,
+                     question: id
+                   })
+                }
+              }
+            }
+          }
+        }
+
+      // 删除当前问题的选项之中关联的中间问题
+      if (e.newIndex == r){
+         for (var option of option_list){
+           console.log("option", option)
+            for (var index in option.related_logic_question){
+              for (let i = l ; i < r; i++){
+                var item = this.info.question_list[i]
+                // console.log(option.related_logic_question[index])
+                if (option.related_logic_question[index].id == item.id){
+                  option.related_logic_question.splice(index, 1)
+                  delete_list.push({
+                    option: option.id,
+                    question: item.id
+                  })
+                }
+            }
+          }
+        }
+      }
+
       const that = this
+      if (delete_list.length){
+          axios
+              .put('/api/question_option_logic_relation/delete_list/',{"delete_list": delete_list})
+              .then(function (response){
+                that.$notify.success({
+                  title: '自动删除冲突逻辑'
+                })
+              })
+              .catch(function (error){
+                that.$notify.error({
+                  title: '出错啦',
+                  message: '编辑失败'
+                })
+              })
+      }
+      
       axios
           .patch('/api/question/' + id + '/', {
             ordering: e.newIndex + 1,
@@ -1081,12 +1175,16 @@ export default {
                 })
               if (that.info.type == "epidemic-check-in"){
               }
+
+              //  设置填写
               for (let item of that.info.question_list) {
                 if (item.type == 'completion'){
                   item.answer = ''
                 }
                 else item.answer = []
               }
+
+              // 选项转换 便于前端绑定
               for (let item of that.info.question_list){
                 item["isShow"] = false
                 for (let i = 0; i < item.option_list.length; i++){
