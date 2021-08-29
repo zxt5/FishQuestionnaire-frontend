@@ -195,7 +195,9 @@
           @end="onEnd"
           >
           <transition-group>              
-          <div class="card"  v-for="(item, index) in info.question_list" :key="item.id ? item.id: item.key">
+          <div class="card"  v-for="(item, index) in info.question_list" :key="item.id ? item.id: item.key"
+          :id = "item.type+item.id"
+          >
             <div style="padding: 20px">
             <div class="op">
               <ul >
@@ -500,12 +502,8 @@ export default {
     ToPosition(question){
  
         this.$nextTick(_=>{
-               this.$forceUpdate()
-              var position = this.$refs[question.type+(question.ordering-1)][0]
-              console.log(position)
-        //     console.log("height",position.$el.offsetTop)
-        //     console.log(this.$refs)
-        //     window.scrollTo({"behavior":"smooth","top": position.$el.offsetTop});
+              var t = document.getElementById(question.type+question.id)
+              window.scrollTo({"behavior":"smooth","top": t.offsetTop});
         })
     },
     set_password() {
@@ -1084,6 +1082,7 @@ export default {
 
       const that = this;
       const _index = index
+      const id = item.id
       axios
           .delete('/api/question/' + item.id + '/',  {
             headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
@@ -1091,6 +1090,19 @@ export default {
           .then(function (response){
             that.info.question_list.splice(_index, 1);
             that.updateOrdering()
+
+            for (var question of that.info.question_list){
+              for (var option of question.option_list){
+                for (var index in option.related_logic_question){
+                  var rel_question = option.related_logic_question[index]
+                  if (rel_question.id == id){
+                    option.related_logic_question.splice(index, 1)
+                  }
+                }
+              }
+            }
+
+
             that.$notify.success({
                   title: '删除成功'
                 })
