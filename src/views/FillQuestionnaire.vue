@@ -614,40 +614,47 @@ export default {
         console.log(that.submit_list);
         if(that.flag === true) {
           // 提交问卷
-          axios
-              .post('/api/answer/', {
-                // ip: returnCitySN.cip,
-                // cname: returnCitySN.cname,
-                questionnaire: that.info.id,
-                answer_list: that.submit_list,
-              }, {
-                headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-              })
-              .then(function (response){
-                that.result = response.data;
-                console.log(that.result.answer_number);
-                if(that.info.type === 'exam' && that.result.is_show_answer_detail===true) {
-                  that.finish = true;
-                }
-                else {
-                  let s1 = Base64.encode('moyu' + id + 'wenjuan');
-                  let url = window.location.origin+ "/thank/" + s1;
-                  window.open(url);
-                }
-              })
-              .catch(function (error){
-                that.$notify.error({
-                  title: '好像发生了什么错误',
-                  message: error.message
+          const that = this;
+
+          this.$confirm('交卷后将无法修改答案！', '是否立即交卷？', {
+            confirmButtonText: '确认交卷',
+            cancelButtonText: '我再看看',
+            type: 'warning'
+          }).then(() => {
+            axios
+                .post('/api/answer/', {
+                  // ip: returnCitySN.cip,
+                  // cname: returnCitySN.cname,
+                  questionnaire: that.info.id,
+                  answer_list: that.submit_list,
+                }, {
+                  headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
                 })
-              })
+                .then(function (response){
+                  that.result = response.data;
+                  console.log(that.result.answer_number);
+                  if(that.info.type === 'exam' && that.result.is_show_answer_detail===true) {
+                    that.finish = true;
+                  }
+                  else {
+                    let s1 = Base64.encode('moyu' + id + 'wenjuan');
+                    let url = window.location.origin+ "/thank/" + s1;
+                    window.open(url);
+                  }
+                })
+                .catch(function (error){
+                  that.$notify.error({
+                    title: '好像发生了什么错误',
+                    message: error.message
+                  })
+                })
+          })
         }
         else {
           that.$notify.warning({
             title: '请完成所有的必选项题目!',
           })
         }
-
       }
     },
   }
