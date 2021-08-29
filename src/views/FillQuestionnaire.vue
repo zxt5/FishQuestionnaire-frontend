@@ -69,7 +69,7 @@
                     hide-details
                 ></v-checkbox>
               </div>
-              <div v-if="item.is_show_result" style="float: right;padding-left: 30px;">
+              <div v-if="item.is_show_result" style="float: right; padding-left: 30px;">
                 <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
               </div>
             </div>
@@ -131,7 +131,7 @@
             <div style="box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)">
               <div style="text-align: center;padding:10px 10px 10px 10px;">
                 <h3>试卷得分</h3>
-                <p style="margin-top: 10px">{{result.user_get_score}}分</p>
+                <p style="margin-top: 10px">{{result.user_get_score}}分/{{result.total_score}}分</p>
               </div>
             </div>
           </el-col>
@@ -139,7 +139,7 @@
             <div style="box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)">
               <div style="text-align: center; padding:10px 10px 10px 10px;">
                 <h3>做对题数</h3>
-                <p style="margin-top: 10px">{{result.user_get_score_question_cnt}}道</p>
+                <p style="margin-top: 10px">{{result.user_get_score_question_cnt}}道/{{result.total_score_question_cnt}}道</p>
               </div>
             </div>
           </el-col>

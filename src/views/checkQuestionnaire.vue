@@ -52,13 +52,19 @@
         <!--多选题展示-->
         <v-app class="choice" v-if="item.type==='multiple-choice'">
           <v-container fluid>
-            <v-checkbox
-                v-for="optionItem in item.option_list"
-                :key="optionItem.id"
-                :label="optionItem.title"
-                v-model="optionItem.is_attr_limit"
-                hide-details
-            ></v-checkbox>
+            <div style="float: left" v-for="optionItem in item.option_list">
+              <div style="float: left;min-width: 460px;max-width: 560px">
+                <v-checkbox
+                    :key="optionItem.id"
+                    :label="optionItem.title"
+                    v-model="optionItem.is_attr_limit"
+                    hide-details
+                ></v-checkbox>
+              </div>
+              <div v-if="item.is_show_result" style="float: right; padding-left: 30px;">
+                <span style="color: red;font-size: 18px">{{optionItem.answer_num}}票({{optionItem.percent_string}})</span>
+              </div>
+            </div>
           </v-container>
         </v-app>
 
