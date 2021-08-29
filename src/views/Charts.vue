@@ -7,7 +7,7 @@
     </div>
     <el-container class="main" id="pdfDom">
       <!--图像区域-->
-      <el-main style="height: fit-content" class="questionnaire">
+      <el-main style="height: fit-content; padding-top: 20px !important;" class="questionnaire">
         <el-tabs v-model="activeName" @tab-click="handleClick" style="margin-bottom: 20px;font-size: large;margin-left: 2%">
           <el-tab-pane label="统计分析" name="first"></el-tab-pane>
           <el-tab-pane label="交叉分析" name="second"></el-tab-pane>
@@ -93,7 +93,7 @@
 
           <div class="block">
             <span class="demonstration">定义行 [一般为需要分析的题目，如爱好，意愿等，限10题。]</span>
-            <div v-for="(i, index) in cross1" :key="index" style="float: left;margin-left: 18.6%;">
+            <div v-for="(i, index) in cross1" :key="index" >
               <el-select  style="margin-bottom: 20px; width: 400px" v-model="i.value" filterable placeholder="请选择">
                 <el-option
                     v-for="item in info.question_list"
@@ -109,7 +109,7 @@
           </div>
           <div class="block">
             <span class="demonstration">定义列 [一般为样本属性，如性别，年龄等，限10题。]</span>
-            <div v-for="(i, index) in cross2" :key="index" style="float: left;margin-left: 18.6%;">
+            <div v-for="(i, index) in cross2" :key="index">
               <el-select  style="margin-bottom: 20px; width: 400px" v-model="i.value" filterable placeholder="请选择">
                 <el-option
                     v-for="item in info.question_list"
@@ -751,7 +751,7 @@ export default {
 .demonstration{
   display: block;
   color: #8492a6;
-  font-size: 14px;
+  font-size: 18px !important;
   margin-bottom: 20px;
 }
 .button{

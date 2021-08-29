@@ -212,10 +212,10 @@
         <!--问卷区域-->
         <el-main style="height: fit-content" class="questionnaire">
           <!--标题区域-->
-          <div class="question-title" contenteditable="true" >
+          <div class="question-title">
             <h2>{{info.title}}</h2>
           </div>
-          <div class="intro" contenteditable="true" @input="info.content = $event.target.innerText" @blur="editTitle(info)"> {{info.content}}</div>
+          <div class="intro"> {{info.content}}</div>
 
             <el-container          
             style="display:inline">
