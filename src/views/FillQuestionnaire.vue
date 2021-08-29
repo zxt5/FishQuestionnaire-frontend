@@ -123,7 +123,7 @@
 
     <el-button v-if="finish === true" @click="getPdf()">导出PDF</el-button>
     <div v-if="finish === true" class="questionnaire" id="pdfDom">
-      <div>
+      <div style="padding: 10px">
         <h1 style="text-align: center; padding-top: 30px">{{info.title}}</h1>
         <el-row style="margin-top: 35px">
           <el-col :span="8">
@@ -198,7 +198,7 @@
                   <v-container class="px-0" fluid >
                     <!--            遍历选项-->
                     <div style="float: left;">
-                      <v-radio-group v-model="item.answer " >
+                      <v-radio-group v-model="item.answer_ordering-1" disabled>
                         <div v-for="optionItem in item.option_list">
                           <div style="float: left;min-width: 460px;max-width: 560px">
                             <v-radio
@@ -218,9 +218,10 @@
                     <div style="float: left" v-for="optionItem in item.option_list">
                       <div style="float: left;min-width: 460px;max-width: 560px">
                         <v-checkbox
+                            disabled
                             :key="optionItem.id"
                             :label="optionItem.title"
-                            v-model="optionItem.is_answer_choice"
+                            v-model="optionItem.is_user_answer"
                             hide-details
                         ></v-checkbox>
                       </div>
@@ -248,13 +249,13 @@
                 <div v-if="item.is_user_answer_right === false"
                      style="background-color: whitesmoke; border-radius: 10px;margin-top: 10px;padding: 8px">
                   <div style="color: green">正确答案：</div>
-                  <div v-if="item.type === 'single-choice' || item.type === 'multiple=choice'">
+                  <div v-if="item.type === 'single-choice' || item.type === 'multiple-choice'">
                   <span v-for="optionItem in item.option_list">
                     <span v-if="optionItem.is_answer_choice">{{optionItem.title}},</span>
                   </span>
                   </div>
                   <div v-else>
-                    <span v-for="optionItem in item.option_list">{{optionItem.content}}</span>
+                    <span v-for="optionItem in item.option_list">{{optionItem.answer}}</span>
                   </div>
                 </div>
 
@@ -281,7 +282,6 @@
         <el-button style="margin-bottom: 0 !important;" type="primary" @click="check_password">确   定</el-button>
       </div>
     </el-dialog>
-<!--    </el-dialog>-->
   </div>
 
 </template>
@@ -307,7 +307,6 @@ export default {
       timeStamp: 1,
       startTime: '',
       endTime: '',
-      // dialogVisible: true,
       password: '',
       BMap: null,
       geolocation: null, // Geolocation对象实例
@@ -318,6 +317,7 @@ export default {
       result:'',
       finish: false,
       only_show_wrong_question: false,
+      qq: 1,
     }
   },
   mounted() {
@@ -402,12 +402,14 @@ export default {
 
   },
   methods: {
+
     resetPositioning() {
       this.positioning = false
       this.location = null
       this.countDown = 30
       clearInterval(this.positioningInterval)
     },
+
     getLocation() {
       const _this = this
       _this.geolocation = new _this.BMap.Geolocation()
@@ -504,9 +506,11 @@ export default {
         })
       }
     },
+
     toIndex(){
       this.$router.push({path: '/'});
     },
+
     check_password() {
       if(this.password === this.info.password) {
         this.$notify.success({
@@ -522,6 +526,7 @@ export default {
         })
       }
     },
+
     click(id){
       let tmp;
       const that = this;
@@ -654,7 +659,6 @@ export default {
 <style scoped>
 
 .line{
-  /*width: 90%;*/
   height: 1px;
   border-top: solid 2px;
   margin-left: 30px;
