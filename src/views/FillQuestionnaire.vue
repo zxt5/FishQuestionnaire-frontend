@@ -28,8 +28,9 @@
             <span style="color: lightgrey" v-if="item.type==='single-choice'">[单选题]</span>
             <span style="color: lightgrey" v-if="item.type==='multiple-choice'">[多选题]</span>
             <span style="color: lightgrey" v-if="item.type==='completion'">[填空题]</span>
-            <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]（默认评分0）</span>
+            <span style="color: lightgrey" v-if="item.type==='scoring'">[评分题]</span>
             <span style="color: lightgrey" v-if="item.type==='position'">[定位题]</span>
+            <span style="color: #F56C6C" v-if="item.is_scoring">（{{item.question_score}}分）</span>
           </div>
         </div>
         <div style="color: dimgray ;font-size: 14px; padding-left: 17px; margin-top: 5px">
@@ -66,7 +67,7 @@
                 <v-checkbox
                     :key="optionItem.id"
                     :label="optionItem.title"
-                    v-model="optionItem.is_answer_choice"
+                    v-model="optionItem.is_attr_limit"
                     hide-details
                 ></v-checkbox>
               </div>
@@ -404,7 +405,7 @@ export default {
           if(item.type === 'multiple-choice'){
             tmp = false;
             for(let i of item.option_list){
-              if(i.is_answer_choice === true){
+              if(i.is_attr_limit === true){
                 let data = {
                   question: item.id,
                   option: i.id,
