@@ -15,7 +15,6 @@ import Thank from "../views/Thank";
 import Welcome from "../views/Welcome";
 import TypeChoose from "../views/TypeChoose";
 import ExamQuestionnairs from "../views/ExamQuestionnairs.vue"
-import ActivityQuestionnairs from "../views/ActivityQuestionnairs";
 
 Vue.use(VueRouter)
 
@@ -103,14 +102,6 @@ const routes = [
     path: '/edit/:id',
     name: 'Questionnairs',
     component: Questionnairs,
-    meta:{
-      title:'问卷编辑'
-    }
-  },
-  {
-    path: '/editActivity/:id',
-    name: 'ActivityQuestionnairs',
-    component: ActivityQuestionnairs,
     meta:{
       title:'问卷编辑'
     }

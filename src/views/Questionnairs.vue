@@ -150,8 +150,8 @@
                     :disabled="info.is_only_answer_once"
                 >
                 </el-switch>
-                <div v-if="info.is_only_answer_once" style="margin-top: 15px; padding-left: 15px">
-                  <span style="color: #a1a1a1; font-size: 15px">设置限答后，必须打开登录验证</span>
+                <div v-if="info.is_only_answer_once || this.order_type" style="margin-top: 15px; padding-left: 15px">
+                  <span style="color: #a1a1a1; font-size: 15px">设置限答或乱序后，必须打开登录验证</span>
                 </div>
               </div>
               <div style="margin-top: 15px">
@@ -160,6 +160,16 @@
                     style="float: right"
                     @change="is_answer_once"
                     v-model="info.is_only_answer_once"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949">
+                </el-switch>
+              </div>
+              <div style="margin-top: 15px">
+                <span style=" margin-top: 30px">是否开启问题乱序</span>
+                <el-switch
+                    style="float: right"
+                    @change="is_disorder"
+                    v-model="order_type"
                     active-color="#13ce66"
                     inactive-color="#ff4949">
                 </el-switch>
@@ -274,7 +284,7 @@
 
               <div
               v-if="item.is_scoring"
-               style="color: #F56C6C; margin-top:20px">正确答案: {{item.option_list[0].content}}</div>
+               style="color: #F56C6C; margin-top:20px">正确答案: {{item.answer}}</div>
             </template>
             <!--定位模板-->
             <template v-if="item.type == 'position'">
@@ -464,6 +474,7 @@ export default {
       answer: [],
       control_time: '',
       show_num: '',
+      order_type: false,
     }
   },
   methods:{
@@ -775,6 +786,31 @@ export default {
             })
           })
     },
+    is_disorder(){
+      if(this.order_type && !this.info.is_required_login){
+        this.info.is_required_login = true;
+      }
+      const that = this;
+      axios
+          .patch('/api/questionnaire/' + that.info.id + '/', {
+            order_type: this.order_type ? 'disorder' : 'order',
+            is_required_login: this.info.is_required_login,
+          }, {
+            headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+          })
+          .then(function (response){
+            that.$notify.success({
+              title: '好耶',
+              message: '设置成功'
+            })
+          })
+          .catch(function (error){
+            that.$notify.error({
+              title: '出错啦',
+              message: '设置失败'
+            })
+          })
+    },
     check(){
       let s1 = Base64.encode('moyu' + this.$route.params.id + 'wenjuan');
       let url = window.location.origin+ "/check/" + s1; //预览链接
@@ -845,7 +881,9 @@ export default {
       var temp = this.$refs[questionType+index][0]
 
       if (this.editItem && this.editItem != temp){
-        this.$notify.error("请完成之前题目编辑")
+        this.$notify.error({
+          title: "请完成当前题目的编辑!"
+        })
         this.$nextTick(_=>{
             window.scrollTo({"behavior":"smooth","top": this.editItem.$el.offsetTop - 300});
         })
@@ -853,7 +891,9 @@ export default {
       }
 
       if (this.isEdit && !item.isShow){
-        this.$notify.error("请完成之前题目编辑")
+        this.$notify.error({
+          title: "请完成当前题目的编辑!"
+        })
         this.$nextTick(_=>{
             var el = document.getElementById("app")
             window.scrollTo({"behavior":"smooth","top": el.offsetHeight});
@@ -883,7 +923,9 @@ export default {
     // 上移
     cardUp(index, item){
       if (this.isEdit){
-        return this.$notify.error('请完成当前编辑')
+        return this.$notify.error({
+          title: "请完成当前题目的编辑!"
+        })
       }
       if (index === 0){
         return this.$notify.error("已经到顶了啊");
@@ -913,7 +955,9 @@ export default {
     // 下移
     cardDown(index, item){
       if (this.isEdit){
-        return this.$notify.error('请完成当前编辑')
+        return this.$notify.error({
+          title: "请完成当前题目的编辑!"
+        })
       }
       if (index === this.info.question_list.length - 1){
         return this.$notify.error("不能继续往下了")
@@ -967,7 +1011,9 @@ export default {
     // 复制
     cardCopy(index, item){
       if (this.isEdit){
-        return this.$notify.error('请完成当前编辑')
+        return this.$notify.error({
+          title: "请完成当前题目的编辑!"
+        })
       }
       const that = this;
       axios
@@ -1060,7 +1106,8 @@ export default {
               that.info = response.data;
               // that.show_num = response.data.is_show_question_num;
               that.control_time = response.data.is_end_time || response.data.is_start_time;
-              that.info.isShow = []
+              that.info.isShow = [];
+              that.order_type = response.data.order_type === 'disorder';
               console.log(that.info);
               if('' + that.info.author.username !== '' + that.userLogin) {
                 that.$router.push({path: '/index'});
