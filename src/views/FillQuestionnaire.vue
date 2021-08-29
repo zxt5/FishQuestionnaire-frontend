@@ -342,72 +342,134 @@ export default {
     s1 = s1.substring(4,s1.length - 7);
     authorization()
       .then(function (res){
-        axios
-            .get('/api/questionnaire/' + parseInt(s1) + '/')
-            .then(function (response) {
-              that.info = response.data;
-              if(that.info.is_required_login && !res[0]){
-                that.$store.commit('flag_true');
-                that.$store.commit('toUrl', that.$route.params.text);
-                that.$notify.warning({
-                  title: '请先登录',
-                  message: '发布者设置了登陆验证'
-                })
-                that.$router.push({path: '/login'});
-              }
-              // console.log(that.info);
-              if(that.info.is_start_time) {
-                var time = that.info.start_time;
-                var date = new Date(time).toJSON();
-                // console.log(date);
-                var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
-                // console.log(str);
-                that.startTime = str;
-                if(Date.parse(that.info.start_time) > Date.now()) {
-                  that.timeStamp = 2;
-                }
-              }
-              if(that.info.is_end_time) {
-                var time = that.info.end_time;
-                var date = new Date(time).toJSON();
-                // console.log(date);
-                var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
-                // console.log(str);
-                that.endTime = str;
-                if(Date.parse(that.info.end_time) < Date.now()) {
-                  that.timeStamp = 3;
-                }
-              }
-              if(that.info.is_only_answer_once){
-                const _that = that;
-                axios
-                    .put('/api/answer/check_answer/', {
-                      id: _that.info.id
-                    }, {
-                      headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-                    })
-                    .then(function (resp){
-                      console.log(resp.data)
-                      if(resp.data.has_answer === true){
-                        _that.timeStamp = 4;
-                      }
-                    })
-                    .catch(function (error){
-                      _that.$notify.error({
-                        title: '出错啦',
-                        message: '限制失败'
-                      })
-                    })
-              }
-              console.log(that.info.is_only_answer_once)
-              console.log(that.timeStamp);
-            })
-            .catch(function (error){
-              that.$notify.error({
-                title: '好像发生了什么错误',
-                message: error.message
+        if(res[0]){
+          axios
+              .get('/api/questionnaire/' + parseInt(s1) + '/fill_or_preview/', {
+                headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
               })
-            })
+              .then(function (response) {
+                that.info = response.data;
+                if(that.info.is_start_time) {
+                  var time = that.info.start_time;
+                  var date = new Date(time).toJSON();
+                  // console.log(date);
+                  var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
+                  // console.log(str);
+                  that.startTime = str;
+                  if(Date.parse(that.info.start_time) > Date.now()) {
+                    that.timeStamp = 2;
+                  }
+                }
+                if(that.info.is_end_time) {
+                  var time = that.info.end_time;
+                  var date = new Date(time).toJSON();
+                  // console.log(date);
+                  var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
+                  // console.log(str);
+                  that.endTime = str;
+                  if(Date.parse(that.info.end_time) < Date.now()) {
+                    that.timeStamp = 3;
+                  }
+                }
+                if(that.info.is_only_answer_once){
+                  const _that = that;
+                  axios
+                      .put('/api/answer/check_answer/', {
+                        id: _that.info.id
+                      }, {
+                        headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+                      })
+                      .then(function (resp){
+                        console.log(resp.data)
+                        if(resp.data.has_answer === true){
+                          _that.timeStamp = 4;
+                        }
+                      })
+                      .catch(function (error){
+                        _that.$notify.error({
+                          title: '出错啦',
+                          message: '限制失败'
+                        })
+                      })
+                }
+              })
+              .catch(function (error){
+                that.$notify.error({
+                  title: '好像发生了什么错误',
+                  message: error.response
+                })
+                // console.log(error.response)
+              })
+        }
+        else{
+          axios
+              .get('/api/questionnaire/' + parseInt(s1) + '/')
+              .then(function (response) {
+                that.info = response.data;
+                if(that.info.is_required_login){
+                  that.$store.commit('flag_true');
+                  that.$store.commit('toUrl', that.$route.params.text);
+                  that.$notify.warning({
+                    title: '请先登录',
+                    message: '发布者设置了登陆验证'
+                  })
+                  that.$router.push({path: '/login'});
+                }
+                // console.log(that.info);
+                if(that.info.is_start_time) {
+                  var time = that.info.start_time;
+                  var date = new Date(time).toJSON();
+                  // console.log(date);
+                  var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
+                  // console.log(str);
+                  that.startTime = str;
+                  if(Date.parse(that.info.start_time) > Date.now()) {
+                    that.timeStamp = 2;
+                  }
+                }
+                if(that.info.is_end_time) {
+                  var time = that.info.end_time;
+                  var date = new Date(time).toJSON();
+                  // console.log(date);
+                  var str = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/,' ');
+                  // console.log(str);
+                  that.endTime = str;
+                  if(Date.parse(that.info.end_time) < Date.now()) {
+                    that.timeStamp = 3;
+                  }
+                }
+                if(that.info.is_only_answer_once){
+                  const _that = that;
+                  axios
+                      .put('/api/answer/check_answer/', {
+                        id: _that.info.id
+                      }, {
+                        headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+                      })
+                      .then(function (resp){
+                        console.log(resp.data)
+                        if(resp.data.has_answer === true){
+                          _that.timeStamp = 4;
+                        }
+                      })
+                      .catch(function (error){
+                        _that.$notify.error({
+                          title: '出错啦',
+                          message: '限制失败'
+                        })
+                      })
+                }
+                console.log(that.info.is_only_answer_once)
+                console.log(that.timeStamp);
+              })
+              .catch(function (error){
+                // that.$notify.error({
+                //   title: '好像发生了什么错误',
+                //   message: error.response
+                // })
+                console.log(error.response)
+              })
+        }
       })
 
   },
