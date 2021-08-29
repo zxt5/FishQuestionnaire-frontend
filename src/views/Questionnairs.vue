@@ -228,7 +228,7 @@
                 >
                   {{subItem.title}}
                   <span
-                  v-if="item.is_scoring && (subIndex == item.answer)"
+                  v-if="item.is_scoring && (subIndex === item.answer)"
                    style="color: #F56C6C; margin-left: 20px">[正确答案]</span>
                 </el-radio>
               </el-radio-group>
