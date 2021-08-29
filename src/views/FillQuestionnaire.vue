@@ -2,12 +2,12 @@
   <div>
 
 <!--    倒计时-->
-    <div v-if="finish === false && is_open && info.is_locked===false && timeStamp!==2 && timeStamp!==3 && info.is_end_time"
+    <a-affix v-if="finish === false && is_open && info.is_locked===false && timeStamp === 1 && info.is_end_time"
         style="text-align: center;">
-      <div style="padding: 20px;background-color: lightskyblue;font-size: 22px;color: blue">
+      <div style="padding: 20px;background-color: #fdf1f1; font-size: 22px; color: #ff0000">
         <h3>考试剩余时间：{{count_down}}</h3>
       </div>
-    </div>
+    </a-affix>
 
     <div v-if="finish === false">
       <div class="questionnaire" v-if="info.is_locked === false">
@@ -54,7 +54,7 @@
                 <div v-for="optionItem in item.option_list">
                   <div style="float: left;min-width: 460px;max-width: 560px">
                     <v-radio
-                        style="float: left"
+                        style="float: left; margin-bottom: 8px"
                         :key="optionItem.id"
                         :label="optionItem.title "
                         :disabled="optionItem.limit_answer_number - optionItem.answer_num <= 0 && optionItem.is_limit_answer"
@@ -218,9 +218,9 @@
                     <div style="float: left;">
                       <v-radio-group v-model="item.answer_ordering-1" disabled>
                         <div v-for="optionItem in item.option_list">
-                          <div style="float: left;min-width: 460px;max-width: 560px">
+                          <div style="float: left;min-width: 460px;max-width: 560px;">
                             <v-radio
-                                style="float: left"
+                                style="float: left; margin-bottom: 8px"
                                 :key="optionItem.id"
                                 :label="optionItem.title "
                             ></v-radio>
@@ -1007,6 +1007,9 @@ h4{
   margin-top: 0 !important;
   padding-top: 0 !important;
   margin-bottom: 8px;
+}
+.v-input--radio-group--column{
+  margin-bottom: 8px !important;
 }
 
 .container{
