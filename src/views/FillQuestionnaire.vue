@@ -417,8 +417,13 @@ export default {
                       })
                     })
               }
-              console.log(that.info.is_only_answer_once)
+              console.log(that.info.is_only_answer_once);
               console.log(that.timeStamp);
+              if(that.timeStamp!==2&&that.timeStamp!==3) {
+                console.log("hhhhhh");
+                console.log(that.timeStamp);
+                _this.Djs_time();
+              }
             })
             .catch(function (error){
               // that.$notify.error({
@@ -429,7 +434,7 @@ export default {
             })
       })
 
-      _this.Djs_time();
+
 
 
   },
@@ -676,7 +681,7 @@ export default {
         }
         console.log(that.submit_list);
         console.log(that.rightTime);
-        if(that.flag === true || that.rightTime > 0) {
+        if(that.flag === true || that.rightTime < 0 ) {
           // 提交问卷
           const that = this;
             axios
