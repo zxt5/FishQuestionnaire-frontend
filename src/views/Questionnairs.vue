@@ -935,8 +935,7 @@ export default {
           })
     },
     check(){
-      let s1 = Base64.encode('moyu' + this.$route.params.id + 'wenjuan');
-      let url = window.location.origin+ "/check/" + s1; //预览链接
+      let url = window.location.origin+ "/check/" + this.$route.params.text; //预览链接
       window.open(url);
     },
     Finish(){
