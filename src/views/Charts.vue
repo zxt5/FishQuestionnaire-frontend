@@ -8,9 +8,9 @@
     <el-container class="main" id="pdfDom">
       <!--图像区域-->
       <el-main style="height: fit-content; padding-top: 20px !important;" class="questionnaire">
-        <el-tabs v-model="activeName" @tab-click="handleClick" style="margin-bottom: 20px;font-size: large;margin-left: 2%">
-          <el-tab-pane label="统计分析" name="first"></el-tab-pane>
-          <el-tab-pane label="交叉分析" name="second"></el-tab-pane>
+        <el-tabs v-model="activeName" @tab-click="handleClick" style="margin-bottom: 20px;font-size: 20px;margin-left: 2%">
+          <el-tab-pane style="font-size: larger" label="统计分析" name="first"></el-tab-pane>
+          <el-tab-pane style="font-size: larger" label="交叉分析" name="second"></el-tab-pane>
         </el-tabs>
         <!--统计分析-->
         <!--折叠面板-->
@@ -592,13 +592,23 @@ export default {
             }
           },
           xAxis: {
+            type: 'category',
             data: this.nums[index].data,
+            axisLabel: {
+              interval: 0
+            }
           },
-          yAxis: {},
+          yAxis: {
+            type: 'value'
+          },
           series: [{
             // name: '销量',
             type: 'bar',
             data: this.nums[index].num,
+            showBackground: true,
+            backgroundStyle: {
+              color: 'rgba(180, 180, 180, 0.2)'
+            }
           }]
         }
       }
@@ -734,7 +744,7 @@ export default {
   width: 70%;
   left: 50%;
   height: 100%;
-  margin-top: 20pt;
+  margin-top: 10pt;
   transform: translate(-50%);
 }
 .choiceinput{
