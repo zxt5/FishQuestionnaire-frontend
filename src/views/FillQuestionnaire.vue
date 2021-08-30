@@ -897,7 +897,9 @@ export default {
       else{
         this.submit_list.splice(0, this.submit_list.length);
         this.flag = true;
+        let it = -1;
         for(let item of this.info.question_list){
+          it ++;
           if(item.type === 'multiple-choice'){
             tmp = false;
             for(let i of item.option_list){
@@ -910,7 +912,7 @@ export default {
                 tmp = true;
               }
             }
-            if(tmp === false && item.is_must_answer) {
+            if(tmp === false && item.is_must_answer && that.Show[it]) {
               that.flag = false;
               console.log('多选')
             }
@@ -927,7 +929,7 @@ export default {
                 that.submit_list.push(data);
               }
             }
-            if(tmp === false && item.is_must_answer) {
+            if(tmp === false && item.is_must_answer && that.Show[it]) {
               that.flag = false;
               console.log('单选 | 评分')
             }
@@ -944,13 +946,13 @@ export default {
                 that.submit_list.push(data);
               }
             }
-            if(tmp === false && item.is_must_answer) {
+            if(tmp === false && item.is_must_answer && that.Show[it]) {
               that.flag = false;
               console.log('单选 | 评分')
             }
           }
           else if(item.type === 'completion'){
-            if(item.answer === '' && item.is_must_answer) {
+            if(item.answer === '' && item.is_must_answer && that.Show[it]) {
               that.flag = false;
               console.log('填空')
             }
@@ -964,7 +966,7 @@ export default {
             }
           }
           else if(item.type === 'position'){
-            if(that.location === null && item.is_must_answer) {
+            if(that.location === null && item.is_must_answer && that.Show[it]) {
               that.flag = false;
               console.log('定位')
             }
