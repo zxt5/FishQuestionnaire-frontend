@@ -193,13 +193,13 @@ export default {
           }
         }
         const that = this;
-        if (that.questionForm.is_scoring){
-          for (var option in that.questionForm.option_list){
-            that.questionForm.option_list[option].is_answer_choice = false
-          }
-          var index = that.questionForm.answer
-          that.questionForm.option_list[index].is_answer_choice = true
-        }
+        // if (that.questionForm.is_scoring){
+        //   for (var option in that.questionForm.option_list){
+        //     that.questionForm.option_list[option].is_answer_choice = false
+        //   }
+        //   var index = that.questionForm.answer
+        //   that.questionForm.option_list[index].is_answer_choice = true
+        // }
 
         let numFlag = true;
         if (that.questionForm.is_limit_answer){
