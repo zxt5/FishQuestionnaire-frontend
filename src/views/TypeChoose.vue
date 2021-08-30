@@ -94,39 +94,40 @@ export default {
           subtitle: '点击 CREATE 创建',
           type: 'normal',
           show: false,
-          content: '这是普通问卷的模板'
+          content: '最基础的问卷类型，包含单选、多选、填空及评分题型。简约好用是我们的初衷，能够满足大部分问卷的需求'
         },
         {
           src: 'https://www.wjx.cn/images/newimg/pic-2/vote@2x.png',
           title: '投票问卷',
-          subtitle: '预览模板',
+          subtitle: '点击 CREATE 创建',
           type: 'vote',
           show: false,
-          content: '这是投票问卷的模板'
+          content: '无需人工计票，实时更新和展示选项对应的票数和结果'
         },
         {
           src: 'https://www.wjx.cn/images/newimg/pic-2/form@2x.png',
           title: '报名问卷',
-          subtitle: '预览模板',
+          subtitle: '点击 CREATE 创建',
           type: 'signup',
           show: false,
-          content: '这是报名问卷的模板'
+          content: '对问卷和问题选项进行限额，踊跃报名活动，机会先到先得'
         },
         {
           src: 'https://www.wjx.cn/images/newimg/pic-2/exam@2x.png',
           title: '考试问卷',
-          subtitle: '预览模板',
+          subtitle: '点击 CREATE 创建',
           type: 'exam',
           show: false,
-          content: '这是考试问卷的模板'
+          content: '“考试开始，请考生开始答题”，系统自动评分，答案解析一键生成\n' +
+              '\n'
         },
         {
           src: 'https://www.wjx.cn/images/newimg/pic-2/360-evaluate@2x.png',
           title: '健康打卡',
-          subtitle: '预览模板',
+          subtitle: '点击 CREATE 创建',
           type: 'epidemic-check-in',
           show: false,
-          content: '这是健康打卡的模板'
+          content: '疫情防控不可懈怠，健康你我从按时打卡做起'
         },
       ]
     }

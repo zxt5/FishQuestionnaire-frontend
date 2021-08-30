@@ -139,7 +139,7 @@
                 </div>
               </div>
               <!--            问卷设置限额-->
-              <div style="margin-top: 15px" v-if="type === 'vote'">
+              <div style="margin-top: 15px" v-if="type === 'signup'">
                 <span style="margin-top: 30px">设定答卷限额</span>
                 <el-switch
                     style="float: right"
