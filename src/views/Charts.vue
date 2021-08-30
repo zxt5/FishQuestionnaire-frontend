@@ -548,6 +548,13 @@ export default {
           // data: ['Direct', 'Mail Ad', 'Affiliate Ad', 'Video Ad', 'Search Engine']
           data: this.crossName_x[index],
         },
+        toolbox: {
+          show : true,
+          feature : {
+            mark : {show: true},
+            saveAsImage : {show: true}
+          }
+        },
         grid: {
           left: '3%',
           right: '4%',
@@ -577,6 +584,13 @@ export default {
           legend: {
             data:['数量']
           },
+          toolbox: {
+            show : true,
+            feature : {
+              mark : {show: true},
+              saveAsImage : {show: true}
+            }
+          },
           xAxis: {
             data: this.nums[index].data,
           },
@@ -602,6 +616,13 @@ export default {
             orient: 'vertical',
             left: 'left',
           },
+          toolbox: {
+            show : true,
+            feature : {
+              mark : {show: true},
+              saveAsImage : {show: true}
+            }
+          },
           series: [
             {
               // name: '访问来源',
@@ -626,6 +647,13 @@ export default {
           legend: {
             top: '5%',
             left: 'center'
+          },
+          toolbox: {
+            show : true,
+            feature : {
+              mark : {show: true},
+              saveAsImage : {show: true}
+            }
           },
           series: [
             {
@@ -668,6 +696,13 @@ export default {
           legend: {
             // data: ['Direct', 'Mail Ad', 'Affiliate Ad', 'Video Ad', 'Search Engine']
             data: this.crossName_x[index],
+          },
+          toolbox: {
+            show : true,
+            feature : {
+              mark : {show: true},
+              saveAsImage : {show: true}
+            }
           },
           grid: {
             left: '3%',
