@@ -147,6 +147,7 @@ export default {
         }
         const that = this;
         this.questionForm.option_list[0].title = '正确答案';
+        this.questionForm.option_list[0].answer = this.questionForm.answer;
         if(!this.flag){
           let s1 = that.$route.params.text;
           s1 = Base64.decode(s1);
@@ -154,7 +155,7 @@ export default {
           axios
               .post('/api/question/', {
                 option_list: that.questionForm.option_list,
-                answer: that.questionForm.answer,
+                // answer: that.questionForm.answer,
                 title: that.questionForm.title,
                 content: that.questionForm.content,
                 type: that.questionForm.type,
@@ -194,7 +195,7 @@ export default {
           axios
               .patch('/api/question/' + that.flag + '/', {
                 option_list: that.questionForm.option_list,
-                answer: that.questionForm.answer,
+                // answer: that.questionForm.answer,
                 title: that.questionForm.title,
                 content: that.questionForm.content,
                 type: that.questionForm.type,

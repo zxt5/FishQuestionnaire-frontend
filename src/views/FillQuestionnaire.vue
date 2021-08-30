@@ -98,7 +98,7 @@
           <!--填空题展示-->
           <v-app class="choice" v-if="item.type==='completion'">
             <v-text-field
-                v-model="item.option_list[0].answer"
+                v-model="item.answer"
                 label="请在此输入答案~"
                 single-line
             ></v-text-field>
@@ -501,27 +501,27 @@ export default {
                     that.timeStamp = 3;
                   }
                 }
-                if(that.info.is_only_answer_once){
-                  const _that = that;
-                  axios
-                      .put('/api/answer/check_answer/', {
-                        id: _that.info.id
-                      }, {
-                        headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
-                      })
-                      .then(function (resp){
-                        console.log(resp.data)
-                        if(resp.data.has_answer === true){
-                          _that.timeStamp = 4;
-                        }
-                      })
-                      .catch(function (error){
-                        _that.$notify.error({
-                          title: '出错啦',
-                          message: '限制失败'
-                        })
-                      })
-                }
+                // if(that.info.is_only_answer_once){
+                //   const _that = that;
+                //   axios
+                //       .put('/api/answer/check_answer/', {
+                //         id: _that.info.id
+                //       }, {
+                //         headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
+                //       })
+                //       .then(function (resp){
+                //         console.log(resp.data)
+                //         if(resp.data.has_answer === true){
+                //           _that.timeStamp = 4;
+                //         }
+                //       })
+                //       .catch(function (error){
+                //         _that.$notify.error({
+                //           title: '出错啦',
+                //           message: '限制失败'
+                //         })
+                //       })
+                // }
                 if(that.info.is_limit_answer) {
                   let total = that.info.limit_answer_number;
                   let num = that.info.answer_num;
@@ -951,7 +951,7 @@ export default {
             }
           }
           else if(item.type === 'completion'){
-            if(item.option_list[0].answer === '' && item.is_must_answer) {
+            if(item.answer === '' && item.is_must_answer) {
               that.flag = false;
               console.log('填空')
             }
@@ -959,7 +959,7 @@ export default {
               let data = {
                 question: item.id,
                 option: item.option_list[0].id,
-                content: item.option_list[0].answer,
+                content: item.answer,
               };
               that.submit_list.push(data);
             }

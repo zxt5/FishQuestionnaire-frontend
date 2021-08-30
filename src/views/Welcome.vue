@@ -98,7 +98,7 @@
           <p class="sub" style="font-size: 2rem; font-weight: 400">
           调查问卷<br/>
           </p>
-            <p class="sub">这里是普通问卷的介绍这里是普通问卷的介绍</p>
+            <p class="sub">最基础的问卷类型，包含单选、多选、填空及评分题型。简约好用是我们的初衷，能够满足大部分问卷的需求</p>
           </div>
         </div>
       </div>
@@ -114,7 +114,7 @@
           <p class="sub" style="font-size: 2rem; font-weight: 400">
           投票问卷<br/>
           </p>
-            <p class="sub">这里是投票问卷的介绍</p>
+            <p class="sub">无需人工计票，实时更新和展示选项对应的票数和结果</p>
           </div>
         </div>
         <div class="block">
@@ -127,7 +127,7 @@
           <p class="sub" style="font-size: 2rem; font-weight: 400">
           报名问卷<br/>
           </p>
-            <p class="sub">这里是报名问卷的介绍</p>
+            <p class="sub">对问卷和问题选项进行限额，踊跃报名活动，机会先到先得 </p>
           </div>
         </div>
       </div>
@@ -143,7 +143,7 @@
           <p class="sub" style="font-size: 2rem; font-weight: 400">
           考试问卷<br/>
           </p>
-            <p class="sub">这里是考试问卷的介绍</p>
+            <p class="sub">“考试开始，请考生开始答题”，系统自动评分，答案解析一键生成</p>
           </div>
         </div>
         <div class="block">
@@ -156,7 +156,7 @@
           <p class="sub" style="font-size: 2rem; font-weight: 400">
           健康打卡<br/>
           </p>
-            <p class="sub">这里是打卡问卷的介绍</p>
+            <p class="sub">疫情防控不可懈怠，健康你我从按时打卡做起</p>
           </div>
         </div>
       </div>
@@ -233,10 +233,10 @@ export default {
   /*margin-bottom: 40px;*/
   /*margin-right: auto;*/
   /*margin-left: auto;*/
-  max-width: 568px;
+  max-width: 200px;
 }
 .img{
-  vertical-align: middle;
+  vertical-align: bottom;
 }
 h2{
   color: #fff;
