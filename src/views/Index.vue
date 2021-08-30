@@ -58,6 +58,7 @@ import Questionnaire from "../components/Questionnaire";
 import RecycleBin from "../components/RecycleBin";
 import axios from "axios";
 import authorization from "@/utils/authorization";
+import {Base64} from "js-base64";
 export default {
   name: "Index",
   components: {Questionnaire, Header},
@@ -129,7 +130,8 @@ export default {
                   .then(function (response){
                     console.log(response.data);
                     that.dialog=false;
-                    that.$router.push({path: '/edit/' + response.data.id});
+                    let s1 = Base64.encode('moyu' + response.data.id + 'wenjuan')
+                    that.$router.push({path: '/edit/' + s1});
                   }).catch(function (error){
                 that.dialog=false;
                 that.$notify.error({

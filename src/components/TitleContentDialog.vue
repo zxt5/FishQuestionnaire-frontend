@@ -29,6 +29,7 @@
 <script>
 
 import axios from "axios";
+import {Base64} from "js-base64";
 
 export default {
   inject: ['reload'],
@@ -88,8 +89,11 @@ export default {
             });
             this.addDialogVisible = false;
             const that = this;
+            let s1 = that.$route.params.text;
+            s1 = Base64.decode(s1);
+            s1 = s1.substring(4,s1.length - 7);
             axios
-                .patch('/api/questionnaire/'+ that.$route.params.id+'/', {
+                .patch('/api/questionnaire/'+ parseInt(s1)+'/', {
                   title: that.questionForm.title,
                   content: that.questionForm.content,
                 })

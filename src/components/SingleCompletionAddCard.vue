@@ -47,6 +47,7 @@
 <script>
 
 import axios from "axios";
+import {Base64} from "js-base64";
 
 export default {
   // inject: ['reload'],
@@ -147,6 +148,9 @@ export default {
         const that = this;
         this.questionForm.option_list[0].title = '正确答案';
         if(!this.flag){
+          let s1 = that.$route.params.text;
+          s1 = Base64.decode(s1);
+          s1 = s1.substring(4,s1.length - 7);
           axios
               .post('/api/question/', {
                 option_list: that.questionForm.option_list,
@@ -155,7 +159,7 @@ export default {
                 content: that.questionForm.content,
                 type: that.questionForm.type,
                 ordering: that.questionForm.ordering,
-                questionnaire: that.$route.params.id,
+                questionnaire: parseInt(s1),
                 is_must_answer: that.questionForm.is_must_answer,
                 is_show_result: that.questionForm.is_show_result,
                 is_scoring: that.questionForm.is_scoring,
@@ -184,6 +188,9 @@ export default {
               })
         }
         else{
+          let s1 = that.$route.params.text;
+          s1 = Base64.decode(s1);
+          s1 = s1.substring(4,s1.length - 7);
           axios
               .patch('/api/question/' + that.flag + '/', {
                 option_list: that.questionForm.option_list,
@@ -192,7 +199,7 @@ export default {
                 content: that.questionForm.content,
                 type: that.questionForm.type,
                 ordering: that.questionForm.ordering,
-                questionnaire: that.$route.params.id,
+                questionnaire: parseInt(s1),
                 is_must_answer: that.questionForm.is_must_answer,
                 is_show_result: that.questionForm.is_show_result,
                 is_scoring: that.questionForm.is_scoring,
