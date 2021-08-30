@@ -100,7 +100,7 @@ const routes = [
     }
   },
   {
-    path: '/edit/:id',
+    path: '/edit/:text',
     name: 'Questionnairs',
     component: Questionnairs,
     meta:{

@@ -139,7 +139,8 @@ export default {
     },
     toEdit(item){
       if(item.answer_num === 0){
-        this.$router.push({path: '/edit/' + item.id})
+        let s1 = Base64.encode('moyu' + item.id + 'wenjuan')
+        this.$router.push({path: '/edit/' + s1});
       }
       else{
         // this.$notify.warning({

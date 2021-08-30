@@ -357,6 +357,7 @@ export default {
   data(){
 
     return {
+      myID:null,
       isEdit: false, // 当前是否处于编辑状态
       editItem: '',  // 编辑的元素
       BMap: null,
@@ -667,7 +668,7 @@ export default {
         title: '',
         content: '',
         type: questionType,
-        questionnaire: this.$route.params.id,
+        questionnaire: this.myID,
         is_must_answer: false,
         is_show_result: false,
         isShow: false,
@@ -897,12 +898,16 @@ export default {
     const that = this;
     authorization().then(function (response) {
       if(response[0]){
+        let s1 = that.$route.params.text;
+        s1 = Base64.decode(s1);
+        s1 = s1.substring(4,s1.length - 7);
         axios
-            .get('/api/questionnaire/' + that.$route.params.id, {
+            .get('/api/questionnaire/' + parseInt(s1), {
               headers: {Authorization: 'Bearer ' + localStorage.getItem('access.myblog')}
             })
             .then(function (response) {
               that.info = response.data;
+              that.myID = that.info.id;
               // that.show_num = response.data.is_show_question_num;
               that.control_time = response.data.is_end_time || response.data.is_start_time;
               that.info.isShow = []
