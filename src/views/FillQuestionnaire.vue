@@ -21,8 +21,7 @@
         <div class="line" v-if="timeStamp!==1"></div>
         <el-button v-if="timeStamp!==1" type="primary" @click="toIndex">确定</el-button>
 
-
-        <div v-if="timeStamp" class="content">&nbsp;{{info.content}}</div>
+        <div v-if="timeStamp===1" class="content">&nbsp;{{info.content}}</div>
         <!--      <div class="line"></div>-->
         <el-divider v-if="timeStamp===1"/>
         <div v-if="timeStamp===1&&Show[index]" class="question_block" v-for="(item, index) in info.question_list" :key="index">
