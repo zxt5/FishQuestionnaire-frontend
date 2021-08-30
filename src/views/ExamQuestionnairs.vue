@@ -834,7 +834,7 @@ export default {
     },
     // 编辑最上面的标题
     editTitle(info){
-      this.info.isShow = !this.info.isShow
+      // this.info.isShow = !this.info.isShow
       this.$refs["title-content-dialog"].edit(info)
     },
     onStart() {
