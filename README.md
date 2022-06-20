@@ -1,7 +1,8 @@
 # Moyu-frontend
 
-在线演示链接：http://49.233.52.139/
+visit our website here：http://49.233.52.139/
 
+Check the backend repository here: https://github.com/zxt539/FishQuestionnaire-backend .
 
 ## Project setup
 ```
