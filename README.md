@@ -1,6 +1,8 @@
-# Moyu-frontend
+# Fish-frontend
 
-visit our website here：http://49.233.52.139/
+Fish Questionnaire, a website provide comprehensive services in terms of questionnaires.
+
+have a try: http://49.233.52.139/ , maybe take some time to load data fist time.
 
 Check the backend repository here: https://github.com/zxt539/FishQuestionnaire-backend .
 
